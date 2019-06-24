@@ -1,0 +1,28 @@
+{
+  "properties": [
+    {
+      "name": "swagger.apis",
+      "type": "java.lang.String",
+      "description": "scanner packages",
+      "defaultValue": "com"
+    },
+    {
+      "name": "swagger.desc",
+      "type": "java.lang.String",
+      "description": "this service name desc",
+      "defaultValue": "http在线接口文档."
+    },
+    {
+      "name": "swagger.name",
+      "type": "java.lang.String",
+      "description": "doc title",
+      "defaultValue": "接口文档."
+    },
+    {
+      "name": "swagger.version",
+      "type": "java.lang.String",
+      "description": "the doc version",
+      "defaultValue": "1.0.0"
+    }
+  ]
+}

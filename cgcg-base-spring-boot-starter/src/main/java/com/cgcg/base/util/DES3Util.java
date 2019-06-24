@@ -1,24 +1,25 @@
 package com.cgcg.base.util;
 
 import com.alibaba.fastjson.JSONObject;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
+import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.TreeMap;
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class DES3Util {
 
-public class DES3Util {
-
+    private static final String CHARSET_NAME = "UTF-8";
     // 定义加密算法，DESede即3DES
-    private static final String Algorithm = "DESede";
-    //    private static final String THREEDES_KEY = "Fwxq1v0Fucxd1FathVKZYsrK";
+    private static final String ALGORITHM = "DESede";
+
     private static final String THREEDES_KEY = "20b6252cabfd3415";
 
     // MD5
@@ -32,8 +33,8 @@ public class DES3Util {
 
         StringBuilder buf = new StringBuilder();
 
-        for (int offset = 0; offset < output.length; offset++) {
-            i = output[offset];
+        for (byte b : output) {
+            i = b;
 
             if (i < 0) {
                 i += 256;
@@ -52,24 +53,17 @@ public class DES3Util {
      * 加密方法
      *
      * @param src 源数据的字节数组
-     * @return
      */
     public static String encryptMode(String src) {
         try {
-            String key = THREEDES_KEY;
-            byte[] targetSrc = src.getBytes("utf-8");
+            byte[] targetSrc = src.getBytes(CHARSET_NAME);
             // 生成密钥
-            SecretKey deskey = new SecretKeySpec(build3DesKey(key), Algorithm);
+            SecretKey deskey = new SecretKeySpec(build3DesKey(THREEDES_KEY), ALGORITHM);
             // 实例化Cipher
-            Cipher cipher = Cipher.getInstance(Algorithm);
+            Cipher cipher = Cipher.getInstance(ALGORITHM);
             cipher.init(Cipher.ENCRYPT_MODE, deskey);
             return Base64Util.encode(cipher.doFinal(targetSrc));
-        } catch (NoSuchAlgorithmException e1) {
-            e1.printStackTrace();
-        } catch (javax.crypto.NoSuchPaddingException e2) {
-            e2.printStackTrace();
-        } catch (Exception e3) {
-            e3.printStackTrace();
+        } catch (Exception ignored) { //NOSONAR
         }
         return null;
     }
@@ -78,22 +72,16 @@ public class DES3Util {
      * 解密函数
      *
      * @param src 密文的字节数组
-     * @return
      */
     public static String decryptMode(String src) {
         try {
-            String key = THREEDES_KEY;
             byte[] targetSrc = Base64Util.decode(src);
-            SecretKey deskey = new SecretKeySpec(build3DesKey(key), Algorithm);
-            Cipher c1 = Cipher.getInstance(Algorithm);
+            SecretKey deskey = new SecretKeySpec(build3DesKey(THREEDES_KEY), ALGORITHM);
+            Cipher c1 = Cipher.getInstance(ALGORITHM);
             c1.init(Cipher.DECRYPT_MODE, deskey);
+            assert targetSrc != null;
             return new String(c1.doFinal(targetSrc), Charset.forName("UTF-8"));
-        } catch (NoSuchAlgorithmException e1) {
-            e1.printStackTrace();
-        } catch (javax.crypto.NoSuchPaddingException e2) {
-            e2.printStackTrace();
-        } catch (Exception e3) {
-            e3.printStackTrace();
+        } catch (Exception ignored) {  //NOSONAR
         }
         return null;
     }
@@ -102,8 +90,6 @@ public class DES3Util {
      * 生成MD5数据签名
      *
      * @param jsonStr 数据体的JSON格式的字符串,不能是JSONARRAY类型字符串
-     * @return
-     * @throws NoSuchAlgorithmException
      */
     @SuppressWarnings("unchecked")
     public static String getSign(String jsonStr) {
@@ -122,7 +108,7 @@ public class DES3Util {
                 try {
                     return MD5Encoding(md5Sign);
                 } catch (NoSuchAlgorithmException e) {
-                    throw new RuntimeException("数据签名发生异常 : " + e.getMessage());
+                    throw new RuntimeException("数据签名发生异常 : " + e.getMessage()); //NOSONAR
                 }
             }
         }
@@ -134,18 +120,15 @@ public class DES3Util {
      *
      * @param JsonData JSON格式的字符串
      * @param sign     原签名字符串
-     * @return
-     * @throws UnsupportedEncodingException
-     * @throws Exception
+     * @throws NoSuchAlgorithmException
      */
     @SuppressWarnings("unchecked")
-    public synchronized static boolean checkSign(String JsonData, String sign)
-            throws UnsupportedEncodingException, Exception {
+    public static boolean checkSign(String JsonData, String sign) throws NoSuchAlgorithmException {
         if (JsonData == null) {
-            throw new RuntimeException("签名内容不能为空");
+            throw new RuntimeException("签名内容不能为空"); //NOSONAR
         }
         if (sign == null) {
-            throw new RuntimeException("原签名内容不能为空");
+            throw new RuntimeException("原签名内容不能为空"); //NOSONAR
         }
         TreeMap<String, Object> testMap = JSONObject.parseObject(JsonData, TreeMap.class);
         String checkData = testMap.get("data").toString();
@@ -170,7 +153,7 @@ public class DES3Util {
      */
     public static byte[] build3DesKey(String keyStr) throws UnsupportedEncodingException {
         byte[] key = new byte[24];
-        byte[] temp = keyStr.getBytes("UTF-8");
+        byte[] temp = keyStr.getBytes(CHARSET_NAME);
 
         if (key.length > temp.length) {
             System.arraycopy(temp, 0, key, 0, temp.length);
@@ -201,41 +184,10 @@ public class DES3Util {
             // 转变为字节数组
             byte[] encoded = generateKey.getEncoded();
             // 生成密钥字符串
-            String encodeHexString = Hex.encodeHexString(encoded);
-            return encodeHexString;
+            return Hex.encodeHexString(encoded);
         } catch (Exception e) {
-            e.printStackTrace();
             return "密钥生成错误.";
         }
     }
 
-    /**
-     * @param
-     */
-    public static void main1(String[] args) {
-        // String str =
-        // "nlnncUis7rVqFo33g+b8uhDIhVw1JjTbLPK8Ftmfnvg0a9sDKaYjR5fD3P0CriEYUkLV9QYuaXknY1A7lsYo7ed2eoSnNIEfwPx1BAi3gdCsqAsjOshM7I/3IypYUg0KmptWNIs8khezwBwdMIbDTgCxEO74oM2pDS20K8junRQ=";
-        // String data =
-        //  String data = "{\"codeType\":\"8\",\"phoneNum\":\"13152644039\"}";
-        // "{\"productpId\":\"2132132121321312\",\"deviceId\":\"21312312\"}";
-        //String data = "{\"homeType\":\"7\"}";
-        String data = "{\"inviteCode\":\"\",\"password\":\"\",\"deviceId\":\"00000000\",\"phoneType\":\"iPhone\",\"phoneNum\":\"17502181535\",\"source\":\"1\",\"verifyCode\":\"8702\",\"channel\":\"1\"}";
-        // String data = "{\"productpId\":\"4\",\"deviceId\":\"32423432\"}";
-        //	String data = "{\"articleId\":\"21321\",\"token\":\"dc5eb73ff73b78e45ce7970bce7cb509\",\"praiseType\":\"1\"}";
-        // String data =
-        // "{\"isRecommend\":\"2\",\"prefectureType\":\"0001\",\"productType\":\"0001\",\"prefectureType\":\"0001\",\"userType\":\"0001\",\"sort\":\"0001\"}";
-        //String data ={\"isPush\":\"1\"};
-        String sign = getSign(data);
-        String str = "{\"data\":" + data + ",\"sign\":\"" + sign + "\"}";
-		/*System.out.println(str);
-		System.out.println(encryptMode(str, ConstantUtils.THREEDES_KEY));*/
-
-        System.out.println(decryptMode("KEMsBy4mrZnJptDH8EgZZ6Rwxf7jpTy6zBUSDe2XGABi6CmQG9VUJjwGoRjUjurSXIAP/vXtgmXzrKLZ1rCWb8K7YJU8ntlyPhFugpleMTLrGlzXR76jCHuVYw9VPLc0Elo5sRIqxVpIQi02vy6YH6z5XOppkUa4gxNhdzBW5suuPJwzTm4wJ1VdvjnarGvEjq7+2P7dhnj1gFSucYS8xzexmj29sxIgC0eG3y/pDYq2WciqTsb51mpWKFxAsf/lIpZl8Hr1MtsNF/rsHJhnXIhRAl3EaazpT1ErMC0Rgal842mEJXiNY8VfNWIKAJH+xbuurWDnWrsuC57Y3uufNZYls5iu9cFD"));
-    }
-
-    public static void main(String[] args) {
-        String key = getKey();
-        System.out.println(key);
-//		System.out.println(DES3Util.decryptMode("KEMsBy4mrZnJptDH8EgZZ34jpqFhEsIfSCqN8ppEyI1lpOniGyXwe0BwUT6RgnEgcxnnsVm+3DHzrKLZ1rCWb8K7YJU8ntlyPhFugpleMTLlOmfmXieLPll9/sONqAcwr58JfEm//zQP92zvwwMQeyW/jCooqpjynADEhIcyOfg/wPCJqs/vRDWNuJsEdo3R+Dm/UpbyM3iU6nDy4v74ji1GEZyekM+yEljbkgUpLEWCotfr1tGKR44VoC7qtt0zF/vNzDZjmMjLKg26ndOY4/pf5cGXuuNwvvPisQCtuYpcPqYX1dQeONVRhcBAxSGJvu5kbio9LUGG3A2aRMO44tqssVH/Et/z7aPOxboFa2ccWTleqU4cLQ=="));
-    }
 }

@@ -1,19 +1,19 @@
 package com.cgcg.base.util;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * Description :
+ * Description : IP工具类
  *
  * @author : zc.lin.
  * @version : 2017/10/17.
  */
-public class IpUtils {
-    private static String getClientIP(HttpServletRequest request) {
-        return request.getHeader("x-forwarded-for") == null?request.getRemoteAddr():request.getHeader("x-forwarded-for");
-    }
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class IpUtils {
 
     public static String getIpAddress(HttpServletRequest request) {
         String ip = request.getHeader("x-forwarded-for");

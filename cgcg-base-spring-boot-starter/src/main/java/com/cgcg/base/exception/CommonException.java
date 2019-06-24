@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Description : 异常
+ * Description : 通用异常类
  *
  * @author : zc.lin.
  * @version : 2017/10/17.
@@ -171,8 +171,6 @@ public class CommonException extends RuntimeException {
         this.errorMsg = errorMsg;
         this.detailErrorMsg = detailErrorMsg;
     }
-
-
 
     @Override
     public String getMessage() {

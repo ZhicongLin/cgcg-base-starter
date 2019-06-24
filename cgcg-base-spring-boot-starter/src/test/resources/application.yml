@@ -1,0 +1,10 @@
+server:
+  port: 8888
+swagger:
+  name: wocalie
+  apis: com.test.base.controller
+  desc: sda
+  version: 1.0.0
+spring:
+  application:
+    name: test-server

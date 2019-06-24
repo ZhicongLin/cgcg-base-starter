@@ -1,6 +1,6 @@
 package com.cgcg.base.exception;
 
-import com.cgcg.base.ResultMap;
+import com.cgcg.base.vo.ResultMap;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
