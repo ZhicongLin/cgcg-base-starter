@@ -32,15 +32,15 @@ public class WebMvcRequestConfigurerAdapter implements WebMvcConfigurer {
         List<String> authIgnore = ignore.getAuthIgnore();
         if (authIgnore == null || authIgnore.isEmpty()) {
             authIgnore = root;
-            authIgnore.addAll(DEFAULT_IGNORE);
         }
+        authIgnore.addAll(DEFAULT_IGNORE);
         registry.addInterceptor(new AuthInterceptor()).addPathPatterns("/**").excludePathPatterns(authIgnore);
 
         List<String> logIgnore = ignore.getLogIgnore();
         if (logIgnore == null || logIgnore.isEmpty()) {
             logIgnore = root;
-            logIgnore.addAll(DEFAULT_IGNORE);
         }
+        logIgnore.addAll(DEFAULT_IGNORE);
         registry.addInterceptor(new RequestInterceptor()).addPathPatterns("/**").excludePathPatterns(logIgnore);
     }
 

@@ -4,12 +4,8 @@ cgcg:
   interceptor:
     auth: true
     ignore:
-      root:
-        - /swagger-resources/**
-        - /swagger-ui.html
-        - /error
-        - /webjars/**
       auth-ignore:
+        - /test/index
       log-ignore:
   swagger:
     name: wocalie
