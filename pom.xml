@@ -10,6 +10,8 @@
     <packaging>pom</packaging>
     <modules>
         <module>cgcg-base-spring-boot-starter</module>
+        <module>cgcg-mybatis-spring-boot-starter</module>
+        <module>cgcg-redis-spring-boot-starter</module>
     </modules>
     <properties>
         <java.version>1.8</java.version>
