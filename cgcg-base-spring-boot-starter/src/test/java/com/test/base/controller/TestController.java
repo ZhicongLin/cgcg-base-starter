@@ -1,13 +1,14 @@
 package com.test.base.controller;
 
+import com.cgcg.base.exception.CommonException;
 import com.cgcg.base.vo.ResultMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,5 +28,27 @@ public class TestController {
         final HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("yes", "OK");
         return ResultMap.success(hashMap);
+    }
+
+    @ApiOperation("接口")
+    @PutMapping
+    public Map<String, Object> put() {
+        final HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("yes", "OK");
+        return hashMap;
+    }
+
+    @ApiOperation("POST接口")
+    @PostMapping
+    public List gets(Integer id) {
+        if (id == 1) {
+            throw new CommonException(123, "zsd");
+        }
+        final HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("yes", "OK");
+
+        final ArrayList arrayList = new ArrayList();
+        arrayList.add(hashMap);
+        return arrayList;
     }
 }

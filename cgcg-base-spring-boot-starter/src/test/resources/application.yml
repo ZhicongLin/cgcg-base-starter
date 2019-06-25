@@ -1,10 +1,23 @@
 server:
   port: 8888
-swagger:
-  name: wocalie
-  apis: com.test.base.controller
-  desc: sda
-  version: 1.0.0
+cgcg:
+  interceptor:
+    auth: true
+    ignore:
+      root:
+        - /swagger-resources/**
+        - /swagger-ui.html
+        - /error
+        - /webjars/**
+      auth-ignore:
+      log-ignore:
+  swagger:
+    name: wocalie
+    apis: com.test.base.controller
+    desc: sda
+    version: 1.0.0
+  format:
+    response-data: true
 spring:
   application:
     name: test-server

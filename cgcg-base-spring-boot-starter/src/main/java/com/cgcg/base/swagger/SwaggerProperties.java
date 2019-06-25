@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Setter
 @Getter
 @Component
-@ConfigurationProperties(prefix = "swagger")
+@ConfigurationProperties(prefix = "cgcg.swagger")
 public class SwaggerProperties {
     private String name = "接口文档";
     private String desc = "http在线接口文档";
