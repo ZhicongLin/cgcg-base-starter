@@ -6,8 +6,15 @@ spring boot 服务基础包
 
     一、支持请求日志打印
     二、支持Swagger文档
+        访问路径：http://yourdomain/swagger-ui.html
+        Swagger写法详见 官网地址：https://swagger.io/
     三、支持异常处理
+        1.处理spirng-mvc常见异常，
+        2.处理自定义异常 throw new CommonException(code, message);
+          （CommonException可以被继承）
     四、支持返回数据格式化
+        如：源数据 {"yes":"ok"} 格式化后：{ "code": 200, "data": {"yes":"ok"}, "message": "操作成功"}
+        
 ### 包引用
     
     git clone 代码到本地
@@ -51,7 +58,6 @@ spring boot 服务基础包
     
     三、其他配置
     cgcg.format.response-data: true 开启数据格式化，默认false
-    开启返回数据格式化后，返回的结果{ "code": 200, "data": "result-data", "message": "操作成功"}
       
       
 
