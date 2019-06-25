@@ -1,7 +1,7 @@
 package com.cgcg.base.util;
 
 import com.alibaba.fastjson.JSONObject;
-import com.cgcg.base.Constant;
+import com.cgcg.base.enums.CharsetCode;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.codec.binary.Hex;
@@ -12,7 +12,6 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.TreeMap;
@@ -58,7 +57,7 @@ public final class DES3Util {
      */
     public static String encryptMode(String src) {
         try {
-            byte[] targetSrc = src.getBytes(Constant.CHARTER);
+            byte[] targetSrc = src.getBytes(CharsetCode.forUtf8());
             // 生成密钥
             SecretKey deskey = new SecretKeySpec(build3DesKey(THREEDES_KEY), ALGORITHM);
             // 实例化Cipher
@@ -82,7 +81,7 @@ public final class DES3Util {
             Cipher c1 = Cipher.getInstance(ALGORITHM);
             c1.init(Cipher.DECRYPT_MODE, deskey);
             assert targetSrc != null;
-            return new String(c1.doFinal(targetSrc), Charset.forName("UTF-8"));
+            return new String(c1.doFinal(targetSrc), CharsetCode.forUtf8());
         } catch (Exception ignored) {  //NOSONAR
         }
         return null;
@@ -155,7 +154,7 @@ public final class DES3Util {
      */
     public static byte[] build3DesKey(String keyStr) throws UnsupportedEncodingException {
         byte[] key = new byte[24];
-        byte[] temp = keyStr.getBytes(Constant.CHARTER);
+        byte[] temp = keyStr.getBytes(CharsetCode.forUtf8());
 
         if (key.length > temp.length) {
             System.arraycopy(temp, 0, key, 0, temp.length);
