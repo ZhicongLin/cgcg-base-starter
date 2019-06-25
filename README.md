@@ -8,6 +8,16 @@ spring boot 服务基础包
     二、支持Swagger文档
     三、支持异常处理
     四、支持返回数据格式化
+### 包引用
+    
+    git clone 代码到本地
+    mvn clean deploy部署到maven的仓库服务
+    
+    <dependency>
+        <groupId>com.github.cgcg</groupId>
+        <artifactId>cgcg-base-spring-boot-starter</artifactId>
+        <version>XXXX对应版本号</version>    
+    </dependency>
     
 ### 服务配置
     
