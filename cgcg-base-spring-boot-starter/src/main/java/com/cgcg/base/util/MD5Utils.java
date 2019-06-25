@@ -1,5 +1,6 @@
 package com.cgcg.base.util;
 
+import com.cgcg.base.Constant;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +18,6 @@ import java.security.NoSuchAlgorithmException;
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MD5Utils {
-    private static final String CHARSET_NAME = "UTF-8";
     private static MessageDigest md = null;
 
     static {
@@ -87,7 +87,7 @@ public final class MD5Utils {
         try {
             md5 = MessageDigest.getInstance("MD5");
 
-            byte[] md5Bytes = md5.digest(str.getBytes(CHARSET_NAME));
+            byte[] md5Bytes = md5.digest(str.getBytes(Constant.CHARTER));
 
             for (byte md5Byte : md5Bytes) {
                 int val = (md5Byte) & 0xff;
@@ -118,7 +118,7 @@ public final class MD5Utils {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
             md.reset();
-            md.update(source.getBytes(CHARSET_NAME));
+            md.update(source.getBytes(Constant.CHARTER));
             result = md.digest();
         } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
             log.warn(e.getMessage(), e);

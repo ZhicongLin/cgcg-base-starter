@@ -1,6 +1,7 @@
 package com.cgcg.base.interceptor;
 
 import com.alibaba.fastjson.JSON;
+import com.cgcg.base.Constant;
 import com.cgcg.base.auth.AuthService;
 import com.cgcg.base.context.SpringContextHolder;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +34,7 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
                     final HashMap<Object, Object> unauthorized = new HashMap<>();
                     unauthorized.put("errorCode", HttpStatus.UNAUTHORIZED);
                     unauthorized.put("errorMsg", "没有访问权限");
-                    response.setCharacterEncoding("UTF-8");
+                    response.setCharacterEncoding(Constant.CHARTER);
                     response.getWriter().write(JSON.toJSONString(unauthorized));
                     return false;
                 }

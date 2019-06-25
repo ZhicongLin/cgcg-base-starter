@@ -14,12 +14,9 @@ import org.springframework.stereotype.Component;
 @Setter
 @Getter
 @Component
+@ConfigurationProperties("cgcg.interceptor")
 public class InterceptorProperties {
 
     private boolean auth;
 
-    @ConfigurationProperties("cgcg.interceptor.auth")
-    public void setAuth(boolean auth) {
-        this.auth = auth;
-    }
 }

@@ -1,12 +1,15 @@
 package com.cgcg.base.util;
 
 import com.alibaba.fastjson.JSONObject;
+import com.cgcg.base.Constant;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.crypto.*;
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
@@ -16,7 +19,6 @@ import java.util.TreeMap;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class DES3Util {
 
-    private static final String CHARSET_NAME = "UTF-8";
     // 定义加密算法，DESede即3DES
     private static final String ALGORITHM = "DESede";
 
@@ -56,7 +58,7 @@ public final class DES3Util {
      */
     public static String encryptMode(String src) {
         try {
-            byte[] targetSrc = src.getBytes(CHARSET_NAME);
+            byte[] targetSrc = src.getBytes(Constant.CHARTER);
             // 生成密钥
             SecretKey deskey = new SecretKeySpec(build3DesKey(THREEDES_KEY), ALGORITHM);
             // 实例化Cipher
@@ -153,7 +155,7 @@ public final class DES3Util {
      */
     public static byte[] build3DesKey(String keyStr) throws UnsupportedEncodingException {
         byte[] key = new byte[24];
-        byte[] temp = keyStr.getBytes(CHARSET_NAME);
+        byte[] temp = keyStr.getBytes(Constant.CHARTER);
 
         if (key.length > temp.length) {
             System.arraycopy(temp, 0, key, 0, temp.length);
