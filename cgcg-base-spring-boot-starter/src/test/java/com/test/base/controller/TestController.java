@@ -1,7 +1,7 @@
 package com.test.base.controller;
 
 import com.cgcg.base.exception.CommonException;
-import com.cgcg.base.vo.ResultMap;
+import com.cgcg.base.vo.Result;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.stereotype.Controller;
@@ -33,10 +33,10 @@ public class TestController {
     @ApiOperation("接口")
     @GetMapping
     @ResponseBody
-    public ResultMap<Map<String, Object>> get() {
+    public Result<Map<String, Object>> get() {
         final HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("yes", "OK");
-        return ResultMap.success(hashMap);
+        return Result.success(hashMap);
     }
 
     @ApiOperation("接口")

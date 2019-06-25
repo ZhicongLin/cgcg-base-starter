@@ -6,7 +6,7 @@
 
     <groupId>com.cgcg</groupId>
     <artifactId>cgcg-base-starter</artifactId>
-    <version> 1.1.0.SNAPSHOT</version>
+    <version>1.1.0.release</version>
     <packaging>pom</packaging>
     <modules>
         <module>cgcg-base-spring-boot-starter</module>
@@ -25,12 +25,21 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+    <distributionManagement>
+        <repository>
+            <id>miguan-nexus</id>
+            <url>http://nexus.miguan.com/nexus/content/repositories/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>miguan-nexus</id>
+            <url>http://nexus.miguan.com/nexus/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
     <build>
         <plugins>
-            <!-- install插件 -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-install-plugin</artifactId>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -38,14 +47,6 @@
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <configuration>
-                    <version>6</version>
-                    <uniqueVersion>false</uniqueVersion>
                 </configuration>
             </plugin>
         </plugins>

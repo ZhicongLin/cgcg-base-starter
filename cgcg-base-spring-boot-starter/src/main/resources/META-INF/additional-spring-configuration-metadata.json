@@ -7,6 +7,12 @@
       "defaultValue": "false"
     },
     {
+      "name": "cgcg.format.class-name",
+      "type": "java.lang.String",
+      "description": "format className",
+      "defaultValue": "com.cgcg.base.vo.Result"
+    },
+    {
       "name": "cgcg.interceptor.auth",
       "type": "java.lang.Boolean",
       "description": "is open auth",

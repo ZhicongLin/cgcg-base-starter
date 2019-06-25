@@ -16,9 +16,9 @@ import org.slf4j.LoggerFactory;
 @Setter
 @Getter
 @ApiModel("返回结果")
-public final class ResultMap<T> {
+public final class Result<T> {
 
-    public static final Logger logger = LoggerFactory.getLogger(ResultMap.class);
+    public static final Logger logger = LoggerFactory.getLogger(Result.class);
 
     @ApiModelProperty("编号")
     private int code;
@@ -27,60 +27,60 @@ public final class ResultMap<T> {
     @ApiModelProperty("提示信息")
     private String message;
 
-    private ResultMap() {
+    private Result() {
         this.code = 200;
         this.message = "操作成功";
     }
 
-    private ResultMap(T data) {
+    private Result(T data) {
         this();
         this.data = data;
     }
 
-    public static <T> ResultMap<T> success(T data) {
-        return new ResultMap<>(data);
+    public static <T> Result<T> success(T data) {
+        return new Result<>(data);
     }
 
-    public static <T> ResultMap<T> success(T data, String message) {
-        ResultMap<T> success = new ResultMap<>(data);
+    public static <T> Result<T> success(T data, String message) {
+        Result<T> success = new Result<>(data);
         success.setCode(200);
         success.setMessage(message);
         return success;
     }
 
-    public static <T> ResultMap<T> error(T data) {
-        final ResultMap<T> error = error();
+    public static <T> Result<T> error(T data) {
+        final Result<T> error = error();
         error.setData(data);
         return error;
     }
 
-    public static <T> ResultMap<T> error(String data) {
-        final ResultMap<T> error = error();
+    public static <T> Result<T> error(String data) {
+        final Result<T> error = error();
         error.setCode(400);
         error.setMessage(data);
         return error;
     }
 
-    public static <T> ResultMap<T> error(int code, String message) {
-        final ResultMap<T> error = error();
+    public static <T> Result<T> error(int code, String message) {
+        final Result<T> error = error();
         error.setCode(code);
         error.setMessage(message);
         return error;
     }
 
-    public static <T> ResultMap<T> error(T data, String message) {
-        final ResultMap<T> error = error();
+    public static <T> Result<T> error(T data, String message) {
+        final Result<T> error = error();
         error.setData(data);
         error.setMessage(message);
         return error;
     }
 
-    public static <T> ResultMap<T> success() {
-        return new ResultMap<>();
+    public static <T> Result<T> success() {
+        return new Result<>();
     }
 
-    public static <T> ResultMap<T> error() {
-        final ResultMap<T> error = new ResultMap<>();
+    public static <T> Result<T> error() {
+        final Result<T> error = new Result<>();
         error.setCode(400);
         error.setMessage("操作失败");
         return error;

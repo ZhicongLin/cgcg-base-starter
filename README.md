@@ -12,6 +12,9 @@ spring boot 服务基础包
         1.处理spirng-mvc常见异常，
         2.处理自定义异常 throw new CommonException(code, message);
           （CommonException可以被继承）
+        3.404异常捕获需要增加下面两条配置，不然不会被捕获
+            spring.mvc.throw-exception-if-no-handler-found=true
+            spring.mvc.static-path-pattern=/statics/**
     四、支持返回数据格式化
         如：源数据 {"yes":"ok"} 格式化后：{ "code": 200, "data": {"yes":"ok"}, "message": "操作成功"}
         
@@ -59,6 +62,8 @@ spring boot 服务基础包
     
     三、其他配置
     cgcg.format.response-data: true 开启数据格式化，默认false
+    cgcg.format.class-name: com.xxx.xx.ResultXX 有默认类，
+        如果需要自定义格式化类，格式化类需要提供静态方法public ResultXX static success(T data);
       
       
 

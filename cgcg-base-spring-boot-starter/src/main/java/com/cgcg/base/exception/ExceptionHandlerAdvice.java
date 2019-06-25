@@ -1,6 +1,6 @@
 package com.cgcg.base.exception;
 
-import com.cgcg.base.vo.ResultMap;
+import com.cgcg.base.vo.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,14 +50,14 @@ public class ExceptionHandlerAdvice {
      */
     @ExceptionHandler(CommonException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ResultMap handleException(CommonException e) {
+    public Result handleException(CommonException e) {
         if (e.getErrorClass() != null) {
             final Logger logger = LoggerFactory.getLogger(e.getErrorClass());
             logger.error(e.getMessage(), e);
         } else {
             log.error(e.getMessage(), e);
         }
-        return ResultMap.error(e.getErrorCode(), e.getErrorMsg() );
+        return Result.error(e.getErrorCode(), e.getErrorMsg() );
     }
 
     /**
@@ -68,11 +68,11 @@ public class ExceptionHandlerAdvice {
      */
     @ExceptionHandler(MissingServletRequestParameterException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ResultMap handleException(MissingServletRequestParameterException e) {
+    public Result handleException(MissingServletRequestParameterException e) {
         String parameterName = e.getParameterName();
         String parameterType = e.getParameterType();
         log.error("缺少必填参数{} {}", parameterType, parameterName, e);
-        return ResultMap.error(100400, "缺少必填参数:" + parameterName );
+        return Result.error(100400, "缺少必填参数:" + parameterName );
     }
 
     /**
@@ -83,7 +83,7 @@ public class ExceptionHandlerAdvice {
      */
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ResultMap handleException(DataIntegrityViolationException e) {
+    public Result handleException(DataIntegrityViolationException e) {
         final Throwable cause = getCause(e);
         String message = "数据完整性冲突";
         if (cause instanceof SQLIntegrityConstraintViolationException) {
@@ -96,7 +96,7 @@ public class ExceptionHandlerAdvice {
             }
         }
         log.error(message, e);
-        return ResultMap.error(100400, message);
+        return Result.error(100400, message);
     }
 
     private Throwable getCause(Throwable t) {
@@ -125,14 +125,14 @@ public class ExceptionHandlerAdvice {
      */
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResultMap handleException(HttpRequestMethodNotSupportedException e) {
+    public Result handleException(HttpRequestMethodNotSupportedException e) {
         final String message = e.getMessage();
         log.error(message, e);
         final String[] split = message.split("'");
         if (split.length >= 2) {
-            return ResultMap.error(100400, String.format("请求方式错误[%s]", split[1]));
+            return Result.error(100400, String.format("请求方式错误[%s]", split[1]));
         }
-        return ResultMap.error(100400, "请求方式错误");
+        return Result.error(100400, "请求方式错误");
     }
 
     /**
@@ -143,19 +143,19 @@ public class ExceptionHandlerAdvice {
      */
     @ExceptionHandler(Throwable.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ResultMap handleException(Throwable e) {
+    public Result handleException(Throwable e) {
         final String message = e.getMessage() != null ? e.getMessage() : e.toString();
         log.error(message, e);
         final String regEx = "[\u4e00-\u9fa5]";
         final Pattern p = Pattern.compile(regEx);
         if (p.matcher(message).find()) {
-            return ResultMap.error(100500, message);
+            return Result.error(100500, message);
         }
         if (message.contains("timeout") || message.contains("timedout")) {
-            return message.contains("refused") ? ResultMap.error(100502, "服务器拒绝连接")
-                    : ResultMap.error(100504, "服务器连接超时");
+            return message.contains("refused") ? Result.error(100502, "服务器拒绝连接")
+                    : Result.error(100504, "服务器连接超时");
         }
-        return ResultMap.error(100500, "服务器内部异常");
+        return Result.error(100500, "服务器内部异常");
     }
 
     /**
@@ -166,9 +166,9 @@ public class ExceptionHandlerAdvice {
      */
     @ExceptionHandler({BindException.class, MethodArgumentNotValidException.class})
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ResultMap handleException(Exception e) {
+    public Result handleException(Exception e) {
         log.error(e.getMessage(), e);
-        return ResultMap.error(100400, this.getBindMessage(e.getMessage()));
+        return Result.error(100400, this.getBindMessage(e.getMessage()));
     }
 
     /**
@@ -179,9 +179,9 @@ public class ExceptionHandlerAdvice {
      */
     @ExceptionHandler(NoHandlerFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResultMap noMapping(NoHandlerFoundException e) {
+    public Result noMapping(NoHandlerFoundException e) {
         log.error(e.getMessage(), e);
-        return ResultMap.error(100404, "请求路径不存在");
+        return Result.error(100404, "请求路径不存在");
     }
 
     /**
@@ -192,9 +192,9 @@ public class ExceptionHandlerAdvice {
      */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResultMap errorParam(MethodArgumentTypeMismatchException me) {
+    public Result errorParam(MethodArgumentTypeMismatchException me) {
         log.error(me.getMessage(), me);
-        return ResultMap.error(100400, "请求参数不合法");
+        return Result.error(100400, "请求参数不合法");
     }
 
     /**
@@ -205,14 +205,14 @@ public class ExceptionHandlerAdvice {
      */
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     @ResponseStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
-    public ResultMap handleException(HttpMediaTypeNotSupportedException e) {
+    public Result handleException(HttpMediaTypeNotSupportedException e) {
         final String message = e.getMessage();
         log.error(message, e);
         final String[] split = message.split("'");
         if (split.length >= 2) {
-            return ResultMap.error(100415, String.format("参数文本格式错误[%s]", split[1]));
+            return Result.error(100415, String.format("参数文本格式错误[%s]", split[1]));
         }
-        return ResultMap.error(100415, "参数文本类型错误");
+        return Result.error(100415, "参数文本类型错误");
     }
 
 
