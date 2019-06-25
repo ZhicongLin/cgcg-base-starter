@@ -3,6 +3,7 @@ package com.cgcg.base.interceptor;
 import com.alibaba.fastjson.JSON;
 import com.cgcg.base.auth.AuthService;
 import com.cgcg.base.context.SpringContextHolder;
+import com.cgcg.base.enums.CharsetCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
@@ -33,7 +34,7 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
                     final HashMap<Object, Object> unauthorized = new HashMap<>();
                     unauthorized.put("errorCode", HttpStatus.UNAUTHORIZED);
                     unauthorized.put("errorMsg", "没有访问权限");
-                    response.setCharacterEncoding(Charset.UTF8.getName());
+                    response.setCharacterEncoding(CharsetCode.forUtf8().name());
                     response.getWriter().write(JSON.toJSONString(unauthorized));
                     return false;
                 }
