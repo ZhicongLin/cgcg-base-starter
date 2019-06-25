@@ -45,7 +45,7 @@ public class TestController {
     public Map<String, Object> put() {
         final HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("yes", "OK");
-        return hashMap;
+        return null;
     }
 
     @ApiOperation("POST接口")

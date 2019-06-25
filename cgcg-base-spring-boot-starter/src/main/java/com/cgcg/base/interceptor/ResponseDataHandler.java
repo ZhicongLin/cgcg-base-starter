@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import java.lang.reflect.Method;
+import java.net.URI;
 
 /**
  * 结果集处理
@@ -32,6 +33,12 @@ public class ResponseDataHandler implements ResponseBodyAdvice {
 
     @Override
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
+        final URI uri = request.getURI();
+        final String path = uri.getPath();
+        if (path.contains("/swagger") || path.equals("/error")
+                || path.equals("/v2/api-docs") || path.contains("/webjars")) {
+            return body;
+        }
         if (returnType.hasMethodAnnotation(ExceptionHandler.class)) {
             //经过异常处理的结果类型，直接返回，不进行格式化
             return body;
@@ -61,7 +68,7 @@ public class ResponseDataHandler implements ResponseBodyAdvice {
             formatClass = Result.class;
             log.error("没有找到对应格式化的类名{}", className);
         }
-        if (body.getClass() == formatClass) {
+        if (body != null && body.getClass() == formatClass) {
             //判断ResultMap类型，直接返回，不进行格式化
             return body;
         }
