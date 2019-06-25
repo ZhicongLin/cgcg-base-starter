@@ -2,6 +2,12 @@
 spring boot 服务基础包
 ## cgcg-base-spring-boot-starter
 服务基础包
+### 包功能简介
+
+    一、支持请求日志打印
+    二、支持Swagger文档
+    三、支持异常处理
+    四、支持返回数据格式化
     
 ### 服务配置
     
