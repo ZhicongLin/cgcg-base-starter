@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>cgcg-base-starter</artifactId>
-        <groupId>com.github.cgcg</groupId>
+        <groupId>com.cgcg</groupId>
         <version>1.0.0.SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -64,5 +64,14 @@
             <optional>true</optional>
         </dependency>
     </dependencies>
-
+    <distributionManagement>
+        <repository>
+            <id>miguan-nexus</id>
+            <url>http://nexus.miguan.com/nexus/content/repositories/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>miguan-nexus</id>
+            <url>http://nexus.miguan.com/nexus/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 </project>

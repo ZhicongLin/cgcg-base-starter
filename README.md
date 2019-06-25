@@ -48,6 +48,7 @@ spring boot 服务基础包
     cgcg.interceptor.ignore.root 配置全局忽略的路径
     cgcg.interceptor.ignore.auth-ignore: 配置忽略鉴权路径
     cgcg.interceptor.ignore.log-ignore: 配置忽略打印请求日志路径
+    忽略资源路径默认"/swagger-resources/**", "/swagger-ui.html", "/error", "/webjars/**"
     auth-ignore和log-ignore各自独立拦截，且如果有配置会优先选择(log-ignore>root,auth-ignore>root)
     
     二、swagger文档相关配置

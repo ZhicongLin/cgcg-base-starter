@@ -7,6 +7,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -16,6 +17,8 @@ import java.util.List;
 @Order
 @Configuration
 public class WebMvcRequestConfigurerAdapter implements WebMvcConfigurer {
+
+    private List<String> DEFAULT_IGNORE = Arrays.asList("/swagger-resources/**", "/swagger-ui.html", "/error", "/webjars/**");
 
     @Resource
     private IgnoreHandle ignore;
@@ -29,12 +32,14 @@ public class WebMvcRequestConfigurerAdapter implements WebMvcConfigurer {
         List<String> authIgnore = ignore.getAuthIgnore();
         if (authIgnore == null || authIgnore.isEmpty()) {
             authIgnore = root;
+            authIgnore.addAll(DEFAULT_IGNORE);
         }
         registry.addInterceptor(new AuthInterceptor()).addPathPatterns("/**").excludePathPatterns(authIgnore);
 
         List<String> logIgnore = ignore.getLogIgnore();
         if (logIgnore == null || logIgnore.isEmpty()) {
             logIgnore = root;
+            logIgnore.addAll(DEFAULT_IGNORE);
         }
         registry.addInterceptor(new RequestInterceptor()).addPathPatterns("/**").excludePathPatterns(logIgnore);
     }
