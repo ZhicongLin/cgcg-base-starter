@@ -14,3 +14,7 @@ cgcg:
     version: 1.0.0
   format:
     response-data: true
+spring:
+  mvc:
+    static-path-pattern: /static/**
+    throw-exception-if-no-handler-found: true
