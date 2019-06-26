@@ -24,7 +24,7 @@ spring boot 服务基础包
     mvn clean deploy部署到maven的仓库服务
     
     <dependency>
-        <groupId>com.github.cgcg</groupId>
+        <groupId>com.cgcg</groupId>
         <artifactId>cgcg-base-spring-boot-starter</artifactId>
         <version>XXXX对应版本号</version>    
     </dependency>
