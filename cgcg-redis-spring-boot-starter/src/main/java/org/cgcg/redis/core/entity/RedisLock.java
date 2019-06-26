@@ -12,7 +12,7 @@ public class RedisLock {
     /**
      * 锁的后缀
      */
-    private static final String LOCK_SUFFIX = "redis_lock";
+    private static final String LOCK_SUFFIX = "::lock";
 
     /**
      * 锁的key
@@ -22,12 +22,7 @@ public class RedisLock {
     /**
      * 锁超时时间，防止线程在入锁以后，防止阻塞后面的线程无法获取锁
      */
-    private int expireMsecs = 300;
-
-    /**
-     * 线程获取锁的等待时间
-     */
-    private int timeoutMsecs = 10 * 1000;
+    private int expireMsecs = 100;
 
     /**
      * 是否锁定标志
@@ -48,22 +43,10 @@ public class RedisLock {
      * 构造器
      * @param redisTemplate
      * @param lockKey 锁的key
-     * @param timeoutMsecs 获取锁的超时时间
+     * @param expireMsecs 获取锁的超时时间
      */
-    public RedisLock(RedisTemplate redisTemplate, String lockKey, int timeoutMsecs) {
+    public RedisLock(RedisTemplate redisTemplate, String lockKey, int expireMsecs) {
         this(redisTemplate, lockKey);
-        this.timeoutMsecs = timeoutMsecs;
-    }
-
-    /**
-     * 构造器
-     * @param redisTemplate
-     * @param lockKey 锁的key
-     * @param timeoutMsecs 获取锁的超时时间
-     * @param expireMsecs 锁的有效期
-     */
-    public RedisLock(RedisTemplate redisTemplate, String lockKey, int timeoutMsecs, int expireMsecs) {
-        this(redisTemplate, lockKey, timeoutMsecs);
         this.expireMsecs = expireMsecs;
     }
 

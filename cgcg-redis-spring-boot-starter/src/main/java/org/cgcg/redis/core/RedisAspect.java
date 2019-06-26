@@ -4,13 +4,9 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.cgcg.redis.core.annotation.RedisCache;
-import org.cgcg.redis.core.entity.CacheNameObject;
-import org.cgcg.redis.core.entity.RedisCacheObject;
-import org.cgcg.redis.core.entity.RedisHelper;
+import org.cgcg.redis.core.entity.*;
 import org.cgcg.redis.core.enums.RedisEnum;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -25,9 +21,6 @@ import javax.annotation.Resource;
 @Component
 public class RedisAspect {
     @Resource
-    @Qualifier("redisCacheTemplate")
-    private RedisTemplate<String, Object> redisTemplate;
-    @Resource
     private Environment env;
     @Resource
     private RedisHelper redisHelper;
@@ -39,7 +32,7 @@ public class RedisAspect {
         final String cacheKey = rco.getCacheKey();
         if (!RedisEnum.UPD.equals(cno.getSuffix()) && !RedisEnum.DEL.equals(cno.getSuffix()) && !RedisEnum.FLUSH.equals(cno.getSuffix())) {
             //查询的注解，先去查询缓存
-            final Object cacheResult = redisTemplate.opsForHash().get(cno.getName(), cacheKey);
+            final Object cacheResult = redisHelper.hget(rco.getCacheName(), rco.getCacheKey());
             if (cacheResult != null) {
                 return cacheResult;
             }
@@ -49,10 +42,10 @@ public class RedisAspect {
 
         if (RedisEnum.DEL.equals(cno.getSuffix())) {
             //删除的注解，在方法执行完成后，执行删除
-            redisHelper.remove(cno.getName(), cacheKey);
+            this.deleteCache(cno, cacheKey);
         } else if (RedisEnum.FLUSH.equals(cno.getSuffix())) {
             //清空缓存数据
-            redisHelper.del(cno.getName());
+            this.flushCache(cno);
         } else {
             //其他的注解，则缓存数据
             this.cacheMethodValue(rco, cno.getName(), cacheKey, proceed);
@@ -60,27 +53,62 @@ public class RedisAspect {
         return proceed;
     }
 
+    /**
+     * 清空当前缓存的所有数据
+     * @auth zhicong.lin
+     * @date 2019/6/26
+     */
+    private void flushCache(CacheNameObject cno) {
+        //清空缓存数据
+        if (cno.isLock()) {
+            RedisTask.executeAsync(this.redisHelper, cno.getName(), new Callback() {
+                @Override
+                public void execute() {
+                    redisHelper.del(cno.getName());
+                }
+            });
+        } else {
+            redisHelper.del(cno.getName());
+        }
+    }
+
+    /**
+     * 删除缓存结果数据
+     * @auth zhicong.lin
+     * @date 2019/6/26
+     */
+    private void deleteCache(CacheNameObject cno, String cacheKey) {
+        final String lockKey = cno.getName() + cacheKey;
+        //删除的注解，在方法执行完成后，执行删除
+        if (cno.isLock()) {
+            RedisTask.executeAsync(this.redisHelper, lockKey, new Callback() {
+                @Override
+                public void execute() {
+                    redisHelper.remove(cno.getName(), cacheKey);
+                }
+            });
+        } else {
+            redisHelper.remove(cno.getName(), cacheKey);
+        }
+    }
+
+    /**
+     * 缓存执行结果数据
+     * @auth zhicong.lin
+     * @date 2019/6/26
+     */
     private void cacheMethodValue(RedisCacheObject rco, String cacheName, String cacheKey, Object proceed) {
-        if (rco.getCno().isLock()) {
-            final String key = cacheName + cacheKey;
-            boolean lock = false;
-            try {
-                lock = this.redisHelper.lock(key);
-                if (lock) {
+        if (rco.getCno() != null && rco.getCno().isLock()) {
+            final String lockKey = cacheName + cacheKey;
+            RedisTask.executeAsync(this.redisHelper, lockKey, new Callback() {
+                @Override
+                public void execute() {
                     redisHelper.hset(cacheName, cacheKey, proceed, rco.getTime(), rco.getUnit());
                 }
-            } finally {
-                if (lock) {
-                    this.redisHelper.delete(key);
-                }
-            }
+            });
         } else {
-            redisTemplate.opsForHash().put(cacheName, cacheKey, proceed);
-            if (rco.getTime() > 0) {
-                redisTemplate.expire(cacheName, rco.getTime(), rco.getUnit());
-            }
+            redisHelper.hset(cacheName, cacheKey, proceed, rco.getTime(), rco.getUnit());
         }
-
     }
 
 }

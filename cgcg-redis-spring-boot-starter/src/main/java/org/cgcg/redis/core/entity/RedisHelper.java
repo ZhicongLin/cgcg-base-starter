@@ -24,14 +24,14 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class RedisHelper {
 
-    private static final String LOCK_PREFIX = "cgcg_redis_lock";
+    private static final String LOCK_PREFIX = "cgcg_redis";
     private static final String DEFAULT_CACHE_NAME = "DEFAULT_CG_NAMESPACES";
     private static final Long DEFAULT_EXPIRE = 2L;
     private static final TimeUnit DEFAULT_TIME_UNIT = TimeUnit.HOURS;
 
     @Resource
     @Qualifier("redisCacheTemplate")
-    private RedisTemplate<String, Object> redisTemplate;
+    private RedisTemplate<String, Object> redisCacheTemplate;
 
     private Map<String, RedisLock> locks = new HashMap<>();
 
@@ -42,8 +42,17 @@ public class RedisHelper {
      * @return 是否获取到
      */
     public boolean lock(String key) {
+        return lock(key, 100);
+    }
+    /**
+     * 最终加强分布式锁
+     *
+     * @param key key值
+     * @return 是否获取到
+     */
+    public boolean lock(String key, int timeout) {
         final String lockKey = LOCK_PREFIX + "_" + key;
-        final RedisLock redisLock = new RedisLock(redisTemplate, lockKey, 300);
+        final RedisLock redisLock = new RedisLock(redisCacheTemplate, lockKey, timeout);
         try {
             final boolean lock = redisLock.lock();
             if (lock) {
@@ -76,10 +85,10 @@ public class RedisHelper {
      * @date 2019/6/21
      */
     public void hset(String name, Object key, Object value, long time, TimeUnit unit) {
-        final HashOperations<String, Object, Object> hashOperations = redisTemplate.opsForHash();
+        final HashOperations<String, Object, Object> hashOperations = redisCacheTemplate.opsForHash();
         hashOperations.put(name, key, value);
         if (time > 0) {
-            redisTemplate.expire(name, time, unit);
+            redisCacheTemplate.expire(name, time, unit);
         }
     }
 
@@ -92,12 +101,12 @@ public class RedisHelper {
     }
 
     public Object hget(String name, Object key) {
-        final HashOperations<String, Object, Object> hashOperations = redisTemplate.opsForHash();
+        final HashOperations<String, Object, Object> hashOperations = redisCacheTemplate.opsForHash();
         return hashOperations.get(name, key);
     }
 
     public List<Object> hgetList(String name) {
-        final HashOperations<String, Object, Object> hashOperations = redisTemplate.opsForHash();
+        final HashOperations<String, Object, Object> hashOperations = redisCacheTemplate.opsForHash();
         return hashOperations.values(name);
     }
 
@@ -112,7 +121,7 @@ public class RedisHelper {
      * @date 2019/6/21
      */
     public void set(String key, Object value, long time, TimeUnit unit) {
-        final ValueOperations<String, Object> opsForValue = redisTemplate.opsForValue();
+        final ValueOperations<String, Object> opsForValue = redisCacheTemplate.opsForValue();
         opsForValue.set(key, value, time, unit);
     }
 
@@ -121,16 +130,16 @@ public class RedisHelper {
     }
 
     public Object get(String key) {
-        return redisTemplate.opsForValue().get(key);
+        return redisCacheTemplate.opsForValue().get(key);
     }
 
     public void rpush(String key, Object value) {
-        redisTemplate.opsForList().rightPushAll(key, value);
-        redisTemplate.expire(key, DEFAULT_EXPIRE, DEFAULT_TIME_UNIT);
+        redisCacheTemplate.opsForList().rightPushAll(key, value);
+        redisCacheTemplate.expire(key, DEFAULT_EXPIRE, DEFAULT_TIME_UNIT);
     }
 
     public Object lpop(String key) {
-        return redisTemplate.opsForList().leftPop(key);
+        return redisCacheTemplate.opsForList().leftPop(key);
     }
 
     public List<Object> list(String key) {
@@ -138,19 +147,19 @@ public class RedisHelper {
     }
 
     public List<Object> list(String key, long start, long end) {
-        return redisTemplate.opsForList().range(key, start, end);
+        return redisCacheTemplate.opsForList().range(key, start, end);
     }
 
     public void del(String... key) {
-        redisTemplate.delete(Arrays.asList(key));
+        redisCacheTemplate.delete(Arrays.asList(key));
     }
 
     public void remove(String name, Object... key) {
-        redisTemplate.opsForHash().delete(name, key);
+        redisCacheTemplate.opsForHash().delete(name, key);
     }
 
     public void expire(String key, long time, TimeUnit unit) {
-        redisTemplate.expire(key, time, unit);
+        redisCacheTemplate.expire(key, time, unit);
     }
 
 }
