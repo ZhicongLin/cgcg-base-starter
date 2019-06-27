@@ -14,6 +14,8 @@ cgcg:
     version: 1.0.0
   format:
     response-data: true
+    des3: 20b6252cabfd3415
+#    class-name: com.xx
 spring:
   mvc:
     static-path-pattern: /static/**

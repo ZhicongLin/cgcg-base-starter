@@ -51,12 +51,13 @@ public class TestController {
     @ApiOperation("POST接口")
     @PostMapping
     @ResponseBody
-    public List gets(Integer id) {
-        if (id == 1) {
+    public List gets(@RequestBody Map<String, String> param) {
+        if (Integer.valueOf(param.get("id")) == 1) {
             throw new CommonException(123, "zsd");
         }
         final HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("yes", "OK");
+        hashMap.put("id", "11");
 
         final ArrayList arrayList = new ArrayList();
         arrayList.add(hashMap);

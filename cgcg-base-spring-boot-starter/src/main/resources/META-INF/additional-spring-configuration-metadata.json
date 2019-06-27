@@ -13,6 +13,24 @@
       "defaultValue": "com.cgcg.base.vo.Result"
     },
     {
+      "name": "cgcg.format.des3",
+      "type": "java.lang.String",
+      "description": "encryption data",
+      "defaultValue": ""
+    },
+    {
+      "name": "cgcg.format.des3.result",
+      "type": "java.lang.String",
+      "description": "encryption data",
+      "defaultValue": ""
+    },
+    {
+      "name": "cgcg.format.des3.param",
+      "type": "java.lang.String",
+      "description": "encryption param",
+      "defaultValue": ""
+    },
+    {
       "name": "cgcg.interceptor.auth",
       "type": "java.lang.Boolean",
       "description": "is open auth",

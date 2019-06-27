@@ -1,6 +1,8 @@
 package com.cgcg.base.util;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.cgcg.base.context.SpringContextHolder;
 import com.cgcg.base.enums.CharsetCode;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -14,14 +16,16 @@ import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
 import java.util.TreeMap;
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class DES3Util {
 
     // 定义加密算法，DESede即3DES
     private static final String ALGORITHM = "DESede";
 
-    private static final String THREEDES_KEY = "20b6252cabfd3415";
+    private static final String THREEDES_KEY = "123456";
 
     // MD5
     public static String MD5Encoding(String source) throws NoSuchAlgorithmException {
@@ -56,17 +60,26 @@ public final class DES3Util {
      * @param src 源数据的字节数组
      */
     public static String encryptMode(String src) {
+       return encryptMode(src, THREEDES_KEY);
+    }
+
+    /**
+     * 加密方法
+     *
+     * @param src 源数据的字节数组
+     */
+    public static String encryptMode(String src, String threedesKey) {
         try {
             byte[] targetSrc = src.getBytes(CharsetCode.forUtf8());
             // 生成密钥
-            SecretKey deskey = new SecretKeySpec(build3DesKey(THREEDES_KEY), ALGORITHM);
+            SecretKey deskey = new SecretKeySpec(build3DesKey(threedesKey), ALGORITHM);
             // 实例化Cipher
             Cipher cipher = Cipher.getInstance(ALGORITHM);
             cipher.init(Cipher.ENCRYPT_MODE, deskey);
             return Base64Util.encode(cipher.doFinal(targetSrc));
         } catch (Exception ignored) { //NOSONAR
         }
-        return null;
+        return "";
     }
 
     /**
@@ -75,16 +88,25 @@ public final class DES3Util {
      * @param src 密文的字节数组
      */
     public static String decryptMode(String src) {
+        return decryptMode(src, THREEDES_KEY);
+    }
+
+    /**
+     * 解密函数
+     *
+     * @param src 密文的字节数组
+     */
+    public static String decryptMode(String src, String threedesKey) {
         try {
             byte[] targetSrc = Base64Util.decode(src);
-            SecretKey deskey = new SecretKeySpec(build3DesKey(THREEDES_KEY), ALGORITHM);
+            SecretKey deskey = new SecretKeySpec(build3DesKey(threedesKey), ALGORITHM);
             Cipher c1 = Cipher.getInstance(ALGORITHM);
             c1.init(Cipher.DECRYPT_MODE, deskey);
             assert targetSrc != null;
             return new String(c1.doFinal(targetSrc), CharsetCode.forUtf8());
         } catch (Exception ignored) {  //NOSONAR
         }
-        return null;
+        return "";
     }
 
     /**
@@ -189,6 +211,34 @@ public final class DES3Util {
         } catch (Exception e) {
             return "密钥生成错误.";
         }
+    }
+
+    /**
+     * 获取配置系统DES3加密密钥
+     * @auth zhicong.lin
+     * @date 2019/6/27
+     */
+    public static String getSystemEncrypt(String envKey) {
+        final String property = SpringContextHolder.getProperty(envKey);
+        if (StringUtils.isBlank(property)) {
+            final String des3Key = SpringContextHolder.getProperty("cgcg.format.des3");
+            if (StringUtils.isNotBlank(des3Key)) {
+                return des3Key;
+            }
+        } else {
+            return property;
+        }
+        return null;
+    }
+
+    public static void main(String[] args) {
+        final HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("yes", "OK");
+        hashMap.put("id", "11");
+        final String s1 = DES3Util.encryptMode(JSON.toJSONString(hashMap));
+        System.out.println("s1 = " + s1);
+        final String s = DES3Util.decryptMode("7tzYCJtFFzfJxEd6AIqEr68xVPGgR+4zDQloN5GkEHTwyGURCdheRChXSh+nce5yyYIUJsHdtr6G7WW93M4cjA==");
+        System.out.println("s = " + s);
     }
 
 }

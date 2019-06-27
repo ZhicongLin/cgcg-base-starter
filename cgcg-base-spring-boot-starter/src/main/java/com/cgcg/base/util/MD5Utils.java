@@ -13,18 +13,72 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Map;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MD5Utils {
+
+    private static final String[] HEX_DIGITS = { "0", "1", "2", "3", "4", "5",
+            "6", "7", "8", "9", "a", "b", "c", "d", "e", "f" };
+
     private static MessageDigest md = null;
 
     static {
         try {
             md = MessageDigest.getInstance("MD5");
         } catch (NoSuchAlgorithmException ne) {
-            log.error("NoSuchAlgorithmException: md5", ne);
+            log.warn("NoSuchAlgorithmException: md5", ne);
         }
+    }
+
+
+    /**
+     * MD5加密
+     * @param bytes
+     * @return
+     */
+    private static String byteArrayToHexString(byte[] bytes) {
+        StringBuilder resultSb = new StringBuilder();
+        for (byte b : bytes) resultSb.append(byteToHexString(b));
+        return resultSb.toString();
+    }
+
+    private static String byteToHexString(byte b) {
+        int n = b;
+        if (n < 0)
+            n += 256;
+        int d1 = n / 16;
+        int d2 = n % 16;
+        return HEX_DIGITS[d1] + HEX_DIGITS[d2];
+    }
+
+    public static String MD5Encode(String origin, String charsetname) {
+        String resultString = null;
+        try {
+            resultString = origin;
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            if (charsetname == null || "".equals(charsetname))
+                resultString = byteArrayToHexString(md.digest(resultString
+                        .getBytes()));
+            else
+                resultString = byteArrayToHexString(md.digest(resultString
+                        .getBytes(charsetname)));
+        } catch (Exception e) {
+            log.warn(e.getMessage(), e);
+        }
+        return resultString;
+    }
+
+    public static String createMD5Sign(String key, Map<String,String> paramMap) {
+        StringBuilder sb = new StringBuilder();
+        for(String k : paramMap.keySet()) {
+            String v = paramMap.get(k);
+            sb.append(k).append("=").append(v).append("&");
+        }
+        String params= sb.append("key=").append(key).substring(0);
+        String sign = MD5Utils.MD5Encode(params, "utf8");
+        return sign.toUpperCase();
     }
 
     /**
@@ -52,7 +106,7 @@ public final class MD5Utils {
                 if (fis != null)
                     fis.close();
             } catch (IOException e) {
-                log.error(e.getMessage());
+                log.warn(e.getMessage(), e);
             }
         }
     }
@@ -96,7 +150,7 @@ public final class MD5Utils {
                 value.append(Integer.toHexString(val));
             }
         } catch (Exception e) {
-
+            log.warn(e.getMessage(), e);
             return "";
         }
 
