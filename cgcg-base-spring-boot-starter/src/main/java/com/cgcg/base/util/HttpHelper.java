@@ -42,4 +42,24 @@ public final class HttpHelper {
         return sb.toString();
     }
 
+    /**
+     * 获取请求Body
+     *
+     * @param is
+     * @return
+     */
+    public static String getStringBody(InputStream is) {
+        final StringBuilder sb = new StringBuilder();
+        try (final InputStreamReader in = new InputStreamReader(is, CharsetCode.forUtf8());
+             final BufferedReader reader = new BufferedReader(in)) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+            }
+        } catch (IOException e) {
+            log.warn(e.getMessage(), e);
+        }
+        return sb.toString();
+    }
+
 }

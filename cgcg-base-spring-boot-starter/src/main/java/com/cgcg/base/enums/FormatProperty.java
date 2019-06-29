@@ -15,6 +15,7 @@ public enum FormatProperty {
     DATA("cgcg.format.response-data"),
     //数据格式化类配置
     CLASS_NAME("cgcg.format.class-name"),
+    PROPERTY("cgcg.format.property"),
     //数据加密密钥配置
     DES_ROOT("cgcg.format.des3"),
     //数据加密参数密钥配置

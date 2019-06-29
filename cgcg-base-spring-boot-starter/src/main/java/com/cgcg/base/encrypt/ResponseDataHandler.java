@@ -1,8 +1,9 @@
-package com.cgcg.base.interceptor;
+package com.cgcg.base.encrypt;
 
 import com.alibaba.fastjson.JSON;
 import com.cgcg.base.enums.FormatProperty;
 import com.cgcg.base.util.DES3Util;
+import com.cgcg.base.util.ReflectionUtils;
 import com.cgcg.base.vo.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -13,10 +14,12 @@ import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
-import java.lang.reflect.Method;
 import java.net.URI;
+import java.util.Objects;
 
 /**
  * 结果集处理
@@ -29,15 +32,18 @@ import java.net.URI;
 public class ResponseDataHandler implements ResponseBodyAdvice {
     @Override
     public boolean supports(MethodParameter returnType, Class converterType) {
-        return true;
+        final boolean hasResponseBody = returnType.hasMethodAnnotation(ResponseBody.class);
+        final Class<?> declaringClass = Objects.requireNonNull(returnType.getMethod()).getDeclaringClass();
+        final RestController annotation = declaringClass.getAnnotation(RestController.class);
+        final EncryptController encryptController = declaringClass.getAnnotation(EncryptController.class);
+        return hasResponseBody || annotation != null || encryptController != null;
     }
 
     @Override
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
         final URI uri = request.getURI();
         final String path = uri.getPath();
-        if (path.contains("/swagger") || path.equals("/error")
-                || path.equals("/v2/api-docs") || path.contains("/webjars")) {
+        if (path.contains("/swagger-resources") || path.equals("/error") || path.equals("/v2/api-docs")) {
             return body;
         }
         if (returnType.hasMethodAnnotation(ExceptionHandler.class)) {
@@ -69,8 +75,9 @@ public class ResponseDataHandler implements ResponseBodyAdvice {
             return body;
         }
         try {
-            final Method success = formatClass.getMethod("success", Object.class);
-            final Object result = success.invoke(null, body);
+            final Object result = formatClass.newInstance();
+            final String fmtField = StringUtils.isBlank(FormatProperty.PROPERTY.getString()) ? "data" : FormatProperty.PROPERTY.getString();
+            ReflectionUtils.setFieldValue(result, fmtField, body);
             if (selectedConverterType == StringHttpMessageConverter.class) {
                 //StringHttpMessageConverter 解析器，需要转成json字符串，不然会类型转换异常
                 return JSON.toJSONString(result);
@@ -83,10 +90,16 @@ public class ResponseDataHandler implements ResponseBodyAdvice {
     }
 
     private Object encrypt(Object result) {
-        final String encryption = FormatProperty.des(FormatProperty.DES_RESULT);
-        if (StringUtils.isBlank(encryption)) {
+        final String encryptionKey = FormatProperty.des(FormatProperty.DES_RESULT);
+        if (StringUtils.isBlank(encryptionKey)) {
             return result;
         }
-        return DES3Util.encryptMode(JSON.toJSONString(result), encryption);
+        final String fmtField = StringUtils.isBlank(FormatProperty.PROPERTY.getString()) ? "data" : FormatProperty.PROPERTY.getString();
+        final Object data = ReflectionUtils.getFieldValue(result, fmtField);
+        if (data != null) {
+            final String encryData = DES3Util.encryptMode(JSON.toJSONString(data), encryptionKey);
+            ReflectionUtils.setFieldValue(result, fmtField, encryData);
+        }
+        return result;
     }
 }

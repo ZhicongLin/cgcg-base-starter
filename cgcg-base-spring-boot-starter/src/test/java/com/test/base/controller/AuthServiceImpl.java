@@ -19,10 +19,10 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        final String token = request.getHeader("token");
-        if (token != null) {
+//        final String token = request.getHeader("token");
+//        if (token != null) {
             return true;
-        }
-        return false;
+//        }
+//        return false;
     }
 }

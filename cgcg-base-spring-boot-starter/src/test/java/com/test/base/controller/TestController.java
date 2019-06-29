@@ -1,10 +1,11 @@
 package com.test.base.controller;
 
+import com.cgcg.base.encrypt.Encrypt;
+import com.cgcg.base.encrypt.EncryptController;
 import com.cgcg.base.exception.CommonException;
 import com.cgcg.base.vo.Result;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -19,7 +20,8 @@ import java.util.Map;
  * @date 2019/6/24
  */
 @Api(tags = "测试接口文档")
-@Controller
+@Encrypt
+@EncryptController
 @RequestMapping("test")
 public class TestController {
 
@@ -32,8 +34,7 @@ public class TestController {
     }
     @ApiOperation("接口")
     @GetMapping
-    @ResponseBody
-    public Result<Map<String, Object>> get() {
+    public Result get() {
         final HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("yes", "OK");
         return Result.success(hashMap);
@@ -41,7 +42,6 @@ public class TestController {
 
     @ApiOperation("接口")
     @PutMapping
-    @ResponseBody
     public Map<String, Object> put() {
         final HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("yes", "OK");
@@ -50,7 +50,6 @@ public class TestController {
 
     @ApiOperation("POST接口")
     @PostMapping
-    @ResponseBody
     public List gets(@RequestBody Map<String, String> param) {
         if (Integer.valueOf(param.get("id")) == 1) {
             throw new CommonException(123, "zsd");

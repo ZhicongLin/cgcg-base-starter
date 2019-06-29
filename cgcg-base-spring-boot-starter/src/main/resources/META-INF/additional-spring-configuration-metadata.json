@@ -13,6 +13,12 @@
       "defaultValue": "com.cgcg.base.vo.Result"
     },
     {
+      "name": "cgcg.format.property",
+      "type": "java.lang.String",
+      "description": "format class field",
+      "defaultValue": "data"
+    },
+    {
       "name": "cgcg.format.des3",
       "type": "java.lang.String",
       "description": "encryption data",
