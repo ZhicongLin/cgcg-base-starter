@@ -29,7 +29,7 @@ import java.util.Objects;
  */
 @Slf4j
 @ControllerAdvice
-public class ResponseDataHandler implements ResponseBodyAdvice {
+public class ResponseBodyHandler implements ResponseBodyAdvice {
     @Override
     public boolean supports(MethodParameter returnType, Class converterType) {
         final boolean hasResponseBody = returnType.hasMethodAnnotation(ResponseBody.class);

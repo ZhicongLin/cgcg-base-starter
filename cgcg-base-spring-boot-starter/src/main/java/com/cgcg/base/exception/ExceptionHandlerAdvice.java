@@ -31,9 +31,9 @@ import java.util.regex.Pattern;
  * @author : zc.lin.
  * @version : 2017/10/17.
  */
-@ControllerAdvice
-@ResponseBody
 @Slf4j
+@ResponseBody
+@ControllerAdvice
 public class ExceptionHandlerAdvice {
     /**
      * Instantiates a new Exception handler advice.

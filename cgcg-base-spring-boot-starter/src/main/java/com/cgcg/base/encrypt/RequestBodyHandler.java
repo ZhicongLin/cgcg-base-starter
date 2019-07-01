@@ -23,7 +23,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 /**
- * .
+ * 请求体加密解密.
  *
  * @author zhicong.lin
  * @date 2019/6/29
@@ -35,9 +35,10 @@ public class RequestBodyHandler extends RequestBodyAdviceAdapter implements Requ
     @Override
     public boolean supports(MethodParameter methodParameter, Type type, Class<? extends HttpMessageConverter<?>> aClass) {
         final Encrypt encrypt = Objects.requireNonNull(methodParameter.getMethod()).getDeclaringClass().getAnnotation(Encrypt.class);
-        final EncryptController encryptController = Objects.requireNonNull(methodParameter.getMethod()).getDeclaringClass().getAnnotation(EncryptController.class);
+        final EncryptController controllerFlag = Objects.requireNonNull(methodParameter.getMethod()).getDeclaringClass().getAnnotation(EncryptController.class);
         final boolean methodFlag = methodParameter.hasMethodAnnotation(Encrypt.class);
-        return (encrypt != null || encryptController != null || methodFlag) && methodParameter.hasParameterAnnotation(RequestBody.class);
+        final boolean requestBodyFlag = methodParameter.hasParameterAnnotation(RequestBody.class);
+        return (encrypt != null || controllerFlag != null || methodFlag) && requestBodyFlag;
     }
 
     @Override

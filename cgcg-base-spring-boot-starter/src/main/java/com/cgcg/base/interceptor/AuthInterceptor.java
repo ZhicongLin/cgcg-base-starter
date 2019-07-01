@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 
 /**
- * .
+ * 权限拦截器.
  *
  * @author zhicong.lin
  * @date 2019/6/25
