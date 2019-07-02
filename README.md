@@ -17,7 +17,14 @@ spring boot 服务基础包
             spring.mvc.static-path-pattern=/statics/**
     四、支持返回数据格式化
         如：源数据 {"yes":"ok"} 格式化后：{ "code": 200, "data": {"yes":"ok"}, "message": "操作成功"}
-        
+    五、接口数据加密(DES)
+        @EnableEncryptApi -- 加密开关
+        @Encrypt -- 方法或者类上注解，注解的接口进行参数的解密和结果的加密
+        @EncryptController 封装@RestController --功能同@Encrypt
+        参数解密只支持@RequestBody的解密操作
+            XXX加密参数XXX ==> 解密后{"yes":"ok"}
+        返回结果只支持@ResponseBody的加密操作
+            加密结果如{ "code": 200, "data": "xxxxxx加密后的字符串xxxx", "message": "操作成功"}
 ### 包引用
     
     git clone 代码到本地

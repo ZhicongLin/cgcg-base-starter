@@ -12,10 +12,9 @@ public class EncryptionParamWrongException extends CommonException {
      * detail message.  The cause is not initialized, and may subsequently be
      * initialized by a call to {@link #initCause}.
      *
-     * @param errorCode the error code
-     * @param errorMsg  the error msg
+     * @param parameterStr  the error msg
      */
-    public EncryptionParamWrongException(int errorCode, String errorMsg) {
-        super(errorCode, String.format("加密参数错误[%s]", errorMsg));
+    public EncryptionParamWrongException(String parameterStr) {
+        super(416, String.format("加密参数错误[%s]", parameterStr));
     }
 }
