@@ -125,6 +125,9 @@ public class ReflectionUtils {
      */
     public static Method getAccessibleMethod(final Object obj, final String methodName,
             final Class<?>... parameterTypes) {
+        if (parameterTypes == null) {
+            return getAccessibleMethod(obj, methodName);
+        }
         Assert.notNull(obj, "object不能为空");
 
         for (Class<?> superClass = obj.getClass(); superClass != Object.class; superClass = superClass.getSuperclass()) {
@@ -133,6 +136,28 @@ public class ReflectionUtils {
 
                 method.setAccessible(true);
 
+                return method;
+
+            } catch (NoSuchMethodException e) {//NOSONAR
+                // Method不在当前类定义,继续向上转型
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 循环向上转型, 获取对象的DeclaredMethod,并强制设置为可访问.
+     * 如向上转型到Object仍无法找到, 返回null.
+     *
+     * 用于方法需要被多次调用的情况. 先使用本函数先取得Method,然后调用Method.invoke(Object obj, Object... args)
+     */
+    public static Method getAccessibleMethod(final Object obj, final String methodName) {
+        Assert.notNull(obj, "object不能为空");
+
+        for (Class<?> superClass = obj.getClass(); superClass != Object.class; superClass = superClass.getSuperclass()) {
+            try {
+                Method method = superClass.getDeclaredMethod(methodName);
+                method.setAccessible(true);
                 return method;
 
             } catch (NoSuchMethodException e) {//NOSONAR
