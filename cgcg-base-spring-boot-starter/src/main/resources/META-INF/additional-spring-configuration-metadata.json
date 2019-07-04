@@ -10,7 +10,7 @@
       "name": "cgcg.format.class-name",
       "type": "java.lang.String",
       "description": "format className",
-      "defaultValue": "com.cgcg.base.vo.Result"
+      "defaultValue": "com.cgcg.base.format"
     },
     {
       "name": "cgcg.format.property",
