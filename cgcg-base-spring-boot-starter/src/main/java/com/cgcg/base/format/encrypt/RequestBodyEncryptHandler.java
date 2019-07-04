@@ -49,7 +49,7 @@ public class RequestBodyEncryptHandler extends RequestBodyAdviceAdapter implemen
             public InputStream getBody() throws IOException {
                 final String requestBodyString = HttpHelper.getStringBody(httpInputMessage.getBody());
                 final String requestParam = DES3Util.decryptMode(requestBodyString, FormatProperty.des(FormatProperty.DES_PARAM));
-                log.debug("body ==>[{}]", requestBodyString, requestParam);
+                log.debug("body ==>[{}]", requestParam);
                 if (StringUtils.isBlank(requestParam)) {
                     throw new EncryptionParamWrongException(requestBodyString);
                 }
