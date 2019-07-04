@@ -1,4 +1,4 @@
-package com.cgcg.base.encrypt;
+package com.cgcg.base.format.encrypt;
 
 import org.springframework.context.annotation.Import;
 
@@ -14,6 +14,6 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Import({RequestBodyHandler.class, ResponseBodyHandler.class})
+@Import({RequestBodyHandler.class, ResponseBodyEncryptHandler.class})
 public @interface EnableEncryptApi {
 }

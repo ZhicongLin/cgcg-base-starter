@@ -1,4 +1,4 @@
-package com.cgcg.base.exception;
+package com.cgcg.base.core.exception;
 
 /**
  * 加密参数错误.

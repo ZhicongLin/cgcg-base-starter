@@ -1,6 +1,6 @@
-package com.cgcg.base.exception;
+package com.cgcg.base.core.exception;
 
-import com.cgcg.base.vo.Result;
+import com.cgcg.base.format.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

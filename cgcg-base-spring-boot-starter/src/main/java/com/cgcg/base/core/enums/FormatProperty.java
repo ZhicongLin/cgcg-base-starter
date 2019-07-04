@@ -1,14 +1,18 @@
-package com.cgcg.base.enums;
+package com.cgcg.base.core.enums;
 
-import com.cgcg.base.context.SpringContextHolder;
+import com.cgcg.base.core.context.SpringContextHolder;
+import com.cgcg.base.format.Result;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 /**
- * .
+ * 格式化配置文件的枚举类.
  *
  * @author zhicong.lin
  * @date 2019/6/27
  */
+@Slf4j
 @Getter
 public enum FormatProperty {
     //数据格式化配置
@@ -59,5 +63,18 @@ public enum FormatProperty {
             return DES_ROOT.getString();
         }
         return null;
+    }
+
+    public static Class getFormatClass() {
+        final String className = CLASS_NAME.getString();
+        Class<?> formatClass = Result.class;
+        try {
+            if (StringUtils.isNotBlank(className)) {
+                formatClass = Class.forName(className);
+            }
+        } catch (Exception e) {
+            log.warn("[{}={}]配置错误", CLASS_NAME.getKey(), className);
+        }
+        return formatClass;
     }
 }

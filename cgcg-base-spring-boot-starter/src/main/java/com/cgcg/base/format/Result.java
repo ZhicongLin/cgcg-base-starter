@@ -1,4 +1,4 @@
-package com.cgcg.base.vo;
+package com.cgcg.base.format;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

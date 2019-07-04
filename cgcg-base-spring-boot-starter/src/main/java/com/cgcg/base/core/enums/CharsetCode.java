@@ -1,4 +1,4 @@
-package com.cgcg.base.enums;
+package com.cgcg.base.core.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

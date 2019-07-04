@@ -2,7 +2,8 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
     com.cgcg.base.interceptor.WebMvcRequestConfigurerAdapter,\
     com.cgcg.base.interceptor.IgnoreHandle,\
     com.cgcg.base.interceptor.InterceptorProperties,\
-    com.cgcg.base.context.SpringContextHolder,\
+    com.cgcg.base.core.context.SpringContextHolder,\
+    com.cgcg.base.format.ResponseBodyFormatHandler,\
     com.cgcg.base.swagger.SwaggerProperties,\
     com.cgcg.base.swagger.SwaggerConfig,\
-    com.cgcg.base.exception.ExceptionHandlerAdvice
+    com.cgcg.base.core.exception.ExceptionHandlerAdvice

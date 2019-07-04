@@ -1,6 +1,6 @@
 package com.cgcg.base.util;
 
-import com.cgcg.base.enums.CharsetCode;
+import com.cgcg.base.core.enums.CharsetCode;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

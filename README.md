@@ -25,6 +25,7 @@ spring boot 服务基础包
             XXX加密参数XXX ==> 解密后{"yes":"ok"}
         返回结果只支持@ResponseBody的加密操作
             加密结果如{ "code": 200, "data": "xxxxxx加密后的字符串xxxx", "message": "操作成功"}
+            如果返回对象不包含配置的加密字段名，则进行整个对象加密
 ### 包引用
     
     git clone 代码到本地
@@ -71,6 +72,7 @@ spring boot 服务基础包
     cgcg.format.response-data: true 开启数据格式化，默认false
     cgcg.format.class-name: com.xxx.xx.ResultXX 有默认类，
         如果需要自定义格式化类，格式化类需要提供静态方法public ResultXX static success(T data);
+    cgcg.format.des.* 如果开启了数据加密，这个密钥需要配置
       
       
 

@@ -1,6 +1,6 @@
 package com.test.base.controller;
 
-import com.cgcg.base.auth.AuthService;
+import com.cgcg.base.interceptor.auth.AuthService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

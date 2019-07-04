@@ -1,6 +1,6 @@
-package com.cgcg.base.context;
+package com.cgcg.base.core.context;
 
-import com.cgcg.base.enums.FormatProperty;
+import com.cgcg.base.core.enums.FormatProperty;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;

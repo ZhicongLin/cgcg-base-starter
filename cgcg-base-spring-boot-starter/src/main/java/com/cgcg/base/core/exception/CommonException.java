@@ -1,4 +1,4 @@
-package com.cgcg.base.exception;
+package com.cgcg.base.core.exception;
 
 import lombok.Getter;
 import lombok.Setter;

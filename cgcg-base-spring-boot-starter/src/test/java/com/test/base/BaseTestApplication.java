@@ -1,6 +1,6 @@
 package com.test.base;
 
-import com.cgcg.base.encrypt.EnableEncryptApi;
+import com.cgcg.base.format.encrypt.EnableEncryptApi;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -17,4 +17,6 @@ public class BaseTestApplication {
     public static void main(String[] args) {
         SpringApplication.run(BaseTestApplication.class, args);
     }
+
+
 }

@@ -1,4 +1,4 @@
-package com.cgcg.base.encrypt;
+package com.cgcg.base.format.encrypt;
 
 import org.springframework.web.bind.annotation.RestController;
 

@@ -1,4 +1,4 @@
-package com.cgcg.base.auth;
+package com.cgcg.base.interceptor.auth;
 
 import org.springframework.web.servlet.ModelAndView;
 

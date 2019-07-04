@@ -2,8 +2,8 @@ package com.cgcg.base.util;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.cgcg.base.context.SpringContextHolder;
-import com.cgcg.base.enums.CharsetCode;
+import com.cgcg.base.core.context.SpringContextHolder;
+import com.cgcg.base.core.enums.CharsetCode;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.codec.binary.Hex;
