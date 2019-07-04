@@ -20,3 +20,6 @@ spring:
   mvc:
     static-path-pattern: /static/**
     throw-exception-if-no-handler-found: true
+logging:
+  level:
+    com: debug

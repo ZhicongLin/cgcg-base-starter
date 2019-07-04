@@ -2,6 +2,7 @@ package com.test.base.controller;
 
 import com.cgcg.base.core.exception.CommonException;
 import com.cgcg.base.format.Result;
+import com.cgcg.base.format.encrypt.Encrypt;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
@@ -46,6 +47,7 @@ public class TestController {
     }
 
     @ApiOperation("POST接口")
+    @Encrypt
     @PostMapping
     public List gets(@RequestBody Map<String, String> param) {
         if (Integer.valueOf(param.get("id")) == 1) {

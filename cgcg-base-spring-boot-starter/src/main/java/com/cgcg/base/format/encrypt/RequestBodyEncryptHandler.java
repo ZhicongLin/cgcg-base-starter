@@ -2,6 +2,7 @@ package com.cgcg.base.format.encrypt;
 
 import com.cgcg.base.core.enums.FormatProperty;
 import com.cgcg.base.core.exception.EncryptionParamWrongException;
+import com.cgcg.base.util.AnnotationUtil;
 import com.cgcg.base.util.DES3Util;
 import com.cgcg.base.util.HttpHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -30,15 +31,15 @@ import java.util.Objects;
  */
 @Slf4j
 @ControllerAdvice
-public class RequestBodyHandler extends RequestBodyAdviceAdapter implements RequestBodyAdvice {
+public class RequestBodyEncryptHandler extends RequestBodyAdviceAdapter implements RequestBodyAdvice {
 
     @Override
     public boolean supports(MethodParameter methodParameter, Type type, Class<? extends HttpMessageConverter<?>> aClass) {
-        final Encrypt encrypt = Objects.requireNonNull(methodParameter.getMethod()).getDeclaringClass().getAnnotation(Encrypt.class);
-        final EncryptController controllerFlag = Objects.requireNonNull(methodParameter.getMethod()).getDeclaringClass().getAnnotation(EncryptController.class);
-        final boolean methodFlag = methodParameter.hasMethodAnnotation(Encrypt.class);
-        final boolean requestBodyFlag = methodParameter.hasParameterAnnotation(RequestBody.class);
-        return (encrypt != null || controllerFlag != null || methodFlag) && requestBodyFlag;
+        final Class<?> declaringClass = Objects.requireNonNull(methodParameter.getMethod()).getDeclaringClass();
+        if (!methodParameter.hasMethodAnnotation(Encrypt.class) && !AnnotationUtil.hasAnnotation(declaringClass, Encrypt.class)) {
+            return false;
+        }
+        return methodParameter.hasParameterAnnotation(RequestBody.class);
     }
 
     @Override
@@ -48,6 +49,7 @@ public class RequestBodyHandler extends RequestBodyAdviceAdapter implements Requ
             public InputStream getBody() throws IOException {
                 final String requestBodyString = HttpHelper.getStringBody(httpInputMessage.getBody());
                 final String requestParam = DES3Util.decryptMode(requestBodyString, FormatProperty.des(FormatProperty.DES_PARAM));
+                log.debug("body ==>[{}]", requestBodyString, requestParam);
                 if (StringUtils.isBlank(requestParam)) {
                     throw new EncryptionParamWrongException(requestBodyString);
                 }
