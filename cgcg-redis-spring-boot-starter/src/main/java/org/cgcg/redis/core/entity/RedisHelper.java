@@ -8,10 +8,7 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -152,6 +149,14 @@ public class RedisHelper {
 
     public void del(String... key) {
         redisCacheTemplate.delete(Arrays.asList(key));
+    }
+
+    public void del(Collection<String> keys) {
+        redisCacheTemplate.delete(keys);
+    }
+
+    public Set<String> keys(String name) {
+        return redisCacheTemplate.keys(name + "*");
     }
 
     public void remove(String name, Object... key) {

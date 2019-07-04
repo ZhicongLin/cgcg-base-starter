@@ -10,9 +10,10 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.Set;
 
 /**
- * .
+ * Redis缓存处理Aop.
  *
  * @author zhicong.lin
  * @date 2019/6/20
@@ -55,59 +56,63 @@ public class RedisAspect {
 
     /**
      * 清空当前缓存的所有数据
+     *
      * @auth zhicong.lin
      * @date 2019/6/26
      */
     private void flushCache(CacheNameObject cno) {
+        final Set<String> keys = redisHelper.keys(cno.getName() + ":");
         //清空缓存数据
         if (cno.isLock()) {
             RedisTask.executeAsync(this.redisHelper, cno.getName(), new Callback() {
                 @Override
                 public void execute() {
-                    redisHelper.del(cno.getName());
+                    redisHelper.del(keys);
                 }
             });
         } else {
-            redisHelper.del(cno.getName());
+            redisHelper.del(keys);
         }
     }
 
     /**
      * 删除缓存结果数据
+     *
      * @auth zhicong.lin
      * @date 2019/6/26
      */
     private void deleteCache(CacheNameObject cno, String cacheKey) {
-        final String lockKey = cno.getName() + cacheKey;
+        final String key = cno.getName() + ":" + cacheKey;
         //删除的注解，在方法执行完成后，执行删除
         if (cno.isLock()) {
-            RedisTask.executeAsync(this.redisHelper, lockKey, new Callback() {
+            RedisTask.executeAsync(this.redisHelper, key, new Callback() {
                 @Override
                 public void execute() {
-                    redisHelper.remove(cno.getName(), cacheKey);
+                    redisHelper.del(key);
                 }
             });
         } else {
-            redisHelper.remove(cno.getName(), cacheKey);
+            redisHelper.del(key);
         }
     }
 
     /**
      * 缓存执行结果数据
+     *
      * @auth zhicong.lin
      * @date 2019/6/26
      */
     private void cacheMethodValue(RedisCacheObject rco, String cacheName, String cacheKey, Object proceed) {
+        final String key = cacheName + ":" + cacheKey;
         if (rco.getCno() != null && rco.getCno().isLock()) {
-            final String lockKey = cacheName + cacheKey;
-            RedisTask.executeAsync(this.redisHelper, lockKey, new Callback() {
+            RedisTask.executeAsync(this.redisHelper, key, new Callback() {
                 @Override
                 public void execute() {
-                    redisHelper.hset(cacheName, cacheKey, proceed, rco.getTime(), rco.getUnit());
+                    redisHelper.set(key, proceed, rco.getTime(), rco.getUnit());
                 }
             });
         } else {
-            redisHelper.hset(cacheName, cacheKey, proceed, rco.getTime(), rco.getUnit());
+            redisHelper.set(key, proceed, rco.getTime(), rco.getUnit());
         }
     }
 

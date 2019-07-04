@@ -5,8 +5,6 @@ import org.cgcg.redis.core.annotation.RedisNameSpace;
 import org.cgcg.redis.core.enums.RedisEnum;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
-
 /**
  * .
  *
@@ -27,7 +25,7 @@ public class TestService {
         return new User(user.getName() + "asd", "sdf");
     }
 
-    @RedisCache(key = "#user.code")
+    @RedisCache(key = "#user.code", type = RedisEnum.DEL)
     public int delete(User user) {
         return 1;
     }
