@@ -1,6 +1,5 @@
 package com.test.base.controller;
 
-import com.cgcg.base.format.encrypt.EncryptController;
 import com.cgcg.base.core.exception.CommonException;
 import com.cgcg.base.format.Result;
 import io.swagger.annotations.Api;
@@ -19,7 +18,7 @@ import java.util.Map;
  * @date 2019/6/24
  */
 @Api(tags = "测试接口文档")
-@EncryptController
+@RestController
 @RequestMapping("test")
 public class TestController {
 

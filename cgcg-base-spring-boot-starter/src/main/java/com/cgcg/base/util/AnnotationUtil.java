@@ -1,5 +1,7 @@
 package com.cgcg.base.util;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Indexed;
@@ -15,7 +17,8 @@ import java.util.List;
  * @author zhicong.lin
  * @date 2019/7/4
  */
-public class AnnotationUtil {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class AnnotationUtil {
     private static List<Class<?>> ignore = Arrays.asList(Documented.class, Target.class, Retention.class,
             Controller.class, Component.class, Indexed.class, Inherited.class);
 
@@ -43,7 +46,7 @@ public class AnnotationUtil {
             }
             boolean flag = false;
             if (!ignore.contains(annoType)) {
-                flag = hasResponseBody(annoType);
+                flag = hasAnnotation(annoType, annotationType);
             }
             if (flag) {
                 return true;
