@@ -33,7 +33,8 @@ public class RedisAspect {
         final String cacheKey = rco.getCacheKey();
         if (!RedisEnum.UPD.equals(cno.getSuffix()) && !RedisEnum.DEL.equals(cno.getSuffix()) && !RedisEnum.FLUSH.equals(cno.getSuffix())) {
             //查询的注解，先去查询缓存
-            final Object cacheResult = redisHelper.hget(rco.getCacheName(), rco.getCacheKey());
+            final String key = cno.getName() + ":" + cacheKey;
+            final Object cacheResult = redisHelper.get(key);
             if (cacheResult != null) {
                 return cacheResult;
             }
