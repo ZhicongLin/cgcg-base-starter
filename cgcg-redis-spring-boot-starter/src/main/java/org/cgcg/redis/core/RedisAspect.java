@@ -6,6 +6,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.cgcg.redis.core.annotation.RedisCache;
 import org.cgcg.redis.core.entity.*;
 import org.cgcg.redis.core.enums.RedisEnum;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +19,7 @@ import java.util.Set;
  * @author zhicong.lin
  * @date 2019/6/20
  */
+@Order(-1)
 @Aspect
 @Component
 public class RedisAspect {

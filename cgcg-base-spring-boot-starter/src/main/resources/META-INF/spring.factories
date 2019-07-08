@@ -7,4 +7,5 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
     com.cgcg.base.format.ResponseBodyFormatHandler,\
     com.cgcg.base.swagger.SwaggerProperties,\
     com.cgcg.base.swagger.SwaggerConfig,\
-    com.cgcg.base.core.exception.ExceptionHandlerAdvice
+    com.cgcg.base.core.exception.ExceptionHandlerAdvice,\
+    com.cgcg.base.validate.ValidateAspect

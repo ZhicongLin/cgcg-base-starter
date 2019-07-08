@@ -41,3 +41,6 @@
       
       
 
+### 版本迭代
+    1.2.1.release 修改redis缓存key-value的形式，每个kv使用单独过期时间（原先用的hset，过期时间配置会存在问题）
+    1.2.2.release 支持base包中数据校验，添加优先顺序，@Validate和@RedisCache同时注解时，优先执行@RedisCache

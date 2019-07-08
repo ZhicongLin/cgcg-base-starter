@@ -1,6 +1,7 @@
 package com.test.base.controller;
 
 import com.cgcg.base.interceptor.auth.AuthService;
+import com.cgcg.base.validate.ValidateException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -24,5 +25,11 @@ public class AuthServiceImpl implements AuthService {
             return true;
 //        }
 //        return false;
+    }
+
+    void test(String vld) {
+        if ("1" .equals(vld) ) {
+            throw new ValidateException(1234, "youbug");
+        }
     }
 }
