@@ -1,6 +1,5 @@
 package com.cgcg.service;
 
-import com.cgcg.base.validate.annotation.Validate;
 import org.cgcg.redis.core.annotation.RedisCache;
 import org.cgcg.redis.core.annotation.RedisNameSpace;
 import org.cgcg.redis.core.enums.RedisEnum;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Service;
 @RedisNameSpace(cache = "TestService", expire = "test.time")
 public class TestService {
 
-    @Validate(value = TestValidate.class, method = "vali")
     @RedisCache(key = "#p0", type = RedisEnum.SEL)
     public User getSer(String key) {
         return new User("ahaha", key);
