@@ -1,11 +1,15 @@
 package org.cgcg.redis.core.entity;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.cgcg.redis.core.RedisManager;
 import org.springframework.data.redis.core.RedisTemplate;
 
 /**
  * redis分布式锁的实现
  */
+@Setter
+@Getter
 public class RedisLock {
 
     private RedisTemplate<String, Object> redisTemplate;
@@ -49,10 +53,6 @@ public class RedisLock {
         this.expireMsecs = expireMsecs;
     }
 
-    public String getLockKey() {
-        return lockKey;
-    }
-
     /**
      * 封装和jedis方法
      * @param key
@@ -88,9 +88,8 @@ public class RedisLock {
     /**
      * 获取锁
      * @return 获取锁成功返回ture，超时返回false
-     * @throws InterruptedException
      */
-    public synchronized boolean lock() throws InterruptedException {
+    public synchronized boolean lock() {
         long expires = System.currentTimeMillis() + expireMsecs + 1;
         //锁到期时间
         String expiresStr = String.valueOf(expires);

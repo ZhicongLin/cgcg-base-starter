@@ -36,9 +36,10 @@ public class RedisTest {
         }
         Object o = this.redisHelper.get("TestService:keys4");
         String s = JSON.toJSONString(o);
+        System.out.println("s = " + s);
         User ser = testService.getSer(key);
         String s1 = JSON.toJSONString(ser);
-        return s + s1;
+        return  s1;
     }
     @PostMapping("/get")
     public User pu() {

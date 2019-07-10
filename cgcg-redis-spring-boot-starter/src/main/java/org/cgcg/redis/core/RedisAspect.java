@@ -67,12 +67,7 @@ public class RedisAspect {
         final Set<String> keys = redisHelper.keys(cno.getName() + ":");
         //清空缓存数据
         if (cno.isLock()) {
-            RedisTask.executeAsync(this.redisHelper, cno.getName(), new Callback() {
-                @Override
-                public void execute() {
-                    redisHelper.del(keys);
-                }
-            });
+            RedisTask.executeAsync(this.redisHelper, cno.getName(), () -> redisHelper.del(keys));
         } else {
             redisHelper.del(keys);
         }
@@ -88,12 +83,7 @@ public class RedisAspect {
         final String key = cno.getName() + ":" + cacheKey;
         //删除的注解，在方法执行完成后，执行删除
         if (cno.isLock()) {
-            RedisTask.executeAsync(this.redisHelper, key, new Callback() {
-                @Override
-                public void execute() {
-                    redisHelper.del(key);
-                }
-            });
+            RedisTask.executeAsync(this.redisHelper, key, () -> redisHelper.del(key));
         } else {
             redisHelper.del(key);
         }
@@ -108,12 +98,7 @@ public class RedisAspect {
     private void cacheMethodValue(RedisCacheObject rco, String cacheName, String cacheKey, Object proceed) {
         final String key = cacheName + ":" + cacheKey;
         if (rco.getCno() != null && rco.getCno().isLock()) {
-            RedisTask.executeAsync(this.redisHelper, key, new Callback() {
-                @Override
-                public void execute() {
-                    redisHelper.set(key, proceed, rco.getTime(), rco.getUnit());
-                }
-            });
+            RedisTask.executeAsync(this.redisHelper, key, () -> redisHelper.set(key, proceed, rco.getTime(), rco.getUnit()));
         } else {
             redisHelper.set(key, proceed, rco.getTime(), rco.getUnit());
         }

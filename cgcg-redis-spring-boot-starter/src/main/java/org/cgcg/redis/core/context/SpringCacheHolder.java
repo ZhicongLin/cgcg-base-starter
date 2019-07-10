@@ -18,7 +18,6 @@ public class SpringCacheHolder implements ApplicationContextAware {
      * 实现ApplicationContextAware接口的context注入函数, 将其存入静态变量.
      */
     public void setApplicationContext(ApplicationContext applicationContext) {
-        log.info("Initializing SpringCacheHolder");
         Assert.notNull(applicationContext, "SpringCacheHolder Load Error");
         SpringCacheHolder.applicationContext = applicationContext; // NOSONAR
     }

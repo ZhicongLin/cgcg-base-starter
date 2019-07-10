@@ -8,5 +8,5 @@ package org.cgcg.redis.core.entity;
  */
 public interface Callback {
 
-   default void execute() {};
+    void execute();
 }

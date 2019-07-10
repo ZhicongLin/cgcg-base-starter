@@ -44,16 +44,11 @@ public class RedisHelper {
     public boolean lock(String key, int timeout) {
         final String lockKey = LOCK_PREFIX + "_" + key;
         final RedisLock redisLock = new RedisLock(lockKey, timeout);
-        try {
-            final boolean lock = redisLock.lock();
-            if (lock) {
-                locks.put(lockKey, redisLock);
-                return lock;
-            }
-        } catch (InterruptedException e) {
-            log.error(e.getMessage(), e);
+        final boolean lock = redisLock.lock();
+        if (lock) {
+            locks.put(lockKey, redisLock);
         }
-        return false;
+        return lock;
     }
 
     /**
