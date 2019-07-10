@@ -1,5 +1,6 @@
 package com.cgcg.test;
 
+import com.alibaba.fastjson.JSON;
 import com.cgcg.service.TestService;
 import com.cgcg.service.User;
 import org.cgcg.redis.core.entity.RedisHelper;
@@ -28,12 +29,16 @@ public class RedisTest {
     }
 
     @GetMapping("/get")
-    public User get() {
+    public Object get() {
         String key = "keys";
         for (int i = 0; i < 10; i++) {
             testService.getSer(key + i);
         }
-        return testService.getSer(key);
+        Object o = this.redisHelper.get("TestService:keys4");
+        String s = JSON.toJSONString(o);
+        User ser = testService.getSer(key);
+        String s1 = JSON.toJSONString(ser);
+        return s + s1;
     }
     @PostMapping("/get")
     public User pu() {

@@ -1,14 +1,11 @@
 package org.cgcg.redis.core;
 
-import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.cgcg.redis.core.context.SpringCacheHolder;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.stereotype.Component;
 
@@ -24,22 +21,34 @@ import java.util.concurrent.TimeUnit;
  * @date 2019/6/20
  */
 @Slf4j
-@Setter
-@Getter
 @Component
 public class RedisManager {
+    /**
+     * Gets redis template.
+     * @return the redis template
+     */
+    public static RedisTemplate<String, Object> getRedisTemplate() {
+        if (RedisTemplateHolder.redisTemplate == null) {
+            synchronized (RedisTemplateHolder.class) {
+                if (RedisTemplateHolder.redisTemplate == null) {
+                    RedisTemplateHolder.redisTemplate = new RedisTemplate<>();
+                    RedisTemplateHolder.redisTemplate.setConnectionFactory(SpringCacheHolder.getBean(RedisConnectionFactory.class));
+                    JdkSerializationRedisSerializer jdkSerializationRedisSerializer = new JdkSerializationRedisSerializer();
+                    RedisTemplateHolder.redisTemplate.setValueSerializer(jdkSerializationRedisSerializer);
+                    RedisTemplateHolder.redisTemplate.setHashValueSerializer(jdkSerializationRedisSerializer);
+                    // 设置键（key）的序列化采用StringRedisSerializer。
+                    StringRedisSerializer serializer = new StringRedisSerializer();
+                    RedisTemplateHolder.redisTemplate.setKeySerializer(serializer);
+                    RedisTemplateHolder.redisTemplate.setHashKeySerializer(serializer);
+                    RedisTemplateHolder.redisTemplate.afterPropertiesSet();
+                }
+            }
+        }
+        return RedisTemplateHolder.redisTemplate;
+    }
 
-    @Primary
-    @Bean("redisCacheTemplate")
-    public RedisTemplate<String, Object> redisTemplate(@Autowired RedisConnectionFactory redisConnectionFactory) {
-        final RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
-        final RedisSerializer<String> serializer = new StringRedisSerializer();
-        redisTemplate.setKeySerializer(serializer);
-        redisTemplate.setHashKeySerializer(serializer);
-        // 开启事务
-        redisTemplate.setEnableTransactionSupport(true);
-        redisTemplate.setConnectionFactory(redisConnectionFactory);
-        return redisTemplate;
+    static class RedisTemplateHolder {
+        private static volatile RedisTemplate<String, Object> redisTemplate;
     }
 
     @Bean("cacheExecutor")

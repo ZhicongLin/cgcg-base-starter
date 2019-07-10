@@ -1,5 +1,6 @@
 package org.cgcg.redis.core.entity;
 
+import org.cgcg.redis.core.RedisManager;
 import org.springframework.data.redis.core.RedisTemplate;
 
 /**
@@ -7,7 +8,7 @@ import org.springframework.data.redis.core.RedisTemplate;
  */
 public class RedisLock {
 
-    private RedisTemplate redisTemplate;
+    private RedisTemplate<String, Object> redisTemplate;
 
     /**
      * 锁的后缀
@@ -31,22 +32,20 @@ public class RedisLock {
 
     /**
      * 构造器
-     * @param redisTemplate
      * @param lockKey 锁的key
      */
-    public RedisLock(RedisTemplate redisTemplate, String lockKey) {
-        this.redisTemplate = redisTemplate;
+    public RedisLock(String lockKey) {
+        this.redisTemplate = RedisManager.getRedisTemplate();
         this.lockKey = lockKey + LOCK_SUFFIX;
     }
 
     /**
      * 构造器
-     * @param redisTemplate
      * @param lockKey 锁的key
      * @param expireMsecs 获取锁的超时时间
      */
-    public RedisLock(RedisTemplate redisTemplate, String lockKey, int expireMsecs) {
-        this(redisTemplate, lockKey);
+    public RedisLock(String lockKey, int expireMsecs) {
+        this(lockKey);
         this.expireMsecs = expireMsecs;
     }
 
@@ -71,7 +70,8 @@ public class RedisLock {
      * @return
      */
     private boolean setNX(final String key, final String value) {
-        return redisTemplate.opsForValue().setIfAbsent(key,value);
+        Boolean result = redisTemplate.opsForValue().setIfAbsent(key, value);
+        return result != null && result;
     }
 
     /**

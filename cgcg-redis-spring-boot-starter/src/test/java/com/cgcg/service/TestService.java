@@ -17,7 +17,7 @@ public class TestService {
 
     @RedisCache(key = "#p0", type = RedisEnum.SEL)
     public User getSer(String key) {
-        return new User("ahaha", key);
+        return new User("哈哈", key);
     }
 
     @RedisCache(key = "#user.code", expire = "30", type = RedisEnum.FLUSH)
