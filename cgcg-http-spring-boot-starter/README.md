@@ -14,7 +14,7 @@
     
 ## 版本迭代信息--${version}   
 
-### 1.0.0
+### 1.0.0.release
 
      1.提供Http请求功能，GET.POST.PUT.DELETE等方式
      2.提供并使用spring ioc
