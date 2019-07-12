@@ -1,0 +1,69 @@
+{
+  "properties": [
+    {
+      "name": "rest.proxy-target-class",
+      "type": "java.lang.Boolean",
+      "defaultValue": true,
+      "description": "Description for rest.server.port."
+    },
+    {
+      "name": "rest.server.host",
+      "type": "java.lang.String",
+      "description": "Description for rest.server.port."
+    },
+    {
+      "name": "rest.server.port",
+      "type": "java.lang.String",
+      "description": "Description for rest.server.port."
+    },
+    {
+      "name": "rest.scan-package",
+      "type": "java.lang.String",
+      "description": "Description for rest.scan-package."
+    },
+    {
+      "name": "rest.server.https",
+      "type": "java.lang.String",
+      "description": "Description for rest.server.https."
+    },
+    {
+      "name": "rest.auth.server.host",
+      "type": "java.lang.String",
+      "description": "Description for rest.server.port."
+    },
+    {
+      "name": "rest.auth.key-info",
+      "type": "java.lang.String",
+      "description": "Description for rest.auth.key-info."
+    },
+    {
+      "name": "rest.auth.secret-info",
+      "type": "java.lang.String",
+      "description": "Description for rest.auth.secret-info."
+    },
+    {
+      "name": "rest.auth.auth-prefix",
+      "type": "java.lang.String",
+      "description": "Description for rest.auth.auth-prefix."
+    },
+    {
+      "name": "rest.auth.exclude",
+      "type": "java.lang.String",
+      "description": "Description for rest.auth.exclude."
+    },
+    {
+      "name": "rest.access-token.host",
+      "type": "java.lang.String",
+      "description": "Description for rest.access-token.host."
+    },
+    {
+      "name": "rest.access-token.port",
+      "type": "java.lang.String",
+      "description": "Description for rest.access-token.port."
+    },
+    {
+      "name": "rest.access-token.https",
+      "type": "java.lang.String",
+      "description": "Description for rest.access-token.https."
+    }
+  ] }
