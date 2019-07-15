@@ -1,6 +1,7 @@
 package org.cgcg.redis.mybatis.annotation;
 
 import org.cgcg.redis.mybatis.CgBeanHolder;
+import org.cgcg.redis.mybatis.ExceptionHandlerAdvice;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;
@@ -14,6 +15,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
 @Documented
-@Import({CgBeanHolder.class})
+@Import({CgBeanHolder.class, ExceptionHandlerAdvice.class})
 public @interface EnableMyBatisCache {
 }

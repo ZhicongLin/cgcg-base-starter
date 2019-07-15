@@ -19,8 +19,8 @@ import java.util.Map;
 @CacheNamespace(implementation = RedisCacheManager.class)
 public interface TestMapper {
 
-    @Select("select * from cl_user")
+    @Select("select * from cl_user1")
     List<Map<String ,Object>> findAll();
-    @Update("update cl_user set login_name = '2222' where login_name = '1212'")
+    @Update("update cl_user1 set login_name = '2222' where login_name = '1212'")
     int update();
 }

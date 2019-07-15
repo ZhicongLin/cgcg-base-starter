@@ -1,6 +1,7 @@
 package com.cgcg.rest.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -17,6 +18,7 @@ import java.util.Map;
  * @version : 2017/10/17.
  */
 @Slf4j
+@Order(1)
 @ResponseBody
 @ControllerAdvice
 public class ExceptionHandlerAdvice {

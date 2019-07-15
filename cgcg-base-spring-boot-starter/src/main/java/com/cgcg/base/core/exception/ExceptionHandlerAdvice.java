@@ -4,7 +4,6 @@ import com.cgcg.base.format.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindException;
@@ -19,10 +18,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
-import java.sql.SQLIntegrityConstraintViolationException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -73,48 +68,6 @@ public class ExceptionHandlerAdvice {
         String parameterType = e.getParameterType();
         log.error("缺少必填参数{} {}", parameterType, parameterName, e);
         return Result.error(100400, "缺少必填参数:" + parameterName );
-    }
-
-    /**
-     * Handle exception result.
-     *
-     * @param e the e
-     * @return the result
-     */
-    @ExceptionHandler(DataIntegrityViolationException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public Result handleException(DataIntegrityViolationException e) {
-        final Throwable cause = getCause(e);
-        String message = "数据完整性冲突";
-        if (cause instanceof SQLIntegrityConstraintViolationException) {
-            final String msg = cause.getMessage();
-            final List<String> msgResult = getMessage(msg);
-            if (msgResult.size() == 1) {
-                message = "数据库字段" + msgResult.get(0) + "不能为空";
-            } else if (msgResult.size() == 2) {
-                message = "数据库字段" + msgResult.get(1) + "插入错误的值" + msgResult.get(0);
-            }
-        }
-        log.error(message, e);
-        return Result.error(100400, message);
-    }
-
-    private Throwable getCause(Throwable t) {
-        final Throwable cause = t.getCause();
-        if (cause == null) {
-            return t;
-        }
-        return getCause(cause);
-    }
-
-    private List<String> getMessage(String msg) {
-        Pattern p = Pattern.compile("\'(.*?)\'");
-        Matcher m = p.matcher(msg);
-        final ArrayList<String> result = new ArrayList<>();
-        while (m.find()) {
-            result.add(m.group());
-        }
-        return result;
     }
 
     /**
