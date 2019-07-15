@@ -33,8 +33,9 @@ public class ExceptionHandlerAdvice {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Map<String, Object> handleException(RestException e) {
         Map<String, Object> result = new HashMap<>();
-        result.put("errorCode", e.getErrorCode());
-        result.put("errorMsg", e.getErrorMsg());
+        result.put("code", e.getErrorCode());
+        result.put("message", e.getErrorMsg());
+        result.put("data", null);
         return result;
     }
 
