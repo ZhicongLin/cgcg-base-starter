@@ -15,9 +15,9 @@ public class RestCglibFactoryBean implements FactoryBean {
     private Enhancer enhancer = new Enhancer();
 
     @Override
-    public Object getObject() throws Exception {
+    public Object getObject() {
         enhancer.setSuperclass(interfaceClass);
-        enhancer.setCallback((MethodInterceptor) RestBuilderProcessor::intercept);
+        enhancer.setCallback((MethodInterceptor) (proxy, method, args, methodProxy) -> RestBuilderProcessor.invoke(method, args));
         return enhancer.create();
     }
 

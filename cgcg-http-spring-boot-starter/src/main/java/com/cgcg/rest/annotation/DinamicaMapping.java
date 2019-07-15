@@ -1,6 +1,5 @@
 package com.cgcg.rest.annotation;
 
-import org.springframework.core.annotation.AliasFor;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.lang.annotation.*;
@@ -16,11 +15,7 @@ import java.lang.annotation.*;
 @Documented
 public @interface DinamicaMapping {
 
-    @AliasFor("name")
     String[] value() default {};
-
-    @AliasFor("value")
-    String[] name() default {};
 
     RequestMethod[] method() default RequestMethod.GET;
 }

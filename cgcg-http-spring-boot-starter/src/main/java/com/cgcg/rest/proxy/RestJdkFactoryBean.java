@@ -13,8 +13,8 @@ public class RestJdkFactoryBean implements FactoryBean {
     private Class interfaceClass;
 
     @Override
-    public Object getObject() throws Exception {
-        return Proxy.newProxyInstance(interfaceClass.getClassLoader(), new Class[]{interfaceClass}, RestBuilderProcessor::invoke);
+    public Object getObject() {
+        return Proxy.newProxyInstance(interfaceClass.getClassLoader(), new Class[]{interfaceClass}, (proxy, method, args) -> RestBuilderProcessor.invoke(method, args));
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.cgcg.rest.param;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.http.HttpHeaders;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,4 +28,6 @@ public class RestHandle<T, D> extends HashMap<T, D> {
     private Map<String, Object> uriParams = new HashMap<>();
 
     private String bodyString;
+
+    private HttpHeaders headers;
 }

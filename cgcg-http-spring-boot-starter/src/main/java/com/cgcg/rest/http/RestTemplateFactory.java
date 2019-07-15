@@ -10,10 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -105,7 +102,7 @@ public class RestTemplateFactory {
      * @param url 文件地址，可带参数，如：url="http://1.1.2.10/oss/aaa/bbbb/ccc/TestFileUpload.jpg?companyId=1&ossType=material"
      * @return 二进制流
      */
-    public byte[] loadFileByte(String url, RestHandle<String, Object> params, HttpHeaders headers) {
+    public byte[] loadFileByte(String url, RestHandle<String, Object> params, HttpHeaders headers, HttpMethod httpMethod) {
         final StringBuilder path = new StringBuilder(url);
         if (params != null && params.size() > 0) {
             if (url.indexOf("?") <= 0) {
@@ -120,7 +117,8 @@ public class RestTemplateFactory {
         }
         final HttpEntity<byte[]> requestEntity = new HttpEntity<>(headers);
         try {
-            ResponseEntity<byte[]> result = restTemplate.exchange(path.toString(), HttpMethod.GET, requestEntity, byte[].class);
+            final HttpMethod method = httpMethod != null ? httpMethod : HttpMethod.GET;
+            ResponseEntity<byte[]> result = restTemplate.exchange(path.toString(), method, requestEntity, byte[].class);
             if (result.getStatusCode().is2xxSuccessful()) {
 
                 HttpHeaders resultHeaders = result.getHeaders();
@@ -142,40 +140,40 @@ public class RestTemplateFactory {
             } else {
                 throw new RestException(500, "下载异常");
             }
+        } catch (HttpClientErrorException hse) {
+            log.error(hse.getMessage(), hse);
+            throw new RestException(hse.getStatusCode().value(), hse.getStatusCode().getReasonPhrase());
         } catch (HttpServerErrorException hse) {
+            log.error(hse.getMessage(), hse);
             throw httpErrorMsg(hse);
         }
 
     }
 
     public <T> T execute(String url, HttpMethod httpMethod, RestHandle<String, Object> params, HttpHeaders httpHeaders, Class<T> resultType) {
-        HttpEntity httpEntity = null;
-        if (params.getBodyString() != null) {
-            httpEntity = new HttpEntity<>(params.getBodyString(), httpHeaders);
-        } else {
-            httpEntity = new HttpEntity<>(params, httpHeaders);
-        }
+        HttpEntity httpEntity;
         if (httpMethod.equals(HttpMethod.GET) || httpMethod.equals(HttpMethod.DELETE) || httpMethod.equals(HttpMethod.HEAD)) {
             params.getUriParams().putAll(params);
             httpEntity = new HttpEntity<>(httpHeaders);
+        } else {
+            httpEntity = new HttpEntity<>(params.getBodyString() != null ? params.getBodyString() : params, httpHeaders);
         }
-        final StringBuilder path = new StringBuilder(url);
-        this.fatchUri(params.getUriParams(), path);
-        url = path.toString();
-        return this.executeHttpRequest(url, httpMethod, httpEntity, resultType, params);
+        final StringBuilder pathBuilder = new StringBuilder(url);
+        this.fatchUri(params.getUriParams(), pathBuilder);
+        return this.executeHttpRequest(pathBuilder.toString(), httpMethod, httpEntity, resultType, params);
     }
 
-    private void fatchUri(Map<String, Object> params, StringBuilder path) {
+    private void fatchUri(Map<String, Object> params, StringBuilder pathBuilder) {
         if (params == null || params.size() <= 0) {
             return;
         }
         for (String key : params.keySet()) {
-            if (path.indexOf("?") <= 0) {
-                path.append("?");
+            if (pathBuilder.indexOf("?") <= 0) {
+                pathBuilder.append("?");
             } else {
-                path.append("&");
+                pathBuilder.append("&");
             }
-            path.append(key).append("=").append("{").append(key).append("}");
+            pathBuilder.append(key).append("=").append("{").append(key).append("}");
         }
     }
 
@@ -232,16 +230,17 @@ public class RestTemplateFactory {
             if (error != null) {
                 throw new RestException(error.getErrorCode(), error.getErrorMsg());
             } else {
-                throw new RestException(100001403, "请求服务失败，请检查参数或者资源路径");
+                final HttpStatus statusCode = e.getStatusCode();
+                throw new RestException(statusCode.value(), String.format("链接请求失败[%s]", statusCode.getReasonPhrase()));
             }
         } catch (HttpServerErrorException e) {
             throw httpErrorMsg(e); // 异常处理
         } catch (ResourceAccessException e) {
             log.error(e.getMessage(), e);
             if (Objects.requireNonNull(e.getMessage()).contains("java.net.ConnectException")) {
-                throw new RestException(100001404, "服务连接失败");
+                throw new RestException(404, "服务连接失败");
             }
-            throw new RestException(100002403, "资源不可用");
+            throw new RestException(403, "资源不可用");
         }
     }
 

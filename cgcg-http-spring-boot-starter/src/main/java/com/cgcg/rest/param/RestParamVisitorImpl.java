@@ -1,8 +1,10 @@
 package com.cgcg.rest.param;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.cgcg.rest.annotation.DinamicaMapping;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,6 +13,8 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * RestParam处理实现.
@@ -65,6 +69,30 @@ public class RestParamVisitorImpl implements RestParamVisitor {
         }
         if (annotation instanceof PathVariable) {
             restParam.put(((PathVariable) annotation).value(), param);
+        }
+        if (annotation instanceof RequestHeader) {
+            this.visitor((RequestHeader) annotation, param, restParam);
+        }
+    }
+
+    private void visitor(RequestHeader  requestHeader, Object param, RestHandle<String, Object> restParam) {
+        final String value = requestHeader.value();
+        final HttpHeaders httpHeaders = new HttpHeaders();
+        restParam.setHeaders(httpHeaders);
+        if (StringUtils.isNotBlank(value)) {
+            httpHeaders.add(value, param.toString());
+        } else if (param instanceof HttpHeaders) {
+            final HttpHeaders headers = (HttpHeaders) param;
+            final Set<String> keySet = headers.keySet();
+            for (String key : keySet) {
+                httpHeaders.addAll(key, Objects.requireNonNull(headers.get(key)));
+            }
+        } else {
+            final JSONObject object = JSON.parseObject(JSON.toJSONString(param));
+            final Set<String> keySet = object.keySet();
+            for (String key : keySet) {
+                httpHeaders.add(key, String.valueOf(object.get(key)));
+            }
         }
     }
 

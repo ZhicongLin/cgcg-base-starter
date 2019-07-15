@@ -2,10 +2,8 @@ package com.cgcg.rest;
 
 import com.cgcg.rest.annotation.DinamicaMapping;
 import com.cgcg.rest.annotation.LoadMapping;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.cgcg.rest.annotation.UpLoadMapping;
+import lombok.*;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,35 +19,42 @@ import java.util.List;
  * @date 2019/7/4
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class AnnotationUtil {
-    private static List<Class<?>> mappingAnnotation = Arrays.asList(PostMapping.class, GetMapping.class, PutMapping.class,
-            DeleteMapping.class, PatchMapping.class, LoadMapping.class, RequestMapping.class, DinamicaMapping.class);
+public final class MappingProcessor {
+    private static List<Class<?>> mappingAnnotation = Arrays.asList(RequestMapping.class, PostMapping.class, GetMapping.class, PutMapping.class,
+            DeleteMapping.class, PatchMapping.class, DinamicaMapping.class, LoadMapping.class, UpLoadMapping.class);
 
-    public static MappingHandle buildMappingHandle(Method method) {
-        return buildMappingHandle(method.getDeclaredAnnotations(), null);
+    /**
+     * 获取方法动态资源映射信息
+     *
+     * @param method
+     * @return MappingHandle
+     */
+    public static MappingHandle execute(Method method) {
+        return execute(method.getDeclaredAnnotations(), null);
     }
 
-    private static MappingHandle buildMappingHandle(Annotation[] annotations, String value) {
+    private static MappingHandle execute(Annotation[] annotations, String value) {
         for (Annotation annotation : annotations) {
             final Class<? extends Annotation> annoType = annotation.annotationType();
             if (mappingAnnotation.contains(annoType)) {
-                final String[] valueArr = (String[])ReflectionUtils.invokeMethod(annotation, "value", new Class[]{}, new Object[]{});
+                final String[] valueArr = (String[]) ReflectionUtils.invokeMethod(annotation, "value", new Class[]{}, new Object[]{});
                 if (value == null && valueArr.length > 0) {
                     value = valueArr[0];
                 }
                 try {
-                    final RequestMethod[] method = (RequestMethod[])ReflectionUtils.invokeMethod(annotation, "method", new Class[]{}, new Object[]{});
+                    final RequestMethod[] method = (RequestMethod[]) ReflectionUtils.invokeMethod(annotation, "method", new Class[]{}, new Object[]{});
                     final HttpMethod httpMethod = HttpMethod.valueOf(method.length > 0 ? method[0].name() : RequestMethod.GET.name());
                     return new MappingHandle(value, httpMethod);
                 } catch (IllegalArgumentException e) {
-                    return buildMappingHandle(annoType.getDeclaredAnnotations(), value);
+                    return execute(annoType.getDeclaredAnnotations(), value);
                 }
             }
         }
         return null;
     }
 
-    @Data
+    @Setter
+    @Getter
     @AllArgsConstructor
     public static class MappingHandle {
         private String value;

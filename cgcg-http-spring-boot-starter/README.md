@@ -23,4 +23,4 @@
      5.提供注解扫描和配置扫描两种方案可选
      6.提供jdk代理方式和cglib代理方式
      7.新增LoadMapping文件读取注解，DinamicaMapping动态url和mehtod请求方式的注解
-
+     8.参数@RequestHeader支持，@RequestHeader("value")value不为空时支持string，为空时，支持全部对象属性Object转成header

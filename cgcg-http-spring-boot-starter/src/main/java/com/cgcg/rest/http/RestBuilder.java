@@ -1,7 +1,7 @@
 package com.cgcg.rest.http;
 
-import com.cgcg.rest.AnnotationUtil;
 import com.cgcg.rest.Constant;
+import com.cgcg.rest.MappingProcessor;
 import com.cgcg.rest.SpringContextHolder;
 import com.cgcg.rest.annotation.DinamicaMapping;
 import com.cgcg.rest.annotation.MappingFilter;
@@ -10,7 +10,9 @@ import com.cgcg.rest.filter.RestFilter;
 import com.cgcg.rest.param.RestHandle;
 import com.cgcg.rest.param.RestParamUtils;
 import com.cgcg.rest.proxy.BuilderCallBack;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -22,6 +24,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -33,14 +37,15 @@ import java.util.Objects;
 @Slf4j
 @Setter
 @Getter
-public class RestBuilder {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class RestBuilder {
     private static final String HTTPS = "https";
     private static final String HTTP = "http";
     private static final String HTTP_SEPARATOR = "://";
     private static final String SEPARATOR = ".";
     private static final String HOST = "host";
     private static final String PORT = "port";
-
+    private static volatile Map<Method, RestBuilder> builderMap = new HashMap<>();
     private HttpHeaders httpHeaders = new HttpHeaders();
 
     private Method method;
@@ -57,17 +62,26 @@ public class RestBuilder {
 
     private boolean isHttps;
 
+    public static RestBuilder getInstance(Method method) {
+        RestBuilder restBuilder = builderMap.get(method);
+        if (restBuilder == null) {
+            synchronized (RestBuilder.class) {
+                restBuilder = builderMap.get(method);
+                if (restBuilder == null) {
+                    restBuilder = new RestBuilder(method);
+                }
+            }
+        }
+        return restBuilder;
+    }
+
     /**
-     * 创建Builder.
+     * 创建RestBuilder
      *
-     * @Param: [method, args]
-     * @Return:
-     * @Author: ZhiCong.Lin
-     * @Date:
+     * @param method
      */
-    public RestBuilder(Method method, Object[] args) {
+    private RestBuilder(Method method) {
         this.method = method;
-        this.args = args;
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (requestAttributes != null) {
             HttpServletRequest request = requestAttributes.getRequest();
@@ -76,17 +90,54 @@ public class RestBuilder {
             }
         }
         this.buildFilter(method);
-        if (filter != null) {
-            if (filter.pre(method, args)) {
-                this.generation(method, args);
+        this.initURI(method);
+        this.builderSchema();
+    }
+
+    /**
+     * 添加请求参数
+     *
+     * @param args
+     * @return
+     */
+    public RestBuilder addArgs(Object[] args) {
+        if (args == null) {
+            return this;
+        }
+        this.args = args;
+        if (method.getDeclaredAnnotation(DinamicaMapping.class) != null) {
+            for (Object parameter : this.args) {
+                if (parameter instanceof HttpMethod) {
+                    this.httpMethod = (HttpMethod) parameter;
+                }
             }
+        }
+        this.params = RestParamUtils.getRestParam(method, args, url);
+        this.buildHeader();
+        return this;
+    }
+
+    /**
+     * 添加头部信息
+     */
+    private void buildHeader() {
+        final HttpHeaders headers = this.params.getHeaders();
+        if (headers != null) {
+            this.httpHeaders = headers;
         } else {
-            this.generation(method, args);
+            this.httpHeaders = new HttpHeaders();
+        }
+        if (this.params.getContentType() != null) {
+            this.httpHeaders.add("content-type", this.params.getContentType());
+        }
+        if (this.params.getAccept() != null) {
+            this.httpHeaders.add("Accept", this.params.getAccept());
         }
     }
 
     /**
      * 生成过滤器
+     *
      * @param method
      */
     private void buildFilter(Method method) {
@@ -109,7 +160,7 @@ public class RestBuilder {
      * @Author: ZhiCong Lin
      * @Date: 2018/8/9 11:36
      */
-    private String createUrl(String serverUri, String methodUri) {
+    private String buildURL(String serverUri, String methodUri) {
         if (StringUtils.isNotBlank(methodUri)) {
             final String uriSep = "/";
             return serverUri + (serverUri.endsWith(uriSep) || methodUri.startsWith(uriSep) ? "" : uriSep) + methodUri;
@@ -119,33 +170,16 @@ public class RestBuilder {
 
     /**
      * 生成资源参数
+     *
      * @param method
-     * @param args
      */
-    private void generation(Method method, Object[] args) {
+    private void initURI(Method method) {
         RestClient restClient = method.getDeclaringClass().getAnnotation(RestClient.class);
-        url = StringUtils.isNotBlank(restClient.url()) ? this.getUrlProperties(restClient) : this.getProperties(restClient.value());
-        final AnnotationUtil.MappingHandle handle = AnnotationUtil.buildMappingHandle(method);
-        String methodUri = "";
+        this.url = StringUtils.isNotBlank(restClient.url()) ? this.getUrlProperties(restClient) : this.getProperties(restClient.value());
+        final MappingProcessor.MappingHandle handle = MappingProcessor.execute(method);
         if (handle != null) {
             this.httpMethod = handle.getHttpMethod();
-            methodUri = handle.getValue();
-        }
-        if (method.getDeclaredAnnotation(DinamicaMapping.class) != null) {
-            for (Object parameter : args) {
-                if (parameter instanceof HttpMethod) {
-                    this.httpMethod = (HttpMethod) parameter;
-                }
-            }
-        }
-        this.params = RestParamUtils.getRestParam(method, args, createUrl(url, methodUri));
-        this.url = this.params.getUrl();
-        this.httpHeaders = new HttpHeaders();
-        if (this.params.getContentType() != null) {
-            this.httpHeaders.add("content-type", this.params.getContentType());
-        }
-        if (this.params.getAccept() != null) {
-            this.httpHeaders.add("Accept", this.params.getAccept());
+            this.url = this.buildURL(url, handle.getValue());
         }
     }
 
@@ -171,25 +205,17 @@ public class RestBuilder {
         return httpString + host + (StringUtils.isNotBlank(port) ? ":" + port : "");
     }
 
-    /**
-     * 发起http回调 .
-     *
-     * @Param: [callBack]
-     * @Return: java.lang.Object
-     * @Author: ZhiCong Lin
-     * @Date: 2018/8/21 17:10
-     */
-    public Object bulid(BuilderCallBack callBack) {
-        this.builderSchema();
+    public Object execute(BuilderCallBack call) {
         if (this.filter != null) {
             this.filter.postServer(url, httpMethod, params, httpHeaders, method.getReturnType());
         }
-        final Object execute = callBack.execute(method, args, url, this.httpMethod, this.params, this.httpHeaders, method.getReturnType());
+        final Object result = call.execute(method, args, url, this.httpMethod, this.params, this.httpHeaders, method.getReturnType());
         if (this.filter != null) {
-            return this.filter.end(execute, method.getReturnType());
+            return this.filter.end(result, method.getReturnType());
         }
-        return execute;
+        return result;
     }
+
 
     private void builderSchema() {
         String schema = "http://";

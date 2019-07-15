@@ -12,9 +12,9 @@ public class HttpController {
     @Resource
     private TestClient testClient;
     @GetMapping("/hasLabel")
-    public Object result() {
+    public Object result(String id) {
         HashMap<String, Object> param = new HashMap<>();
-        param.put("accountId", "8c503264549f4866a686ad67c7f87c2d");
+        param.put("accountId", id);
         return testClient.hasLabel(param, "h5");
     }
 }
