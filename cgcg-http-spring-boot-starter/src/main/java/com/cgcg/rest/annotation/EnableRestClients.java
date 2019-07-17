@@ -1,6 +1,6 @@
 package com.cgcg.rest.annotation;
 
-import com.cgcg.rest.RestRegistryBean;
+import com.cgcg.rest.RestClientsRegistrar;
 import com.cgcg.rest.SpringContextHolder;
 import com.cgcg.rest.exception.RestExceptionHandlerAdvice;
 import com.cgcg.rest.http.RestTemplateConfigure;
@@ -21,7 +21,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
 @Documented
-@Import({SpringContextHolder.class, RestExceptionHandlerAdvice.class, RestTemplateConfigure.class, RestProperties.class, RestServerProperties.class, RestTemplateFactory.class, RestRegistryBean.class})
+@Import({SpringContextHolder.class, RestExceptionHandlerAdvice.class, RestTemplateConfigure.class, RestProperties.class, RestServerProperties.class, RestTemplateFactory.class, RestClientsRegistrar.class})
 public @interface EnableRestClients {
 
     @AliasFor("basePackages")
