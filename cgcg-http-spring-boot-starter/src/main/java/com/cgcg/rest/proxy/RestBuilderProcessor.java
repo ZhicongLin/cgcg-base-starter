@@ -7,8 +7,6 @@ import com.cgcg.rest.http.RestBuilder;
 import com.cgcg.rest.http.RestTemplateFactory;
 import com.cgcg.rest.param.RestHandle;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 
@@ -32,9 +30,8 @@ public class RestBuilderProcessor implements BuilderCallBack {
         final long start = System.currentTimeMillis();
         final RestBuilder builder = RestBuilder.getInstance(method);
         final Object execute = builder.addArgs(args).execute(restBuilderProcessor);
-        if (log.isDebugEnabled()) {
-            Logger logger = LoggerFactory.getLogger(builder.getMethodName());
-            logger.debug("Response {} {}ms", builder.getUrl() , (System.currentTimeMillis() - start));
+        if (builder.getMethodLogger() != null) {
+            builder.getMethodLogger().debug("Response {}ms", (System.currentTimeMillis() - start));
         }
         return execute;
     }

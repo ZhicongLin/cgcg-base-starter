@@ -16,6 +16,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -62,7 +64,7 @@ public final class RestBuilder {
 
     private boolean isHttps;
 
-    private String methodName;
+    private Logger methodLogger;
 
     public static RestBuilder getInstance(Method method) {
         RestBuilder restBuilder = builderMap.get(method);
@@ -89,7 +91,7 @@ public final class RestBuilder {
             HttpServletRequest request = requestAttributes.getRequest();
             if (request.getAttribute(Constant.REST_METHOD_NAME) == null) {
                 final String methodName = this.method.getDeclaringClass().getName() + "#" + method.getName();
-                this.methodName = methodName;
+                this.methodLogger = LoggerFactory.getLogger(methodName);
                 request.setAttribute(Constant.REST_METHOD_NAME, methodName);
             }
         }
