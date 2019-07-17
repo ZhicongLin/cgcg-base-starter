@@ -6,6 +6,9 @@ import com.cgcg.rest.annotation.UpLoadMapping;
 import com.cgcg.rest.http.RestBuilder;
 import com.cgcg.rest.http.RestTemplateFactory;
 import com.cgcg.rest.param.RestHandle;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 
@@ -17,6 +20,7 @@ import java.lang.reflect.Method;
  * @Author: ZhiCong.Lin
  * @Create: 2018-08-21 13:49
  */
+@Slf4j
 public class RestBuilderProcessor implements BuilderCallBack {
 
     private static RestBuilderProcessor restBuilderProcessor = new RestBuilderProcessor();
@@ -25,7 +29,14 @@ public class RestBuilderProcessor implements BuilderCallBack {
      * 包装调用方法：进行预处理、调用后处理
      */
     public static Object invoke(Method method, Object[] args) {
-        return RestBuilder.getInstance(method).addArgs(args).execute(restBuilderProcessor);
+        final long start = System.currentTimeMillis();
+        final RestBuilder builder = RestBuilder.getInstance(method);
+        final Object execute = builder.addArgs(args).execute(restBuilderProcessor);
+        if (log.isDebugEnabled()) {
+            Logger logger = LoggerFactory.getLogger(builder.getMethodName());
+            logger.debug("Response {} {}ms", builder.getUrl() , (System.currentTimeMillis() - start));
+        }
+        return execute;
     }
 
     /**

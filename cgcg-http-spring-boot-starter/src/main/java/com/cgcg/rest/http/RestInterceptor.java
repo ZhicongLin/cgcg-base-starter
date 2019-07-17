@@ -48,9 +48,6 @@ public class RestInterceptor implements ClientHttpRequestInterceptor {
                 logger.debug("Body    {}", new String(bytes, StandardCharsets.UTF_8));
             }
         }
-        long start = System.currentTimeMillis();
-        ClientHttpResponse execute = clientHttpRequestExecution.execute(httpRequest, bytes);
-        logger.debug("Response {}\t{}ms.", uri, System.currentTimeMillis() - start);
-        return execute;
+        return clientHttpRequestExecution.execute(httpRequest, bytes);
     }
 }

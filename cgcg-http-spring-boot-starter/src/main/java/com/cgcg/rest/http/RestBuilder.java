@@ -62,6 +62,8 @@ public final class RestBuilder {
 
     private boolean isHttps;
 
+    private String methodName;
+
     public static RestBuilder getInstance(Method method) {
         RestBuilder restBuilder = builderMap.get(method);
         if (restBuilder == null) {
@@ -86,7 +88,9 @@ public final class RestBuilder {
         if (requestAttributes != null) {
             HttpServletRequest request = requestAttributes.getRequest();
             if (request.getAttribute(Constant.REST_METHOD_NAME) == null) {
-                request.setAttribute(Constant.REST_METHOD_NAME, this.method.getDeclaringClass().getName() + "#" + method.getName());
+                final String methodName = this.method.getDeclaringClass().getName() + "#" + method.getName();
+                this.methodName = methodName;
+                request.setAttribute(Constant.REST_METHOD_NAME, methodName);
             }
         }
         this.buildFilter(method);
