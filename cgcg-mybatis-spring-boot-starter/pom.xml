@@ -16,12 +16,12 @@
         <dependency>
             <groupId>com.cgcg</groupId>
             <artifactId>cgcg-base-spring-boot-starter</artifactId>
-            <version>1.2.3.release</version>
+            <version>1.2.2.release</version>
         </dependency>
         <dependency>
             <groupId>com.cgcg</groupId>
             <artifactId>cgcg-redis-spring-boot-starter</artifactId>
-            <version>1.2.3.release</version>
+            <version>1.2.2.release</version>
         </dependency>
         <dependency>
             <groupId>org.mybatis.spring.boot</groupId>
