@@ -1,0 +1,5 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+    org.cgcg.redis.core.RedisAspect,\
+    org.cgcg.redis.core.RedisManager,\
+    org.cgcg.redis.core.context.SpringCacheHolder,\
+    org.cgcg.redis.core.entity.RedisHelper

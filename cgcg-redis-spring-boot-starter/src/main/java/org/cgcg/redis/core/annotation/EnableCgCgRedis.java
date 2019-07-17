@@ -12,6 +12,7 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE})
 @Documented
 @Import({SpringCacheHolder.class ,RedisManager.class, RedisAspect.class, RedisHelper.class})
+@Deprecated
 public @interface EnableCgCgRedis {
 
     String value() default "";

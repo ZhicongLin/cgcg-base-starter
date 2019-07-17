@@ -1,4 +1,4 @@
-package org.cgcg.redis.mybatis;
+package com.cgcg.redis.mybatis;
 
 import com.cgcg.base.format.Result;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
 @Order(-1)
 @ResponseBody
 @ControllerAdvice
-public class ExceptionHandlerAdvice {
+public class MybatisExceptionHandlerAdvice {
 
     /**
      * Handle exception result.

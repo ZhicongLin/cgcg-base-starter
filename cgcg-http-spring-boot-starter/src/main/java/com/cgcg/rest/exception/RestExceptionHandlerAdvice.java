@@ -21,7 +21,7 @@ import java.util.Map;
 @Order(1)
 @ResponseBody
 @ControllerAdvice
-public class ExceptionHandlerAdvice {
+public class RestExceptionHandlerAdvice {
 
     /**
      * Handle exception result.
