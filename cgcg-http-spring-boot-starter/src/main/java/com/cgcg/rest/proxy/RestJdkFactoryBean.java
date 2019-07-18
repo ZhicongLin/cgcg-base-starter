@@ -11,10 +11,10 @@ import java.lang.reflect.Proxy;
 public class RestJdkFactoryBean implements FactoryBean {
 
     private Class interfaceClass;
-
+    private Object fallbackBean;
     @Override
     public Object getObject() {
-        return Proxy.newProxyInstance(interfaceClass.getClassLoader(), new Class[]{interfaceClass}, (proxy, method, args) -> RestBuilderProcessor.invoke(method, args));
+        return Proxy.newProxyInstance(interfaceClass.getClassLoader(), new Class[]{interfaceClass}, (proxy, method, args) -> RestBuilderProcessor.invoke(method, args, fallbackBean));
     }
 
     @Override

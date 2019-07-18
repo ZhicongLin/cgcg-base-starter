@@ -14,10 +14,11 @@ public class RestCglibFactoryBean implements FactoryBean {
 
     private Enhancer enhancer = new Enhancer();
 
+    private Object fallbackBean;
     @Override
     public Object getObject() {
         enhancer.setSuperclass(interfaceClass);
-        enhancer.setCallback((MethodInterceptor) (proxy, method, args, methodProxy) -> RestBuilderProcessor.invoke(method, args));
+        enhancer.setCallback((MethodInterceptor) (proxy, method, args, methodProxy) -> RestBuilderProcessor.invoke(method, args, fallbackBean));
         return enhancer.create();
     }
 

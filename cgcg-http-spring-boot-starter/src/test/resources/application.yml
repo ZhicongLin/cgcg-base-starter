@@ -3,3 +3,7 @@ server:
 logging:
   level:
     com.cgcg: debug
+rest:
+  fallback:
+    enable: true
+    expire: 3000

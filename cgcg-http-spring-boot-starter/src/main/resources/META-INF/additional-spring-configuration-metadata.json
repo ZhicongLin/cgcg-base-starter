@@ -7,6 +7,18 @@
       "description": "Description for rest.server.port."
     },
     {
+      "name": "rest.fallback.enable",
+      "type": "java.lang.Boolean",
+      "defaultValue": true,
+      "description": "default true."
+    },
+    {
+      "name": "rest.fallback.expire",
+      "type": "java.lang.Long",
+      "defaultValue": 60000,
+      "description": "default 60 seconds."
+    },
+    {
       "name": "rest.server.host",
       "type": "java.lang.String",
       "description": "Description for rest.server.port."

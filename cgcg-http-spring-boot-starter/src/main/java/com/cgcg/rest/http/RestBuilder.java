@@ -86,12 +86,12 @@ public final class RestBuilder {
      */
     private RestBuilder(Method method) {
         this.method = method;
+        final String methodName = this.method.getDeclaringClass().getName() + "#" + method.getName();
+        this.methodLogger = LoggerFactory.getLogger(methodName);
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (requestAttributes != null) {
             HttpServletRequest request = requestAttributes.getRequest();
             if (request.getAttribute(Constant.REST_METHOD_NAME) == null) {
-                final String methodName = this.method.getDeclaringClass().getName() + "#" + method.getName();
-                this.methodLogger = LoggerFactory.getLogger(methodName);
                 request.setAttribute(Constant.REST_METHOD_NAME, methodName);
             }
         }

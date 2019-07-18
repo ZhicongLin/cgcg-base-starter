@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 public class HttpController {
@@ -15,6 +16,8 @@ public class HttpController {
     public Object result(String id) {
         HashMap<String, Object> param = new HashMap<>();
         param.put("accountId", id);
-        return testClient.hasLabel(param, "h5");
+        final Map<String, Object> h5 = testClient.hasLabelPost(param, "h5");
+        testClient.hasLabel(param, "h5");
+        return h5;
     }
 }

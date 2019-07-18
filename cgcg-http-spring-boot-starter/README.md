@@ -24,3 +24,11 @@
      6.提供jdk代理方式和cglib代理方式
      7.新增LoadMapping文件读取注解，DinamicaMapping动态url和mehtod请求方式的注解
      8.参数@RequestHeader支持，@RequestHeader("value")value不为空时支持string，为空时，支持全部对象属性Object转成header
+### 1.0.1.release
+    * 新增
+    新增fallback熔断机制
+    添加实现类，实现RestClient注解的interface，把实现类配置到RestClient的fallback里面
+    新增熔断配置rest.fallback.enable默认true
+    新增熔断配置rest.fallback.expire默认60000L、
+    * 修改
+    日志打印存在的BUG
