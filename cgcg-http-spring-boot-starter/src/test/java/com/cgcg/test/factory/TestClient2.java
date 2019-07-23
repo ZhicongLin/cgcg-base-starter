@@ -10,12 +10,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
-@RestClient(url = "http://localhost:6666")
+@RestClient(url = "http://localhost:8888")
 @MappingFilter(name = RequestFilter.class)
 public interface TestClient2 {
 
     @PostMapping(value = "hehe")
     Map<String, Object> hasLabel(@ModelAttribute Map<String, Object> param);
+
     @UpLoadMapping("up")
     long upload(@RequestPart("newfile") MultipartFile file);
     @LoadMapping
