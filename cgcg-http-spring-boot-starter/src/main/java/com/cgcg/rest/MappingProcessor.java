@@ -1,6 +1,6 @@
 package com.cgcg.rest;
 
-import com.cgcg.rest.annotation.DinamicaMapping;
+import com.cgcg.rest.annotation.DynamicMapping;
 import com.cgcg.rest.annotation.LoadMapping;
 import com.cgcg.rest.annotation.UpLoadMapping;
 import lombok.*;
@@ -21,7 +21,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MappingProcessor {
     private static List<Class<?>> mappingAnnotation = Arrays.asList(RequestMapping.class, PostMapping.class, GetMapping.class, PutMapping.class,
-            DeleteMapping.class, PatchMapping.class, DinamicaMapping.class, LoadMapping.class, UpLoadMapping.class);
+            DeleteMapping.class, PatchMapping.class, DynamicMapping.class, LoadMapping.class, UpLoadMapping.class);
 
     /**
      * 获取方法动态资源映射信息

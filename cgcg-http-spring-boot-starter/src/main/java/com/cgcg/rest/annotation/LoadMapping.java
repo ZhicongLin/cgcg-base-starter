@@ -16,15 +16,6 @@ import java.lang.annotation.*;
 public @interface LoadMapping {
 
     String[] value() default "";
-    /**
-     * 是否下载.
-     *
-     * @Param: []
-     * @Return: boolean
-     * @Author: ZhiCong Lin
-     * @Date: 2018/8/14 17:26
-     */
-    boolean down() default false;
 
     RequestMethod[] method() default RequestMethod.GET;
 }

@@ -13,7 +13,7 @@ import java.lang.annotation.*;
 @Target({ElementType.METHOD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface DinamicaMapping {
+public @interface DynamicMapping {
 
     String[] value() default {};
 

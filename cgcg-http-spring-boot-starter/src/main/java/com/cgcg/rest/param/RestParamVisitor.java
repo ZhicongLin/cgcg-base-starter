@@ -1,9 +1,7 @@
 package com.cgcg.rest.param;
 
-import com.cgcg.rest.annotation.DinamicaMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-
-import java.lang.annotation.Annotation;
+import com.cgcg.rest.annotation.DynamicParam;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * rest param 处理工具.
@@ -13,9 +11,18 @@ import java.lang.annotation.Annotation;
  */
 public interface RestParamVisitor {
 
-    void visitor(Annotation annotation, Object param, RestHandle<String, Object> restParam);
+    void visitor(RequestHeader annotation, Object param, RestHandle<String, Object> restParam);
 
-    String visitor(PathVariable annotation, Object param, String path);
+    void visitor(RequestParam annotation, Object param, RestHandle<String, Object> restParam);
 
-    String visitor(DinamicaMapping annotation, Object arg, String url);
+    void visitor(ModelAttribute annotation, Object param, RestHandle<String, Object> restParam);
+
+    void visitor(PathVariable annotation, Object param, RestHandle<String, Object> restParam);
+
+    void visitor(RequestBody annotation, Object param, RestHandle<String, Object> restParam);
+
+    void visitor(RequestPart annotation, Object param, RestHandle<String, Object> restParam);
+
+    void visitor(DynamicParam annotation, Object param, RestHandle<String, Object> restParam);
+
 }

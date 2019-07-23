@@ -2,18 +2,24 @@ package com.cgcg.rest.param;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.cgcg.rest.annotation.DinamicaMapping;
+import com.cgcg.rest.URLUtils;
+import com.cgcg.rest.annotation.DynamicParam;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import sun.security.action.GetPropertyAction;
 
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.lang.annotation.Annotation;
+import java.io.File;
+import java.io.IOException;
+import java.security.AccessController;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -22,6 +28,7 @@ import java.util.Set;
  * @Author: ZhiCong.Lin
  * @Create: 2018-08-09 09:16
  */
+@Slf4j
 public class RestParamVisitorImpl implements RestParamVisitor {
     /**
      * 对象转Map .
@@ -46,102 +53,112 @@ public class RestParamVisitorImpl implements RestParamVisitor {
         return returnMap;
     }
 
-    /**
-     * 根据方法参数组装请求参数 .
-     *
-     * @Param: [annotation, param, restParam]
-     * @Return: void
-     * @Author: ZhiCong Lin
-     * @Date: 2018/8/15 9:40
-     */
-    public void visitor(Annotation annotation, Object param, RestHandle<String, Object> restParam) {
-        if (annotation instanceof RequestParam) {
-            this.visitor((RequestParam) annotation, param, restParam);
-        }
-        if (annotation instanceof ModelAttribute) {
-            this.visitor(param, restParam);
-        }
-        if (annotation instanceof RequestBody) {
-            this.visitor((RequestBody) annotation, param, restParam);
-        }
-        if (annotation instanceof RequestPart) {
-            this.visitor((RequestPart) annotation, param, restParam);
-        }
-        if (annotation instanceof PathVariable) {
-            restParam.put(((PathVariable) annotation).value(), param);
-        }
-        if (annotation instanceof RequestHeader) {
-            this.visitor((RequestHeader) annotation, param, restParam);
-        }
-    }
-
-    private void visitor(RequestHeader  requestHeader, Object param, RestHandle<String, Object> restParam) {
+    public void visitor(RequestHeader requestHeader, Object param, RestHandle<String, Object> handle) {
         final String value = requestHeader.value();
-        final HttpHeaders httpHeaders = new HttpHeaders();
-        restParam.setHeaders(httpHeaders);
         if (StringUtils.isNotBlank(value)) {
-            httpHeaders.add(value, param.toString());
+            handle.addHeader(value, param.toString());
         } else if (param instanceof HttpHeaders) {
             final HttpHeaders headers = (HttpHeaders) param;
             final Set<String> keySet = headers.keySet();
             for (String key : keySet) {
-                httpHeaders.addAll(key, Objects.requireNonNull(headers.get(key)));
+                handle.addHeader(key, headers.get(key));
             }
         } else {
             final JSONObject object = JSON.parseObject(JSON.toJSONString(param));
             final Set<String> keySet = object.keySet();
             for (String key : keySet) {
-                httpHeaders.add(key, String.valueOf(object.get(key)));
+                handle.addHeader(key, String.valueOf(object.get(key)));
             }
         }
     }
 
-    private void visitor(RequestParam annotation, Object param, RestHandle<String, Object> restParam) {
-        restParam.put(annotation.value(), param.toString());
+    public void visitor(RequestParam annotation, Object param, RestHandle<String, Object> restParam) {
+        restParam.getParameterUri().append("&").append(annotation.value()).append("=").append("{").append(annotation.value()).append("}");
         restParam.getUriParams().put(annotation.value(), param);
     }
 
-    private void visitor(Object param, RestHandle<String, Object> restParam) {
+    public void visitor(ModelAttribute modelAttribute, Object param, RestHandle<String, Object> restParam) {
         try {
-            if (param instanceof Map) {
+            final String value = modelAttribute.value();
+            if (StringUtils.isNotBlank(value)) {
+                restParam.put(value, param);
+            } else if (param instanceof Map) {
                 Map map = (Map) param;
-                for (Object key : map.keySet()) {
+                final Set keySet = map.keySet();
+                for (Object key : keySet) {
                     restParam.put(key.toString(), map.get(key));
                 }
+            } else {
+                restParam.putAll(obj2Map(param));
             }
-            restParam.putAll(obj2Map(param));
+            if (!MediaType.MULTIPART_FORM_DATA_VALUE.equals(restParam.getContentType())) {
+                restParam.setContentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE);
+                restParam.getHeaders().add("content-type", MediaType.APPLICATION_FORM_URLENCODED_VALUE);
+            }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
     }
 
-    @Override
-    public String visitor(PathVariable annotation, Object param, String path) {
-        return path.replace("{" + annotation.value() + "}", param.toString());
+    public void visitor(PathVariable annotation, Object param, RestHandle<String, Object> restParam) {
+        restParam.getUriParams().put(annotation.value(), param.toString());
     }
 
-    @Override
-    public String visitor(DinamicaMapping dinamicaMapping, Object arg, String url) {
-        String uri = arg.toString();
-        if (uri.startsWith(url)) {
-            return uri;
-        }
-        url = url.endsWith("/") ? url.substring(0, url.length() - 1) : url;
-        uri = uri.startsWith("/") ? uri.substring(1) : uri;
-        return url + "/" + uri;
-    }
-
-    private void visitor(RequestBody annotation, Object param, RestHandle<String, Object> restParam) {
+    public void visitor(RequestBody annotation, Object param, RestHandle<String, Object> restParam) {
         if (param instanceof String) {
             restParam.setBodyString(param.toString());
-        } else if (param != null){
+        } else if (param != null) {
             restParam.setBodyString(JSON.toJSONString(param));
         }
         restParam.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
+        restParam.getHeaders().add("content-type", MediaType.APPLICATION_JSON_UTF8_VALUE);
     }
 
-    private void visitor(RequestPart annotation, Object param, RestHandle<String, Object> restParam) {
-        restParam.put(StringUtils.isNotBlank(annotation.value()) ? annotation.value() : "file", param);
+    public void visitor(RequestPart annotation, Object param, RestHandle<String, Object> restParam) {
         restParam.setContentType(MediaType.MULTIPART_FORM_DATA_VALUE);
+        restParam.getHeaders().add("content-type", MediaType.MULTIPART_FORM_DATA_VALUE);
+        final String fileKey = StringUtils.isNotBlank(annotation.value()) ? annotation.value() : "file";
+        this.saveTempFile(restParam, fileKey, param);
+    }
+
+    @Override
+    public void visitor(DynamicParam annotation, Object param, RestHandle<String, Object> restParam) {
+        boolean isUrl = annotation.isUrl();
+        if (isUrl) {
+            restParam.setUrl(param.toString());
+        } else {
+            final String value = annotation.value();
+            if (StringUtils.isNotBlank(value)) {
+                restParam.setUrl(URLUtils.add(restParam.getUrl(), value));
+            }
+        }
+    }
+
+    /**
+     * 保存临时文件 .
+     *
+     * @Param: [params]
+     * @Return: java.io.File
+     * @Author: ZhiCong.Lin
+     * @Date: 2018/8/14 14:20
+     */
+    private void saveTempFile(RestHandle<String, Object> params, String fileKey, Object fileObject) {
+        if (fileObject instanceof MultipartFile) {
+            MultipartFile multipartFile = (MultipartFile) fileObject;
+            // 获取文件名
+            String fileName = multipartFile.getOriginalFilename();
+            if (fileName == null) {
+                return;
+            }
+            try {
+                File tmpdir = new File(AccessController.doPrivileged(new GetPropertyAction("java.io.tmpdir")));
+                File tempFile = new File(tmpdir, fileName);
+                multipartFile.transferTo(tempFile);
+                params.put(fileKey, new FileSystemResource(tempFile));
+                params.setFiles(new File[]{tempFile});
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
+            }
+        }
     }
 }

@@ -1,7 +1,6 @@
 package com.cgcg.rest.param;
 
-import com.cgcg.rest.annotation.DinamicaMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import com.cgcg.rest.ReflectionUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -28,39 +27,13 @@ public class RestParamUtils {
         final Annotation[][] parameterAnnotations = method.getParameterAnnotations();
         for (int i = 0; i < parameterAnnotations.length; i++) {
             Object param = args[i];
-            Annotation[] paramAnnotation = parameterAnnotations[i];
+            final Annotation[] paramAnnotation = parameterAnnotations[i];
             final RestParamVisitorImpl restParamVisitor = new RestParamVisitorImpl();
-            String dinamicaUrl = checkDinamica(param, paramAnnotation, restParamVisitor, url);
-            if (!dinamicaUrl.equals(url)) {
-                restParam.setUrl(dinamicaUrl);
-            }
-            String resultUrl = checkPathVariable(param, paramAnnotation, restParamVisitor, restParam.getUrl());
-            if (!resultUrl.equals(restParam.getUrl())) {
-                restParam.setUrl(resultUrl);
-            }
             for (Annotation annotation : paramAnnotation) {
-                restParamVisitor.visitor(annotation, param, restParam);
+                ReflectionUtils.invokeMethod(restParamVisitor, "visitor", new Class[]{annotation.annotationType(), Object.class, RestHandle.class}, new Object[]{annotation, param, restParam});
             }
         }
         return restParam;
-    }
-
-    private static String checkDinamica(Object arg, Annotation[] paramAnnotation, RestParamVisitorImpl restParamVisitor, String url) {
-        for (Annotation annotation : paramAnnotation) {
-            if (annotation instanceof DinamicaMapping) {
-                url = restParamVisitor.visitor((DinamicaMapping) annotation, arg, url);
-            }
-        }
-        return url;
-    }
-
-    private static String checkPathVariable(Object arg, Annotation[] paramAnnotation, RestParamVisitorImpl restParamVisitor, String url) {
-        for (Annotation annotation : paramAnnotation) {
-            if (annotation instanceof PathVariable) {
-                url = restParamVisitor.visitor((PathVariable) annotation, arg, url);
-            }
-        }
-        return url;
     }
 
 }

@@ -1,8 +1,6 @@
 package com.cgcg.rest.proxy;
 
 import com.cgcg.rest.param.RestHandle;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 
 import java.lang.reflect.Method;
 
@@ -22,5 +20,5 @@ public interface BuilderCallBack {
      * @Author: ZhiCong Lin
      * @Date: 2018/8/21 13:48
      */
-    Object execute(Method method, Object[] args, String url, HttpMethod httpMethod, RestHandle<String, Object> params, HttpHeaders httpHeaders, Class<?> returnType);
+    Object execute(Method method, Object[] args, String url, RestHandle<String, Object> params);
 }

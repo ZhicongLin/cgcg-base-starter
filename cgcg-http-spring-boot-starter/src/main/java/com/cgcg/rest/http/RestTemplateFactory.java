@@ -2,14 +2,13 @@ package com.cgcg.rest.http;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.cgcg.rest.URLUtils;
 import com.cgcg.rest.exception.ErrorFactory;
-import com.cgcg.rest.exception.NullFileException;
 import com.cgcg.rest.exception.RestException;
 import com.cgcg.rest.param.RestHandle;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
@@ -18,21 +17,14 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.multipart.MultipartFile;
-import sun.security.action.GetPropertyAction;
 
 import javax.annotation.Resource;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.security.AccessController;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 /**
  * RestTemplate
@@ -57,70 +49,21 @@ public class RestTemplateFactory {
                 returnFileName = org.springframework.util.StringUtils.replace(returnFileName, " ", "%20");
             }
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
         return returnFileName;
     }
 
     /**
-     * @throws Exception the exception
-     * @Description: 文件下载
-     * @author nengneng.lian
-     * @date 2017/10/26 20:44
-     */
-    private void loadFileOutputStream(ResponseEntity<byte[]> result, String fileName) throws RestException {
-        byte[] bytes = result.getBody();
-        if (bytes == null) {
-            return;
-        }
-        if (response.getHeader("content-disposition") == null) {
-            //3.设置content-disposition响应头控制浏览器以下载的形式打开文件
-            response.setHeader("content-disposition", "attachment; filename=" + encodingFileName(fileName));
-        }
-        ServletOutputStream out = null;
-        try {
-            out = response.getOutputStream();
-            out.write(bytes);
-            out.flush();
-        } catch (IOException e) {
-            throw new RestException(500, "文件下载IO异常");
-        } finally {
-            if (out != null) {
-                try {
-                    out.close();
-                } catch (IOException e) {
-                    log.error(e.getMessage(), e);
-                }
-            }
-        }
-
-    }
-
-    /**
      * 文件下载
-     *
-     * @param url 文件地址，可带参数，如：url="http://1.1.2.10/oss/aaa/bbbb/ccc/TestFileUpload.jpg?companyId=1&ossType=material"
      * @return 二进制流
      */
-    public byte[] loadFileByte(String url, RestHandle<String, Object> params, HttpHeaders headers, HttpMethod httpMethod) {
-        final StringBuilder path = new StringBuilder(url);
-        if (params != null && params.size() > 0) {
-            if (url.indexOf("?") <= 0) {
-                path.append("?");
-            } else if (!url.endsWith("?") && !url.endsWith("&")) {
-                path.append("&");
-            }
-
-            for (String key : params.keySet()) {
-                path.append(key).append("=").append(params.get(key)).append("&");
-            }
-        }
-        final HttpEntity<byte[]> requestEntity = new HttpEntity<>(headers);
+    public byte[] loadFileByte(RestHandle<String, Object> handle) {
+        final String url = URLUtils.addParameter(handle.getUrl(), handle.getParameterUri().toString());
+        final HttpEntity<byte[]> requestEntity = new HttpEntity<>(handle.getHeaders());
         try {
-            final HttpMethod method = httpMethod != null ? httpMethod : HttpMethod.GET;
-            ResponseEntity<byte[]> result = restTemplate.exchange(path.toString(), method, requestEntity, byte[].class);
+            ResponseEntity<byte[]> result = restTemplate.exchange(url, handle.getHttpMethod(), requestEntity, byte[].class, handle.getUriParams());
             if (result.getStatusCode().is2xxSuccessful()) {
-
                 HttpHeaders resultHeaders = result.getHeaders();
                 for (String key : resultHeaders.keySet()) {
                     List<String> headList = resultHeaders.get(key);
@@ -131,12 +74,12 @@ public class RestTemplateFactory {
                         this.response.setHeader(key, hv);
                     }
                 }
-                if (params != null && params.getDown() != null && params.getDown()) {
-                    loadFileOutputStream(result, String.valueOf(params.get("fileName")));
-                    return null;
-                } else {
-                    return result.getBody();
+                final String fileName = String.valueOf(handle.getUriParams().get("fileName") == null ? "" : handle.getUriParams().get("fileName"));
+                if (response.getHeader("content-disposition") == null) {
+                    //3.设置content-disposition响应头控制浏览器以下载的形式打开文件
+                    response.setHeader("content-disposition", "attachment; filename=" + encodingFileName(fileName));
                 }
+                return result.getBody();
             } else {
                 throw new RestException(500, "下载异常");
             }
@@ -150,33 +93,44 @@ public class RestTemplateFactory {
 
     }
 
-    public <T> T execute(String url, HttpMethod httpMethod, RestHandle<String, Object> params, HttpHeaders httpHeaders, Class<T> resultType) {
-        HttpEntity httpEntity;
-        if (httpMethod.equals(HttpMethod.GET) || httpMethod.equals(HttpMethod.DELETE) || httpMethod.equals(HttpMethod.HEAD)) {
-            params.getUriParams().putAll(params);
-            httpEntity = new HttpEntity<>(httpHeaders);
-        } else {
-            httpEntity = new HttpEntity<>(params.getBodyString() != null ? params.getBodyString() : params, httpHeaders);
-        }
-        final StringBuilder pathBuilder = new StringBuilder(url);
-        this.fatchUri(params.getUriParams(), pathBuilder);
-        return this.executeHttpRequest(pathBuilder.toString(), httpMethod, httpEntity, resultType, params);
-    }
-
-    private void fatchUri(Map<String, Object> params, StringBuilder pathBuilder) {
-        if (params == null || params.size() <= 0) {
-            return;
-        }
-        for (String key : params.keySet()) {
-            if (pathBuilder.indexOf("?") <= 0) {
-                pathBuilder.append("?");
-            } else {
-                pathBuilder.append("&");
+    public <T> T execute(RestHandle<String, Object> handle,  Class<T> resultType) {
+        final String url = URLUtils.addParameter(handle.getUrl(), handle.getParameterUri().toString());
+        HttpEntity<?> httpEntity = this.createHttpEntity(handle);
+        handle.putAll(handle.getUriParams());
+        try {
+            return this.executeHttpRequest(url, handle.getHttpMethod(), httpEntity, resultType, handle);
+        } finally {
+            //程序结束时，删除临时文件
+            final File[] files = handle.getFiles();
+            if (files != null) {
+                try {
+                    for (File tempFile : files) {
+                        FileUtils.forceDelete(tempFile);
+                    }
+                } catch (IOException e) {
+                    log.error("delete temp file error");
+                }
             }
-            pathBuilder.append(key).append("=").append("{").append(key).append("}");
         }
     }
 
+    private HttpEntity<?> createHttpEntity(RestHandle<String, Object> handle) {
+        HttpEntity<?> httpEntity;
+        final String contentType = handle.getContentType();
+        if (MediaType.APPLICATION_FORM_URLENCODED_VALUE.equals(contentType) || MediaType.MULTIPART_FORM_DATA_VALUE.equals(contentType)) {
+            MultiValueMap<String, Object> multiValueMap = new LinkedMultiValueMap<>();
+            final Set<Map.Entry<String, Object>> entrySet = handle.entrySet();
+            for (Map.Entry<String, Object> entry : entrySet) {
+                multiValueMap.put(entry.getKey(), Collections.singletonList(entry.getValue()));
+            }
+            httpEntity = new HttpEntity<>(multiValueMap);
+        } else if ((MediaType.APPLICATION_JSON_UTF8_VALUE.equals(contentType) || MediaType.APPLICATION_JSON_VALUE.equals(contentType)) && StringUtils.isNotBlank(handle.getBodyString())) {
+            httpEntity = new HttpEntity<>(handle.getBodyString(), handle.getHeaders());
+        } else {
+            httpEntity = new HttpEntity<>(handle.getHeaders());
+        }
+        return httpEntity;
+    }
     /**
      * @return RestException
      * @Description: 捕获微服务接口中返回的异常信息, 封装后再抛出
@@ -242,83 +196,6 @@ public class RestTemplateFactory {
             }
             throw new RestException(403, "资源不可用");
         }
-    }
-
-    /**
-     * @return http响应 response
-     * @Description: 文件上传
-     * @author nengneng.lian
-     * @date 2017/10/31 14:21
-     */
-    public <T> T uploadFile(String url, RestHandle<String, Object> params, HttpHeaders httpHeaders, Class<T> responseType) throws RestException {
-        File tempFile = null;
-        // 发送POST请求
-        try {
-            tempFile = saveTempFile(params);
-            if (tempFile == null) {
-                throw new NullFileException();
-            }
-            // 请求参数
-            MultiValueMap<String, Object> formData = new LinkedMultiValueMap<>();
-            //组装普通的post格式数据
-            if (params.size() > 0) {
-                for (String str : params.keySet()) {
-                    formData.add(str, params.get(str));
-                }
-            }
-            // 设置请求体
-            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(formData, httpHeaders);
-            T result = restTemplate.postForObject(url, requestEntity, responseType);
-            if (result != null) {
-                return result;
-            }
-        } catch (HttpClientErrorException e) {
-            log.error(e.getResponseBodyAsString(), e);
-        } catch (HttpServerErrorException e) {
-            throw httpErrorMsg(e);
-        } catch (IOException e) {
-            log.error("save temp file error");
-        } finally {
-            //程序结束时，删除临时文件
-            if (tempFile != null) {
-                try {
-                    FileUtils.forceDelete(tempFile);
-                } catch (IOException e) {
-                    log.error("delete temp file {} error " + tempFile);
-                }
-            }
-        }
-        // 返回响应体
-        return null;
-    }
-
-    /**
-     * 保存临时文件 .
-     *
-     * @Param: [params]
-     * @Return: java.io.File
-     * @Author: ZhiCong.Lin
-     * @Date: 2018/8/14 14:20
-     */
-    private File saveTempFile(Map<String, Object> params) throws IOException {
-        Set<String> keys = params.keySet();
-        for (String key : keys) {
-            Object object = params.get(key);
-            if (object instanceof MultipartFile) {
-                MultipartFile multipartFile = (MultipartFile) object;
-                // 获取文件名
-                String fileName = multipartFile.getOriginalFilename();
-                if (fileName == null) {
-                    return null;
-                }
-                File tmpdir = new File(AccessController.doPrivileged(new GetPropertyAction("java.io.tmpdir")));
-                File tempFile = new File(tmpdir, fileName);
-                multipartFile.transferTo(tempFile);
-                params.put(key, new FileSystemResource(tempFile));
-                return tempFile;
-            }
-        }
-        return null;
     }
 
 }

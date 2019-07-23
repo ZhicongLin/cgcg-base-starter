@@ -11,6 +11,11 @@ public class TestClientImpl implements TestClient {
     }
 
     @Override
+    public Map<String, Object> path(Map<String, Object> param, String channel, String hl) {
+        return null;
+    }
+
+    @Override
     public Map<String, Object> hasLabel(Map<String, Object> param, String channel) {
         System.out.println("param = 又进来");
         final HashMap<String, Object> hashMap = new HashMap<>();

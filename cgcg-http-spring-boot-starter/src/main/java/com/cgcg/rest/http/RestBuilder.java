@@ -3,7 +3,8 @@ package com.cgcg.rest.http;
 import com.cgcg.rest.Constant;
 import com.cgcg.rest.MappingProcessor;
 import com.cgcg.rest.SpringContextHolder;
-import com.cgcg.rest.annotation.DinamicaMapping;
+import com.cgcg.rest.URLUtils;
+import com.cgcg.rest.annotation.DynamicMapping;
 import com.cgcg.rest.annotation.MappingFilter;
 import com.cgcg.rest.annotation.RestClient;
 import com.cgcg.rest.filter.RestFilter;
@@ -19,7 +20,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -48,7 +48,6 @@ public final class RestBuilder {
     private static final String HOST = "host";
     private static final String PORT = "port";
     private static volatile Map<Method, RestBuilder> builderMap = new HashMap<>();
-    private HttpHeaders httpHeaders = new HttpHeaders();
 
     private Method method;
 
@@ -111,7 +110,7 @@ public final class RestBuilder {
             return this;
         }
         this.args = args;
-        if (method.getDeclaredAnnotation(DinamicaMapping.class) != null) {
+        if (method.getDeclaredAnnotation(DynamicMapping.class) != null) {
             for (Object parameter : this.args) {
                 if (parameter instanceof HttpMethod) {
                     this.httpMethod = (HttpMethod) parameter;
@@ -127,17 +126,11 @@ public final class RestBuilder {
      * 添加头部信息
      */
     private void buildHeader() {
-        final HttpHeaders headers = this.params.getHeaders();
-        if (headers != null) {
-            this.httpHeaders = headers;
-        } else {
-            this.httpHeaders = new HttpHeaders();
-        }
         if (this.params.getContentType() != null) {
-            this.httpHeaders.add("content-type", this.params.getContentType());
+            this.params.addHeader("content-type", this.params.getContentType());
         }
         if (this.params.getAccept() != null) {
-            this.httpHeaders.add("Accept", this.params.getAccept());
+            this.params.addHeader("Accept", this.params.getAccept());
         }
     }
 
@@ -159,22 +152,6 @@ public final class RestBuilder {
     }
 
     /**
-     * 拼装url .
-     *
-     * @Param: [serverUri, requestMappingValue]
-     * @Return: java.lang.String
-     * @Author: ZhiCong Lin
-     * @Date: 2018/8/9 11:36
-     */
-    private String buildURL(String serverUri, String methodUri) {
-        if (StringUtils.isNotBlank(methodUri)) {
-            final String uriSep = "/";
-            return serverUri + (serverUri.endsWith(uriSep) || methodUri.startsWith(uriSep) ? "" : uriSep) + methodUri;
-        }
-        return serverUri;
-    }
-
-    /**
      * 生成资源参数
      *
      * @param method
@@ -185,7 +162,7 @@ public final class RestBuilder {
         final MappingProcessor.MappingHandle handle = MappingProcessor.execute(method);
         if (handle != null) {
             this.httpMethod = handle.getHttpMethod();
-            this.url = this.buildURL(url, handle.getValue());
+            this.url = URLUtils.add(url, handle.getValue());
         }
     }
 
@@ -212,10 +189,11 @@ public final class RestBuilder {
     }
 
     public Object execute(BuilderCallBack call) {
+        params.setHttpMethod(this.httpMethod);
         if (this.filter != null) {
-            this.filter.postServer(url, httpMethod, params, httpHeaders, method.getReturnType());
+            this.filter.postServer(url, httpMethod, params, params.getHeaders(), method.getReturnType());
         }
-        final Object result = call.execute(method, args, url, this.httpMethod, this.params, this.httpHeaders, method.getReturnType());
+        final Object result = call.execute(method, args, url, this.params);
         if (this.filter != null) {
             return this.filter.end(result, method.getReturnType());
         }
