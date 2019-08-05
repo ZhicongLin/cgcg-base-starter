@@ -1,6 +1,7 @@
 package com.cgcg.base.core.exception;
 
 import com.cgcg.base.format.Result;
+import com.cgcg.base.language.Translator;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,7 @@ import java.util.regex.Pattern;
 @ResponseBody
 @ControllerAdvice
 public class ExceptionHandlerAdvice {
+
     /**
      * Instantiates a new Exception handler advice.
      */
@@ -52,7 +54,7 @@ public class ExceptionHandlerAdvice {
         } else {
             log.error(e.getMessage(), e);
         }
-        return Result.error(e.getErrorCode(), e.getErrorMsg() );
+        return Result.error(e.getErrorCode(), e.getErrorMsg());
     }
 
     /**
@@ -67,7 +69,7 @@ public class ExceptionHandlerAdvice {
         String parameterName = e.getParameterName();
         String parameterType = e.getParameterType();
         log.error("缺少必填参数{} {}", parameterType, parameterName, e);
-        return Result.error(100400, "缺少必填参数:" + parameterName );
+        return Result.error(100400, Translator.toLocale("RequiredParameter", "缺少必填参数:") + parameterName);
     }
 
     /**
@@ -83,9 +85,9 @@ public class ExceptionHandlerAdvice {
         log.error(message, e);
         final String[] split = message.split("'");
         if (split.length >= 2) {
-            return Result.error(100400, String.format("请求方式错误[%s]", split[1]));
+            return Result.error(100400, String.format(Translator.toLocale("ErrorRequestMethodFmt", "请求方式错误"), split[1]));
         }
-        return Result.error(100400, "请求方式错误");
+        return Result.error(100400, Translator.toLocale("ErrorRequestMethod", "请求方式错误"));
     }
 
     /**
@@ -105,10 +107,10 @@ public class ExceptionHandlerAdvice {
             return Result.error(100500, message);
         }
         if (message.contains("timeout") || message.contains("timedout")) {
-            return message.contains("refused") ? Result.error(100502, "服务器拒绝连接")
-                    : Result.error(100504, "服务器连接超时");
+            return message.contains("refused") ? Result.error(100502, Translator.toLocale("ConnectionRefused", "服务器拒绝连接"))
+                    : Result.error(100504, Translator.toLocale("ConnectionTimeOut", "服务器连接超时"));
         }
-        return Result.error(100500, "服务器内部异常");
+        return Result.error(100500, Translator.toLocale("ServerError", "服务器内部异常"));
     }
 
     /**
@@ -134,7 +136,7 @@ public class ExceptionHandlerAdvice {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Result noMapping(NoHandlerFoundException e) {
         log.error(e.getMessage(), e);
-        return Result.error(100404, "请求路径不存在");
+        return Result.error(100404, Translator.toLocale("PathNotFound", "请求路径不存在"));
     }
 
     /**
@@ -147,7 +149,7 @@ public class ExceptionHandlerAdvice {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Result errorParam(MethodArgumentTypeMismatchException me) {
         log.error(me.getMessage(), me);
-        return Result.error(100400, "请求参数不合法");
+        return Result.error(100400, Translator.toLocale("WrongParameter", "请求参数不合法"));
     }
 
     /**
@@ -163,9 +165,9 @@ public class ExceptionHandlerAdvice {
         log.error(message, e);
         final String[] split = message.split("'");
         if (split.length >= 2) {
-            return Result.error(100415, String.format("参数文本格式错误[%s]", split[1]));
+            return Result.error(100415, String.format(Translator.toLocale("TextTypeErrorFmt", "参数文本类型错误"), split[1]));
         }
-        return Result.error(100415, "参数文本类型错误");
+        return Result.error(100415, Translator.toLocale("TextTypeError", "参数文本类型错误"));
     }
 
 
@@ -187,4 +189,5 @@ public class ExceptionHandlerAdvice {
         }
         return str;
     }
+
 }
