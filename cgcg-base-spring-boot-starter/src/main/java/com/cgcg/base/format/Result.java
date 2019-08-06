@@ -47,7 +47,7 @@ public final class Result {
     public static  Result error() {
         final Result error = new Result();
         error.setCode(400);
-        error.setMessage(Translator.toLocale("faild", "操作失败"));
+        error.setMessage(Translator.toLocale("failed", "操作失败"));
         return error;
     }
 
