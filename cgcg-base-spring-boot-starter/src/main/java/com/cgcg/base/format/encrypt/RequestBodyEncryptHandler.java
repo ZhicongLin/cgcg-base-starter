@@ -2,7 +2,6 @@ package com.cgcg.base.format.encrypt;
 
 import com.cgcg.base.core.enums.FormatProperty;
 import com.cgcg.base.core.exception.EncryptionParamWrongException;
-import com.cgcg.base.util.AnnotationUtil;
 import com.cgcg.base.util.DES3Util;
 import com.cgcg.base.util.HttpHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
-import java.util.Objects;
 
 /**
  * 请求体加密解密.
@@ -35,11 +33,10 @@ public class RequestBodyEncryptHandler extends RequestBodyAdviceAdapter implemen
 
     @Override
     public boolean supports(MethodParameter methodParameter, Type type, Class<? extends HttpMessageConverter<?>> aClass) {
-        final Class<?> declaringClass = Objects.requireNonNull(methodParameter.getMethod()).getDeclaringClass();
-        if (!methodParameter.hasMethodAnnotation(Encrypt.class) && !AnnotationUtil.hasAnnotation(declaringClass, Encrypt.class)) {
-            return false;
+        if (EncryptCheckHandler.processor(methodParameter)) {
+            return methodParameter.hasParameterAnnotation(RequestBody.class);
         }
-        return methodParameter.hasParameterAnnotation(RequestBody.class);
+        return false;
     }
 
     @Override

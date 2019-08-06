@@ -51,7 +51,7 @@ public class TestController {
     }
 
     @ApiOperation("POST接口")
-    @Encrypt
+    @Encrypt(enable = false)
     @PostMapping
     public List gets(@RequestBody Map<String, String> param) {
         if (Integer.valueOf(param.get("id")) == 1) {

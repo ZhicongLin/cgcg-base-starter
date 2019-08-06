@@ -12,4 +12,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Encrypt {
+
+    boolean enable() default true;
 }

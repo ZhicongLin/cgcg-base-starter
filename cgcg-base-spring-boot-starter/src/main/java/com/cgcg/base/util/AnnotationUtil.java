@@ -54,4 +54,18 @@ public final class AnnotationUtil {
         }
         return false;
     }
+
+    public static <T extends Annotation> T getAnnotation(Class clzz, Class<T> annotationType) {
+        final Annotation[] annotations = clzz.getAnnotations();
+        for (Annotation annotation : annotations) {
+            final Class<? extends Annotation> annoType = annotation.annotationType();
+            if (annoType.equals(annotationType)) {
+                return (T) annotation;
+            }
+            if (!ignore.contains(annoType)) {
+                return getAnnotation(annoType, annotationType);
+            }
+        }
+        return null;
+    }
 }

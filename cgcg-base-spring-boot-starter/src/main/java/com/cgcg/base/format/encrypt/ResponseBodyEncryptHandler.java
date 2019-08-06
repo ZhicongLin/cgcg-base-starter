@@ -3,7 +3,6 @@ package com.cgcg.base.format.encrypt;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.cgcg.base.core.enums.FormatProperty;
-import com.cgcg.base.util.AnnotationUtil;
 import com.cgcg.base.util.DES3Util;
 import com.cgcg.base.util.ReflectionUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -17,8 +16,6 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
-import java.util.Objects;
-
 /**
  * 结果集加密处理
  *
@@ -31,9 +28,7 @@ import java.util.Objects;
 public class ResponseBodyEncryptHandler implements ResponseBodyAdvice {
     @Override
     public boolean supports(MethodParameter returnType, Class converterType) {
-        final Class<?> declaringClass = Objects.requireNonNull(returnType.getMethod()).getDeclaringClass();
-        return AnnotationUtil.hasResponseBody(declaringClass)
-                && (returnType.hasMethodAnnotation(Encrypt.class) || AnnotationUtil.hasAnnotation(declaringClass, Encrypt.class));
+        return EncryptCheckHandler.processor(returnType);
     }
 
     @Override
