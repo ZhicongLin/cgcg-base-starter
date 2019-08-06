@@ -1,5 +1,6 @@
 package com.cgcg.base.format;
 
+import com.cgcg.base.language.Translator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -25,7 +26,7 @@ public final class Result {
 
     public Result() {
         this.code = 200;
-        this.message = "操作成功";
+        this.message = Translator.toLocale("success", "操作成功");
     }
 
     public Result(Object data) {
@@ -46,7 +47,7 @@ public final class Result {
     public static  Result error() {
         final Result error = new Result();
         error.setCode(400);
-        error.setMessage("操作失败");
+        error.setMessage(Translator.toLocale("faild", "操作失败"));
         return error;
     }
 
