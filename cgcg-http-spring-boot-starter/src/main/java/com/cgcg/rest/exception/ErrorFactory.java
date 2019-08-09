@@ -38,9 +38,9 @@ public class ErrorFactory {
         try {
             JSONObject object = JSON.parseObject(errorBody);
             String error = object.getString("error");
-            if (error.equals("unauthorized")) {
+            if ("unauthorized".equals(error)) {
                 return new ErrorFactory(100001401, "无权访问该接口");
-            } else if (error.equals("invalid_token")) {
+            } else if ("invalid_token".equals(error)) {
                 return new ErrorFactory(100002401, "授权码无效");
             }
         } catch (JSONException je) {
