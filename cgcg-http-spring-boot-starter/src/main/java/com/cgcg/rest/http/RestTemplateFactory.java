@@ -185,7 +185,7 @@ public class RestTemplateFactory {
                 throw new RestException(error.getErrorCode(), error.getErrorMsg());
             } else {
                 final HttpStatus statusCode = e.getStatusCode();
-                throw new RestException(statusCode.value(), String.format("链接请求失败[%s]", statusCode.getReasonPhrase()));
+                throw new RestException(statusCode.value(), responseBodyAsString);
             }
         } catch (HttpServerErrorException e) {
             throw httpErrorMsg(e); // 异常处理
