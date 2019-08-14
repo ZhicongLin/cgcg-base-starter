@@ -90,6 +90,18 @@ public class CommonException extends RuntimeException {
      * detail message.  The cause is not initialized, and may subsequently be
      * initialized by a call to {@link #initCause}.
      *
+     * @param errorMsg  the error msg
+     */
+    public CommonException(String errorMsg) {
+        this.errorCode = 400;
+        this.errorMsg = errorMsg;
+    }
+
+    /**
+     * Constructs a new runtime exception with {@code null} as its
+     * detail message.  The cause is not initialized, and may subsequently be
+     * initialized by a call to {@link #initCause}.
+     *
      * @param errorCode  the error code
      * @param errorClass the error class
      * @param errorMsg   the error msg
