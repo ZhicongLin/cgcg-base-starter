@@ -25,9 +25,18 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        final String referer = request.getHeader("Referer");
+        if (referer != null && referer.contains("/swagger-ui.html")) {
+            return true;
+        }
         final Boolean property = SpringContextHolder.getProperty("cgcg.interceptor.auth", Boolean.class);
         if (property != null && property) {
-            final AuthService authService = SpringContextHolder.getBean(AuthService.class);
+            AuthService authService = null;
+            try {
+                authService = SpringContextHolder.getBean(AuthService.class);
+            } catch (Exception e) {
+                log.warn("Not Found AuthService");
+            }
             if (authService != null) {
                 if (authService.preHandle(request, response, handler)) {
                     return true;
