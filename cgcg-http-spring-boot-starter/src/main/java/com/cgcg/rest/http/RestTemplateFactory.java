@@ -138,9 +138,9 @@ public class RestTemplateFactory {
      * @date 2017/11/15 10:50
      */
     private RestException httpErrorMsg(HttpServerErrorException e) {
-        log.error("服务异常原始信息：" + e.getResponseBodyAsString());
+        log.error("服务异常原始信息：{}" , e.getResponseBodyAsString(), e);
         // 异常码
-        String errorCode = e.getStatusCode().toString();
+        int errorCode = e.getRawStatusCode();
         // 异常消息
         String errorMsg = e.getMessage();
         // 获取异常body
@@ -148,17 +148,19 @@ public class RestTemplateFactory {
             JSONObject jsonError = JSON.parseObject(e.getResponseBodyAsString());
             // errorCode存在且为数字
             if (jsonError.get("errorCode") != null && StringUtils.isNumeric(jsonError.get("errorCode").toString())) {
-                errorCode = jsonError.get("errorCode").toString();
+                errorCode = Integer.parseInt(jsonError.get("errorCode").toString()) ;
+            } else if (jsonError.get("code") != null && StringUtils.isNumeric(jsonError.get("code").toString())) {
+                errorCode = Integer.parseInt(jsonError.get("code").toString()) ;
             }
             // errorMsg存在
-            if (jsonError.get("errorMsg") != null) { // 微服务封装errorMsg的情况下选择errorMsg
-                errorMsg = jsonError.get("errorMsg").toString();
+            if (jsonError.get("message") != null) { // 微服务封装errorMsg的情况下选择errorMsg
+                errorMsg = jsonError.get("message").toString();
             } else if (jsonError.get("errorMsg") != null) { // 微服务没有封装则调用SpringBoot自带异常消息
                 errorMsg = jsonError.get("errorMsg").toString();
             }
         }
         // 抛出异常
-        return new RestException(Integer.parseInt(errorCode), errorMsg);
+        return new RestException(errorCode, errorMsg);
     }
 
     /**
