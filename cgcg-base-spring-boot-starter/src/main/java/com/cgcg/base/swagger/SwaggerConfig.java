@@ -29,13 +29,18 @@ public class SwaggerConfig {
 
     @Bean
     public Docket createRestApi() {
-        ParameterBuilder tokenPar = new ParameterBuilder();
         List<Parameter> pars = new ArrayList<>();
-        tokenPar.name("token").description("客户端授权")
-                .modelRef(new ModelRef("string"))
-                .parameterType("header")
-                .required(false).build();
-        pars.add(tokenPar.build());
+        final List<String> headers = this.properties.getHeaders();
+        if (headers != null && headers.size() > 0) {
+            for (String header : headers) {
+                ParameterBuilder tokenPar = new ParameterBuilder();
+                tokenPar.name(header).description("Request Header")
+                        .modelRef(new ModelRef("string"))
+                        .parameterType("header")
+                        .required(false).build();
+                pars.add(tokenPar.build());
+            }
+        }
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
                 .select()
