@@ -14,6 +14,7 @@ cgcg:
     version: 1.0.0
   format:
     response-data: true
+    response-data-ignore: /test
     des3: 123456
 spring:
   datasource:

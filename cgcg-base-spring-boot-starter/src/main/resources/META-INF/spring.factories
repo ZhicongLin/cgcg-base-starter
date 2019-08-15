@@ -3,6 +3,7 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
     com.cgcg.base.interceptor.IgnoreHandle,\
     com.cgcg.base.interceptor.InterceptorProperties,\
     com.cgcg.base.core.context.SpringContextHolder,\
+    com.cgcg.base.format.FormatConfig,\
     com.cgcg.base.format.RequestBodyHandler,\
     com.cgcg.base.format.ResponseBodyFormatHandler,\
     com.cgcg.base.swagger.SwaggerProperties,\

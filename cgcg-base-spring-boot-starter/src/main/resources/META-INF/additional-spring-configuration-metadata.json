@@ -7,6 +7,12 @@
       "defaultValue": "false"
     },
     {
+      "name": "cgcg.format.response-data-ignore",
+      "type": "java.util.List",
+      "description": "忽略格式化返回结果",
+      "defaultValue": ""
+    },
+    {
       "name": "cgcg.format.class-name",
       "type": "java.lang.String",
       "description": "format className",

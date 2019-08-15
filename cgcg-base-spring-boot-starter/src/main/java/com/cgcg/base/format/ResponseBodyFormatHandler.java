@@ -17,7 +17,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
+import javax.annotation.Resource;
 import java.net.URI;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -30,6 +32,8 @@ import java.util.Objects;
 @Order(1)
 @ControllerAdvice
 public class ResponseBodyFormatHandler implements ResponseBodyAdvice {
+    @Resource
+    private List<String> responseDataIgnore;
     @Override
     public boolean supports(MethodParameter returnType, Class converterType) {
         final Class<?> declaringClass = Objects.requireNonNull(returnType.getMethod()).getDeclaringClass();
@@ -49,7 +53,7 @@ public class ResponseBodyFormatHandler implements ResponseBodyAdvice {
         }
         //获取配置，是否开启格式化
         final Boolean formatResponseData = FormatProperty.DATA.getBoolean();
-        if (formatResponseData == null || !formatResponseData) {
+        if (formatResponseData == null || !formatResponseData || this.responseDataIgnore.contains(path)) {
             //没有开启格式化，直接返回
             return body;
         }
