@@ -1,7 +1,6 @@
 package com.cgcg.rest.param;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.cgcg.rest.URLUtils;
 import com.cgcg.rest.annotation.DynamicParam;
 import lombok.extern.slf4j.Slf4j;
@@ -58,17 +57,7 @@ public class RestParamVisitorImpl implements RestParamVisitor {
         if (StringUtils.isNotBlank(value)) {
             handle.addHeader(value, param.toString());
         } else if (param instanceof HttpHeaders) {
-            final HttpHeaders headers = (HttpHeaders) param;
-            final Set<String> keySet = headers.keySet();
-            for (String key : keySet) {
-                handle.addHeader(key, headers.get(key));
-            }
-        } else {
-            final JSONObject object = JSON.parseObject(JSON.toJSONString(param));
-            final Set<String> keySet = object.keySet();
-            for (String key : keySet) {
-                handle.addHeader(key, String.valueOf(object.get(key)));
-            }
+            handle.setMaxHeader((HttpHeaders) param);
         }
     }
 

@@ -40,4 +40,14 @@ public class RestHandle<T, D> extends HashMap<T, D> {
     public void addHeader(String key, Object val) {
         this.headers.add(key, String.valueOf(val));
     }
+
+    private HttpHeaders maxHeader;
+
+    public HttpHeaders getHeaders() {
+        if (this.maxHeader != null) {
+            return maxHeader;
+        }
+        return this.headers;
+    }
+
 }
