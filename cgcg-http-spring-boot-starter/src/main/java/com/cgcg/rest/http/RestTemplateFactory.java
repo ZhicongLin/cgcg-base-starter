@@ -100,16 +100,20 @@ public class RestTemplateFactory {
         try {
             return this.executeHttpRequest(url, handle.getHttpMethod(), httpEntity, resultType, handle);
         } finally {
-            //程序结束时，删除临时文件
-            final File[] files = handle.getFiles();
-            if (files != null) {
-                try {
-                    for (File tempFile : files) {
-                        FileUtils.forceDelete(tempFile);
-                    }
-                } catch (IOException e) {
-                    log.error("delete temp file error");
+            this.clearTempFiles(handle);
+        }
+    }
+
+    private void clearTempFiles(RestHandle<String, Object> handle) {
+        //程序结束时，删除临时文件
+        final File[] files = handle.getFiles();
+        if (files != null) {
+            try {
+                for (File tempFile : files) {
+                    FileUtils.forceDelete(tempFile);
                 }
+            } catch (IOException e) {
+                log.error("delete temp file error");
             }
         }
     }
