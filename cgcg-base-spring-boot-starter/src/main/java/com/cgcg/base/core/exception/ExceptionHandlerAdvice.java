@@ -46,7 +46,7 @@ public class ExceptionHandlerAdvice {
      * @return the result
      */
     @ExceptionHandler(CommonException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.OK)
     public Result handleException(CommonException e) {
         if (e.getErrorClass() != null) {
             final Logger logger = LoggerFactory.getLogger(e.getErrorClass());
@@ -64,12 +64,12 @@ public class ExceptionHandlerAdvice {
      * @return the result
      */
     @ExceptionHandler(MissingServletRequestParameterException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.OK)
     public Result handleException(MissingServletRequestParameterException e) {
         String parameterName = e.getParameterName();
         String parameterType = e.getParameterType();
         log.error("缺少必填参数{} {}", parameterType, parameterName, e);
-        return Result.error(100400, Translator.toLocale("RequiredParameter", "缺少必填参数:") + parameterName);
+        return Result.error(400, Translator.toLocale("RequiredParameter", "缺少必填参数:") + parameterName);
     }
 
     /**
@@ -79,15 +79,15 @@ public class ExceptionHandlerAdvice {
      * @return the error result
      */
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.OK)
     public Result handleException(HttpRequestMethodNotSupportedException e) {
         final String message = e.getMessage();
         log.error(message, e);
         final String[] split = message.split("'");
         if (split.length >= 2) {
-            return Result.error(100400, String.format(Translator.toLocale("ErrorRequestMethodFmt", "请求方式错误"), split[1]));
+            return Result.error(400, String.format(Translator.toLocale("ErrorRequestMethodFmt", "请求方式错误"), split[1]));
         }
-        return Result.error(100400, Translator.toLocale("ErrorRequestMethod", "请求方式错误"));
+        return Result.error(400, Translator.toLocale("ErrorRequestMethod", "请求方式错误"));
     }
 
     /**
@@ -97,20 +97,20 @@ public class ExceptionHandlerAdvice {
      * @return the error result
      */
     @ExceptionHandler(Throwable.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.OK)
     public Result handleException(Throwable e) {
         final String message = e.getMessage() != null ? e.getMessage() : e.toString();
         log.error(message, e);
         final String regEx = "[\u4e00-\u9fa5]";
         final Pattern p = Pattern.compile(regEx);
         if (p.matcher(message).find()) {
-            return Result.error(100500, message);
+            return Result.error(400, message);
         }
         if (message.contains("timeout") || message.contains("timedout")) {
-            return message.contains("refused") ? Result.error(100502, Translator.toLocale("ConnectionRefused", "服务器拒绝连接"))
-                    : Result.error(100504, Translator.toLocale("ConnectionTimeOut", "服务器连接超时"));
+            return message.contains("refused") ? Result.error(400, Translator.toLocale("ConnectionRefused", "服务器拒绝连接"))
+                    : Result.error(400, Translator.toLocale("ConnectionTimeOut", "服务器连接超时"));
         }
-        return Result.error(100500, Translator.toLocale("ServerError", "服务器内部异常"));
+        return Result.error(400, Translator.toLocale("ServerError", "服务器内部异常"));
     }
 
     /**
@@ -120,10 +120,10 @@ public class ExceptionHandlerAdvice {
      * @return the error result
      */
     @ExceptionHandler({BindException.class, MethodArgumentNotValidException.class})
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.OK)
     public Result handleException(Exception e) {
         log.error(e.getMessage(), e);
-        return Result.error(100400, this.getBindMessage(e.getMessage()));
+        return Result.error(400, this.getBindMessage(e.getMessage()));
     }
 
     /**
@@ -133,10 +133,10 @@ public class ExceptionHandlerAdvice {
      * @return the error result
      */
     @ExceptionHandler(NoHandlerFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseStatus(HttpStatus.OK)
     public Result noMapping(NoHandlerFoundException e) {
         log.error(e.getMessage(), e);
-        return Result.error(100404, Translator.toLocale("PathNotFound", "请求路径不存在"));
+        return Result.error(400, Translator.toLocale("PathNotFound", "请求路径不存在"));
     }
 
     /**
@@ -146,10 +146,10 @@ public class ExceptionHandlerAdvice {
      * @return the error result
      */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.OK)
     public Result errorParam(MethodArgumentTypeMismatchException me) {
         log.error(me.getMessage(), me);
-        return Result.error(100400, Translator.toLocale("WrongParameter", "请求参数不合法"));
+        return Result.error(400, Translator.toLocale("WrongParameter", "请求参数不合法"));
     }
 
     /**
@@ -165,9 +165,9 @@ public class ExceptionHandlerAdvice {
         log.error(message, e);
         final String[] split = message.split("'");
         if (split.length >= 2) {
-            return Result.error(100415, String.format(Translator.toLocale("TextTypeErrorFmt", "参数文本类型错误"), split[1]));
+            return Result.error(400, String.format(Translator.toLocale("TextTypeErrorFmt", "参数文本类型错误"), split[1]));
         }
-        return Result.error(100415, Translator.toLocale("TextTypeError", "参数文本类型错误"));
+        return Result.error(400, Translator.toLocale("TextTypeError", "参数文本类型错误"));
     }
 
 
