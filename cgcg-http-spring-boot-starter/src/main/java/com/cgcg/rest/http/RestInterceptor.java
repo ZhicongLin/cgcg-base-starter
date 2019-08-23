@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -17,7 +18,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.util.Objects;
 
 /**
  * rest 请求拦截器，默认有Authorization处理.
@@ -32,11 +32,12 @@ public class RestInterceptor implements ClientHttpRequestInterceptor {
     public ClientHttpResponse intercept(HttpRequest httpRequest, byte[] bytes, ClientHttpRequestExecution clientHttpRequestExecution) throws IOException {
         URI uri = httpRequest.getURI();
         HttpHeaders headers = httpRequest.getHeaders();
-        HttpServletRequest request = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
         Logger logger = log;
         if (log.isDebugEnabled()) {
-            Object attribute = request.getAttribute(Constant.REST_METHOD_NAME);
-            if (attribute != null) {
+            final RequestAttributes attributes = RequestContextHolder.getRequestAttributes();
+            if (attributes != null) {
+                HttpServletRequest request = ((ServletRequestAttributes) attributes).getRequest();
+                Object attribute = request.getAttribute(Constant.REST_METHOD_NAME);
                 logger = LoggerFactory.getLogger(attribute.toString());
             }
             logger.debug("{} {}.", httpRequest.getMethod(), uri);
