@@ -62,7 +62,7 @@ public class ResponseBodyFormatHandler implements ResponseBodyAdvice {
 
     private Object getFormatResult(Object body, Class selectedConverterType) {
         final Class<?> formatClass = FormatProperty.getFormatClass();
-        if (body != null && body.getClass() == formatClass) {
+        if (body != null && body.getClass().getName().equals(formatClass.getName())) {
             //判断ResultMap类型，直接返回，不进行格式化
             return body;
         }
