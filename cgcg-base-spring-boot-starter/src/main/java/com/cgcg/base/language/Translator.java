@@ -1,5 +1,6 @@
 package com.cgcg.base.language;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Locale;
 
+@Slf4j
 @Component
 public class Translator {
 
