@@ -18,6 +18,6 @@ public class TestService {
     @Resource
     TestMapper testMapper;
     public Object findAll() {
-        return this.testMapper.findAll();
+        return this.testMapper.insert();
     }
 }

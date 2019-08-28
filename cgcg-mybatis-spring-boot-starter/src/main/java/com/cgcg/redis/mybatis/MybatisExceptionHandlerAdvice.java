@@ -1,6 +1,8 @@
 package com.cgcg.redis.mybatis;
 
 import com.cgcg.base.format.Result;
+import com.cgcg.base.language.Translator;
+import com.mysql.cj.jdbc.exceptions.MysqlDataTruncation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -10,7 +12,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.SQLSyntaxErrorException;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,15 +40,10 @@ public class MybatisExceptionHandlerAdvice {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Result handleException(DataIntegrityViolationException e) {
         final Throwable cause = getCause(e);
-        String message = "数据完整性冲突";
-        if (cause instanceof SQLIntegrityConstraintViolationException) {
-            final String msg = cause.getMessage();
-            final List<String> msgResult = getMessage(msg);
-            if (msgResult.size() == 1) {
-                message = "数据库字段" + msgResult.get(0) + "不能为空";
-            } else if (msgResult.size() == 2) {
-                message = "数据库字段" + msgResult.get(1) + "插入错误的值" + msgResult.get(0);
-            }
+        String message = Translator.toLocale("DataIntegrityViolationException");
+        if (cause instanceof MysqlDataTruncation) {
+            final List<String> msgResult = getMessage(cause.getMessage());
+            message = String.format(Translator.toLocale("MysqlDataTruncation"), msgResult.get(0));
         }
         log.error(message, e);
         return Result.error(100400, message);

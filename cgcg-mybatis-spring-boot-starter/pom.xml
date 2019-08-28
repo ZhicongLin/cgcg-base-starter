@@ -10,13 +10,14 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>cgcg-mybatis-spring-boot-starter</artifactId>
-    <version>1.2.0.release</version>
+    <version>1.2.1.release</version>
 
     <dependencies>
         <dependency>
             <groupId>com.cgcg</groupId>
             <artifactId>cgcg-base-spring-boot-starter</artifactId>
-            <version>1.2.2.release</version>
+            <version>1.2.5.r8</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.cgcg</groupId>
