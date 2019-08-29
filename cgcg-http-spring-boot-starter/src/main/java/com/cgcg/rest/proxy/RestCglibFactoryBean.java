@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.cglib.proxy.Enhancer;
-import org.springframework.cglib.proxy.MethodInterceptor;
 
 @Setter
 @Getter
@@ -18,7 +17,7 @@ public class RestCglibFactoryBean implements FactoryBean {
     @Override
     public Object getObject() {
         enhancer.setSuperclass(interfaceClass);
-        enhancer.setCallback((MethodInterceptor) (proxy, method, args, methodProxy) -> RestBuilderProcessor.invoke(method, args, fallbackBean));
+        enhancer.setCallback(Proceeding.cglib(interfaceClass, fallbackBean));
         return enhancer.create();
     }
 

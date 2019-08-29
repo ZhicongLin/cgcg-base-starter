@@ -14,7 +14,7 @@ public class RestJdkFactoryBean implements FactoryBean {
     private Object fallbackBean;
     @Override
     public Object getObject() {
-        return Proxy.newProxyInstance(interfaceClass.getClassLoader(), new Class[]{interfaceClass}, (proxy, method, args) -> RestBuilderProcessor.invoke(method, args, fallbackBean));
+        return Proxy.newProxyInstance(interfaceClass.getClassLoader(), new Class[]{interfaceClass}, Proceeding.jdk(interfaceClass, fallbackBean));
     }
 
     @Override

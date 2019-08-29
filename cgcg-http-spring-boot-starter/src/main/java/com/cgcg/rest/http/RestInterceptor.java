@@ -1,6 +1,5 @@
 package com.cgcg.rest.http;
 
-import com.cgcg.rest.Constant;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,14 +9,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 /**
  * rest 请求拦截器，默认有Authorization处理.
@@ -32,13 +28,11 @@ public class RestInterceptor implements ClientHttpRequestInterceptor {
     public ClientHttpResponse intercept(HttpRequest httpRequest, byte[] bytes, ClientHttpRequestExecution clientHttpRequestExecution) throws IOException {
         URI uri = httpRequest.getURI();
         HttpHeaders headers = httpRequest.getHeaders();
+        final List<String> logNames = headers.get("client-log-name");
         Logger logger = log;
         if (log.isDebugEnabled()) {
-            final RequestAttributes attributes = RequestContextHolder.getRequestAttributes();
-            if (attributes != null) {
-                HttpServletRequest request = ((ServletRequestAttributes) attributes).getRequest();
-                Object attribute = request.getAttribute(Constant.REST_METHOD_NAME);
-                logger = LoggerFactory.getLogger(attribute.toString());
+            if (logNames != null && logNames.get(0) != null) {
+                logger = LoggerFactory.getLogger(logNames.get(0));
             }
             logger.debug("{} {}.", httpRequest.getMethod(), uri);
             logger.debug("Headers {}", headers);

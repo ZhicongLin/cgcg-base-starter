@@ -28,15 +28,16 @@ public class RestBuilderProcessor implements BuilderCallBack {
     /**
      * 包装调用方法：进行预处理、调用后处理
      */
-    public static Object invoke(Method method, Object[] args, Object fallbackBean) {
+    public static Object invoke(Proceeding proceeding) {
+        final Method method = proceeding.getMethod();
+        final Object fallbackBean = proceeding.getInstance();
+        final Object[] args = proceeding.getArguments();
         final long start = System.currentTimeMillis();
-        final RestBuilder builder = RestBuilder.getInstance(method);
+        final RestBuilder builder = RestBuilder.getInstance(proceeding);
         final boolean valid = validateFallback(method, fallbackBean, start);
         try {
             if (valid) {
-                if (builder.getMethodLogger() != null) {
-                    builder.getMethodLogger().info("RestClient Hit Fallback.");
-                }
+                proceeding.getLogger().info("RestClient Hit Fallback.");
                 return fallBackResult.get(fallbackBean).get(method);
             }
             return builder.addArgs(args).execute(restBuilderProcessor);
@@ -46,11 +47,10 @@ public class RestBuilderProcessor implements BuilderCallBack {
             }
             throw e;
         } finally {
-            if (builder.getMethodLogger() != null) {
-                builder.getMethodLogger().debug("Response {}ms", (System.currentTimeMillis() - start));
-            }
+            proceeding.getLogger().debug("Response {}ms", (System.currentTimeMillis() - start));
         }
     }
+
 
     private static boolean validateFallback(Method method, Object fallbackBean, long startTime) {
         if (fallbackBean == null) {

@@ -46,12 +46,12 @@ public class RestTemplateConfigure {
      */
     @Bean
     public ClientHttpRequestFactory clientHttpRequestFactory() {
-        final HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory();
-        clientHttpRequestFactory.setHttpClient(httpClientBuilder().build());
-        clientHttpRequestFactory.setConnectTimeout(60000); // 连接超时时间/毫秒
-        clientHttpRequestFactory.setReadTimeout(6000); // 读写超时时间/毫秒
-        clientHttpRequestFactory.setConnectionRequestTimeout(5000);// 请求超时时间/毫秒
-        return clientHttpRequestFactory;
+        final HttpComponentsClientHttpRequestFactory chrf = new HttpComponentsClientHttpRequestFactory();
+        chrf.setHttpClient(httpClientBuilder().build());
+        chrf.setConnectTimeout(60000); // 连接超时时间/毫秒
+        chrf.setReadTimeout(6000); // 读写超时时间/毫秒
+        chrf.setConnectionRequestTimeout(5000);// 请求超时时间/毫秒
+        return chrf;
     }
 
     /**

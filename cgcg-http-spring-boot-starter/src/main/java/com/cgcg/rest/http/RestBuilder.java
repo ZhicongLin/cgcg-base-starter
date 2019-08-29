@@ -1,6 +1,5 @@
 package com.cgcg.rest.http;
 
-import com.cgcg.rest.Constant;
 import com.cgcg.rest.MappingProcessor;
 import com.cgcg.rest.SpringContextHolder;
 import com.cgcg.rest.URLUtils;
@@ -11,20 +10,16 @@ import com.cgcg.rest.filter.RestFilter;
 import com.cgcg.rest.param.RestHandle;
 import com.cgcg.rest.param.RestParamUtils;
 import com.cgcg.rest.proxy.BuilderCallBack;
+import com.cgcg.rest.proxy.Proceeding;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -63,15 +58,17 @@ public final class RestBuilder {
 
     private boolean isHttps;
 
-    private Logger methodLogger;
+    private String methodLogger;
 
-    public static RestBuilder getInstance(Method method) {
+    public static RestBuilder getInstance(Proceeding proceeding) {
+        final Method method = proceeding.getMethod();
         RestBuilder restBuilder = builderMap.get(method);
         if (restBuilder == null) {
             synchronized (RestBuilder.class) {
                 restBuilder = builderMap.get(method);
                 if (restBuilder == null) {
                     restBuilder = new RestBuilder(method);
+                    restBuilder.setMethodLogger(proceeding.getLogName());
                 }
             }
         }
@@ -85,15 +82,6 @@ public final class RestBuilder {
      */
     private RestBuilder(Method method) {
         this.method = method;
-        final String methodName = this.method.getDeclaringClass().getName() + "#" + method.getName();
-        this.methodLogger = LoggerFactory.getLogger(methodName);
-        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        if (requestAttributes != null) {
-            HttpServletRequest request = requestAttributes.getRequest();
-            if (request.getAttribute(Constant.REST_METHOD_NAME) == null) {
-                request.setAttribute(Constant.REST_METHOD_NAME, methodName);
-            }
-        }
         this.buildFilter(method);
         this.initURI(method);
         this.builderSchema();
@@ -131,6 +119,9 @@ public final class RestBuilder {
         }
         if (this.params.getAccept() != null) {
             this.params.addHeader("Accept", this.params.getAccept());
+        }
+        if (this.methodLogger != null) {
+            this.params.addHeader("client-log-name", this.methodLogger);
         }
     }
 

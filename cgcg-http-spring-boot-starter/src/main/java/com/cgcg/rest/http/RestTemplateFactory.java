@@ -127,7 +127,7 @@ public class RestTemplateFactory {
             for (Map.Entry<String, Object> entry : entrySet) {
                 multiValueMap.put(entry.getKey(), Collections.singletonList(entry.getValue()));
             }
-            httpEntity = new HttpEntity<>(multiValueMap);
+            httpEntity = new HttpEntity<>(multiValueMap, handle.getHeaders());
         } else if ((MediaType.APPLICATION_JSON_UTF8_VALUE.equals(contentType) || MediaType.APPLICATION_JSON_VALUE.equals(contentType)) && StringUtils.isNotBlank(handle.getBodyString())) {
             httpEntity = new HttpEntity<>(handle.getBodyString(), handle.getHeaders());
         } else {
