@@ -28,14 +28,6 @@ public class Proceeding {
         this.logger = LoggerFactory.getLogger(this.logName);
     }
 
-    public Object proceed() throws Exception {
-        return proceed(this.arguments);
-    }
-
-    public Object proceed(Object[] arguments) throws Exception {
-        return method.invoke(this.instance, arguments);
-    }
-
     public static MethodInterceptor cglib(Class interfaceClass, Object fallbackBean) {
         return (o, method, arguments, methodProxy) -> RestBuilderProcessor.invoke(new Proceeding(method, arguments, interfaceClass, fallbackBean));
     }
