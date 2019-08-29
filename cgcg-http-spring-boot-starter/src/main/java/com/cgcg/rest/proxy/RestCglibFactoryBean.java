@@ -16,12 +16,8 @@ public class RestCglibFactoryBean implements FactoryBean {
     private Object fallbackBean;
     @Override
     public Object getObject() {
-        enhancer.setSuperclass(interfaceClass);
-        enhancer.setCallback(Proceeding.cglib(interfaceClass, fallbackBean));
-        return enhancer.create();
+        return Proceeding.cglib(interfaceClass, fallbackBean, enhancer);
     }
-
-
     @Override
     public Class getObjectType() {
         return this.interfaceClass;

@@ -4,10 +4,12 @@ import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cglib.proxy.Enhancer;
 import org.springframework.cglib.proxy.MethodInterceptor;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 
 @Setter
 @Getter
@@ -28,11 +30,15 @@ public class Proceeding {
         this.logger = LoggerFactory.getLogger(this.logName);
     }
 
-    public static MethodInterceptor cglib(Class interfaceClass, Object fallbackBean) {
-        return (o, method, arguments, methodProxy) -> RestBuilderProcessor.invoke(new Proceeding(method, arguments, interfaceClass, fallbackBean));
+    public static Object cglib(Class interfaceClass, Object fallbackBean, Enhancer enhancer) {
+        final MethodInterceptor methodInterceptor = (o, method, arguments, methodProxy) -> RestBuilderProcessor.invoke(new Proceeding(method, arguments, interfaceClass, fallbackBean));
+        enhancer.setSuperclass(interfaceClass);
+        enhancer.setCallback(methodInterceptor);
+        return enhancer.create();
     }
 
-    public static InvocationHandler jdk(Class interfaceClass, Object fallbackBean) {
-        return (proxy, method, args) -> RestBuilderProcessor.invoke(new Proceeding(method, args, interfaceClass, fallbackBean));
+    public static Object jdk(Class interfaceClass, Object fallbackBean) {
+        final InvocationHandler invocationHandler = (proxy, method, args) -> RestBuilderProcessor.invoke(new Proceeding(method, args, interfaceClass, fallbackBean));
+        return Proxy.newProxyInstance(interfaceClass.getClassLoader(), new Class[]{interfaceClass}, invocationHandler);
     }
 }

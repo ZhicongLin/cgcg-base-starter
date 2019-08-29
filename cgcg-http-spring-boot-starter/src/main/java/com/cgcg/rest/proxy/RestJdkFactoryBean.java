@@ -4,8 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.FactoryBean;
 
-import java.lang.reflect.Proxy;
-
 @Setter
 @Getter
 public class RestJdkFactoryBean implements FactoryBean {
@@ -14,7 +12,7 @@ public class RestJdkFactoryBean implements FactoryBean {
     private Object fallbackBean;
     @Override
     public Object getObject() {
-        return Proxy.newProxyInstance(interfaceClass.getClassLoader(), new Class[]{interfaceClass}, Proceeding.jdk(interfaceClass, fallbackBean));
+        return Proceeding.jdk(interfaceClass, fallbackBean);
     }
 
     @Override
