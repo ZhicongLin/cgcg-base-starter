@@ -4,8 +4,6 @@ import com.cgcg.rest.annotation.RestClient;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.ScannedGenericBeanDefinition;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
@@ -37,9 +35,9 @@ public class RestClientScannerConfigurer {
         this.environment = environment;
     }
 
-    public Set<BeanDefinition> findCandidateComponents(Collection<String> basePackages) {
+    public Set<RestClientGenericBeanDefinition> findCandidateComponents(Collection<String> basePackages) {
         try {
-            final Set<BeanDefinition> definitions = new HashSet<>();
+            final Set<RestClientGenericBeanDefinition> definitions = new HashSet<>();
             for (String basePackage : basePackages) {
                 definitions.addAll(this.findCandidateClasses(basePackage));
             }
@@ -57,14 +55,14 @@ public class RestClientScannerConfigurer {
      * @return
      * @throws IOException
      */
-    public Set<BeanDefinition> findCandidateClasses(String basePackage) throws IOException {
-        final Set<BeanDefinition> candidates = new HashSet<>();
+    public Set<RestClientGenericBeanDefinition> findCandidateClasses(String basePackage) throws IOException {
+        final Set<RestClientGenericBeanDefinition> candidates = new HashSet<>();
         final String packageSearchPath = CLASSPATH_ALL_URL_PREFIX + resolveBasePackage(basePackage) + '/' + RESOURCE_PATTERN;
         final Resource[] resources = ResourcePatternUtils.getResourcePatternResolver(resourceLoader).getResources(packageSearchPath);
         for (Resource resource : resources) {
             final MetadataReader reader = readerFactory.getMetadataReader(resource);
             if (annotationTypeFilter.match(reader, readerFactory)) {
-                final ScannedGenericBeanDefinition sbd = new ScannedGenericBeanDefinition(reader);
+                final RestClientGenericBeanDefinition sbd = new RestClientGenericBeanDefinition(reader);
                 sbd.setResource(resource);
                 sbd.setSource(resource);
                 candidates.add(sbd);

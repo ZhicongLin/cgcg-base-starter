@@ -7,8 +7,6 @@ import com.cgcg.rest.proxy.RestJdkFactoryBean;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -41,27 +39,18 @@ public class RestClientsRegistrar implements ImportBeanDefinitionRegistrar, Envi
         final RestClientScannerConfigurer scanner = new RestClientScannerConfigurer(this.environment);
         //扫描
         final long start = System.currentTimeMillis();
-        final Set<BeanDefinition> restClients = scanner.findCandidateComponents(basePackages);
+        final Set<RestClientGenericBeanDefinition> restClients = scanner.findCandidateComponents(basePackages);
         log.info("Finished Cgcg Rest Clients scanning in {}ms, Found {} clients interfaces.", (System.currentTimeMillis() - start), restClients.size());
-        for (BeanDefinition candidateComponent : restClients) {
-            if (candidateComponent instanceof AnnotatedBeanDefinition) {
-                final AnnotationMetadata metadata = ((AnnotatedBeanDefinition) candidateComponent).getMetadata();
-                this.registerRestClientBean(registry, metadata);
-            }
+        for (RestClientGenericBeanDefinition candidateComponent : restClients) {
+            this.registerRestClientBean(registry, candidateComponent);
         }
     }
 
     @SneakyThrows
-    private void registerRestClientBean(BeanDefinitionRegistry registry, AnnotationMetadata metadata) {
-        final Class<?> beanClass;
-        try {
-            beanClass = Class.forName(metadata.getClassName());
-        } catch (ClassNotFoundException e) {
-            log.error("Register error [{}]", e.getMessage());
-            return;
-        }
-        final Environment env = this.environment;
-        final Boolean proxyModel = env.getProperty("rest.proxy-target-class", Boolean.class);
+    private void registerRestClientBean(BeanDefinitionRegistry registry, RestClientGenericBeanDefinition candidateComponent) {
+        final Class<?> beanClass = candidateComponent.getBeanClass();
+        final AnnotationMetadata metadata = candidateComponent.getMetadata();
+        final Boolean proxyModel = this.environment.getProperty("rest.proxy-target-class", Boolean.class);
         final Class proxyClass = proxyModel == null || proxyModel ? RestCglibFactoryBean.class : RestJdkFactoryBean.class;
         final BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(proxyClass); // BeanDefinitionBuilder.genericBeanDefinition(proxyClass);
         builder.addPropertyValue(Constant.PROXY_CLASS_KEY, beanClass);
@@ -69,7 +58,7 @@ public class RestClientsRegistrar implements ImportBeanDefinitionRegistrar, Envi
         definition.setAutowireCandidate(true);
         final Map<String, Object> attributes = metadata.getAnnotationAttributes(RestClient.class.getCanonicalName());
         if (attributes != null) {
-            final Boolean enableFallback = env.getProperty("rest.fallback.enable", Boolean.class);
+            final Boolean enableFallback = this.environment.getProperty("rest.fallback.enable", Boolean.class);
             final Object fallback = attributes.get(Constant.PROXY_FALLBACK_KEY);
             if ((enableFallback == null || enableFallback) && fallback != Void.class) {
                 final Object bean = ((Class<?>) fallback).newInstance();
