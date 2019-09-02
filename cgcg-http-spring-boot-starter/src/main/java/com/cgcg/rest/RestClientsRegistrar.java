@@ -35,20 +35,20 @@ public class RestClientsRegistrar implements ImportBeanDefinitionRegistrar, Envi
     private Environment environment;
 
     public void registerBeanDefinitions(AnnotationMetadata annotationMetadata, BeanDefinitionRegistry registry) {
-        final long start = System.currentTimeMillis();
         //获取扫描包
         final Set<String> basePackages = this.getBasePackages(annotationMetadata);
         //新增扫描器
         final RestClientScannerConfigurer scanner = new RestClientScannerConfigurer(this.environment);
         //扫描
+        final long start = System.currentTimeMillis();
         final Set<BeanDefinition> restClients = scanner.findCandidateComponents(basePackages);
+        log.info("Finished Cgcg Rest Clients scanning in {}ms, Found {} clients interfaces", (System.currentTimeMillis() - start), restClients.size());
         for (BeanDefinition candidateComponent : restClients) {
             if (candidateComponent instanceof AnnotatedBeanDefinition) {
                 final AnnotationMetadata metadata = ((AnnotatedBeanDefinition) candidateComponent).getMetadata();
                 this.registerRestClientBean(registry, metadata);
             }
         }
-        log.debug("Finished Cgcg Rest Clients scanning in {}ms, Found {} clients interfaces", (System.currentTimeMillis() - start), restClients.size());
     }
 
     @SneakyThrows
