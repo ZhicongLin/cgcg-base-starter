@@ -32,6 +32,7 @@ public class RestClientsRegistrar implements ImportBeanDefinitionRegistrar {
     private RestClientsScanner scanner = new RestClientsScanner();
 
     public void registerBeanDefinitions(AnnotationMetadata annotationMetadata, BeanDefinitionRegistry registry) {
+        long start = System.currentTimeMillis();
         //获取扫描包
         final Set<String> basePackages = this.getBasePackages(annotationMetadata);
         final Set<BeanDefinition> components = this.scanner.findCandidateComponents(basePackages);
@@ -46,7 +47,7 @@ public class RestClientsRegistrar implements ImportBeanDefinitionRegistrar {
                 }
             }
         }
-        log.debug("Rest Clients {}", restBeans);
+        log.debug("Finished Cgcg Rest Clients scanning in {}ms, Found {} clients interfaces", (System.currentTimeMillis() - start), restBeans.size());
     }
 
     @SneakyThrows
