@@ -42,7 +42,7 @@ public class RestClientsRegistrar implements ImportBeanDefinitionRegistrar, Envi
         //扫描
         final long start = System.currentTimeMillis();
         final Set<BeanDefinition> restClients = scanner.findCandidateComponents(basePackages);
-        log.info("Finished Cgcg Rest Clients scanning in {}ms, Found {} clients interfaces", (System.currentTimeMillis() - start), restClients.size());
+        log.info("Finished Cgcg Rest Clients scanning in {}ms, Found {} clients interfaces.", (System.currentTimeMillis() - start), restClients.size());
         for (BeanDefinition candidateComponent : restClients) {
             if (candidateComponent instanceof AnnotatedBeanDefinition) {
                 final AnnotationMetadata metadata = ((AnnotatedBeanDefinition) candidateComponent).getMetadata();
