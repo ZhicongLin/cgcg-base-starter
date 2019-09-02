@@ -14,52 +14,53 @@ import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotationMetadata;
-import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * RestClient Registrar SpringContext
  */
 @Slf4j
 @Setter
-public class RestClientsRegistrar implements ImportBeanDefinitionRegistrar {
-    private RestClientsScanner scanner = new RestClientsScanner();
+public class RestClientsRegistrar implements ImportBeanDefinitionRegistrar, EnvironmentAware {
+    private Environment environment;
 
     public void registerBeanDefinitions(AnnotationMetadata annotationMetadata, BeanDefinitionRegistry registry) {
-        long start = System.currentTimeMillis();
+        final long start = System.currentTimeMillis();
         //获取扫描包
         final Set<String> basePackages = this.getBasePackages(annotationMetadata);
-        final Set<BeanDefinition> components = this.scanner.findCandidateComponents(basePackages);
-        final List<String> restBeans = new LinkedList<>();
-        for (BeanDefinition candidateComponent : components) {
+        //新增扫描器
+        final RestClientScannerConfigurer scanner = new RestClientScannerConfigurer(this.environment);
+        //扫描
+        final Set<BeanDefinition> restClients = scanner.findCandidateComponents(basePackages);
+        for (BeanDefinition candidateComponent : restClients) {
             if (candidateComponent instanceof AnnotatedBeanDefinition) {
                 final AnnotationMetadata metadata = ((AnnotatedBeanDefinition) candidateComponent).getMetadata();
-                Assert.isTrue(metadata.isInterface(), "@RestClient can only be specified on an interface");
-                final String beanClassName = this.registerRestClientBean(registry, metadata);
-                if (beanClassName != null) {
-                    restBeans.add(beanClassName);
-                }
+                this.registerRestClientBean(registry, metadata);
             }
         }
-        log.debug("Finished Cgcg Rest Clients scanning in {}ms, Found {} clients interfaces", (System.currentTimeMillis() - start), restBeans.size());
+        log.debug("Finished Cgcg Rest Clients scanning in {}ms, Found {} clients interfaces", (System.currentTimeMillis() - start), restClients.size());
     }
 
     @SneakyThrows
-    private String registerRestClientBean(BeanDefinitionRegistry registry, AnnotationMetadata metadata) {
+    private void registerRestClientBean(BeanDefinitionRegistry registry, AnnotationMetadata metadata) {
         final Class<?> beanClass;
         try {
             beanClass = Class.forName(metadata.getClassName());
         } catch (ClassNotFoundException e) {
-            log.error("Register ERROR [{}]", e.getMessage());
-            return null;
+            log.error("Register error [{}]", e.getMessage());
+            return;
         }
-        final Environment env = this.scanner.getEnvironment();
+        final Environment env = this.environment;
         final Boolean proxyModel = env.getProperty("rest.proxy-target-class", Boolean.class);
         final Class proxyClass = proxyModel == null || proxyModel ? RestCglibFactoryBean.class : RestJdkFactoryBean.class;
         final BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(proxyClass); // BeanDefinitionBuilder.genericBeanDefinition(proxyClass);
@@ -80,7 +81,6 @@ public class RestClientsRegistrar implements ImportBeanDefinitionRegistrar {
         final BeanDefinitionHolder holder = new BeanDefinitionHolder(definition, metadata.getClassName(), new String[]{clientName});
         //注册到容器
         BeanDefinitionReaderUtils.registerBeanDefinition(holder, registry);
-        return beanClass.getName();
     }
 
     private Set<String> getBasePackages(AnnotationMetadata importingClassMetadata) {
