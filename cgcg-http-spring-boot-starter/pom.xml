@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>cgcg-http-spring-boot-starter</artifactId>
-    <version>1.1.4.r3</version>
+    <version>1.1.4.r4</version>
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
