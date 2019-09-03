@@ -1,10 +1,10 @@
 package com.cgcg.base.interceptor;
 
 import com.alibaba.fastjson.JSON;
-import com.cgcg.base.interceptor.auth.AuthService;
-import com.cgcg.base.core.context.SpringContextHolder;
 import com.cgcg.base.core.enums.CharsetCode;
+import com.cgcg.base.interceptor.auth.AuthService;
 import com.cgcg.base.language.Translator;
+import com.cgcg.context.SpringContextHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

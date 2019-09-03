@@ -1,7 +1,7 @@
 package com.cgcg.rest.annotation;
 
 import com.cgcg.rest.RestClientsRegistrar;
-import com.cgcg.rest.SpringContextHolder;
+import com.cgcg.context.SpringContextHolder;
 import com.cgcg.rest.exception.RestExceptionHandlerAdvice;
 import com.cgcg.rest.http.RestTemplateConfigure;
 import com.cgcg.rest.http.RestTemplateFactory;

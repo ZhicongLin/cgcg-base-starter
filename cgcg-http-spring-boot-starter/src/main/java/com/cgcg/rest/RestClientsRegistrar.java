@@ -65,11 +65,10 @@ public class RestClientsRegistrar implements ImportBeanDefinitionRegistrar, Envi
                 builder.addPropertyValue(Constant.PROXY_FALLBACK_BEAN_KEY, bean);
             }
         }
-        definition.setFactoryBeanName(beanClass.getName());
+        definition.setFactoryBeanName(candidateComponent.getBeanClassName());
         final String clientName = this.getClientName(attributes, beanClass);
-        final BeanDefinitionHolder holder = new BeanDefinitionHolder(definition, metadata.getClassName(), new String[]{clientName});
         //注册到容器
-        BeanDefinitionReaderUtils.registerBeanDefinition(holder, registry);
+        BeanDefinitionReaderUtils.registerBeanDefinition(new BeanDefinitionHolder(definition, candidateComponent.getBeanClassName(), new String[]{clientName}), registry);
     }
 
     private Set<String> getBasePackages(AnnotationMetadata importingClassMetadata) {

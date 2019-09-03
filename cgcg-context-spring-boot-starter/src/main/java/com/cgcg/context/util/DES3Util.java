@@ -1,9 +1,9 @@
-package com.cgcg.base.util;
+package com.cgcg.context.util;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.cgcg.base.core.context.SpringContextHolder;
-import com.cgcg.base.core.enums.CharsetCode;
+import com.cgcg.context.SpringContextHolder;
+import com.cgcg.context.enums.CharsetCode;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.codec.binary.Hex;
@@ -60,7 +60,7 @@ public final class DES3Util {
      * @param src 源数据的字节数组
      */
     public static String encryptMode(String src) {
-       return encryptMode(src, THREEDES_KEY);
+        return encryptMode(src, THREEDES_KEY);
     }
 
     /**
@@ -215,6 +215,7 @@ public final class DES3Util {
 
     /**
      * 获取配置系统DES3加密密钥
+     *
      * @auth zhicong.lin
      * @date 2019/6/27
      */

@@ -63,8 +63,6 @@ public class RestClientScannerConfigurer {
             final MetadataReader reader = readerFactory.getMetadataReader(resource);
             if (annotationTypeFilter.match(reader, readerFactory)) {
                 final RestClientGenericBeanDefinition sbd = new RestClientGenericBeanDefinition(reader);
-                sbd.setResource(resource);
-                sbd.setSource(resource);
                 candidates.add(sbd);
             }
         }

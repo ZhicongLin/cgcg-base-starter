@@ -1,4 +1,4 @@
-package com.cgcg.base.util;
+package com.cgcg.context.util;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -17,18 +17,18 @@ public final class IpUtils {
 
     public static String getIpAddress(HttpServletRequest request) {
         String ip = request.getHeader("x-forwarded-for");
-        if(StringUtils.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
+        if (StringUtils.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
             ip = request.getHeader("Proxy-Client-IP");
         }
 
-        if(StringUtils.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
+        if (StringUtils.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
             ip = request.getHeader("WL-Proxy-Client-IP");
         }
 
-        if(StringUtils.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
+        if (StringUtils.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
             ip = request.getRemoteAddr();
         }
 
-        return "0:0:0:0:0:0:0:1".equals(ip)?"127.0.0.1":ip;
+        return "0:0:0:0:0:0:0:1".equals(ip) ? "127.0.0.1" : ip;
     }
 }

@@ -1,6 +1,6 @@
 package com.cgcg.base.format;
 
-import com.cgcg.base.util.HttpHelper;
+import com.cgcg.context.util.HttpHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.Order;

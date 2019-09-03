@@ -1,6 +1,6 @@
 package com.cgcg.rest.filter;
 
-import com.cgcg.rest.SpringContextHolder;
+import com.cgcg.context.SpringContextHolder;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
 /**

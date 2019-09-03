@@ -1,8 +1,8 @@
 package com.cgcg.base.validate;
 
-import com.cgcg.base.core.context.SpringContextHolder;
 import com.cgcg.base.core.exception.CommonException;
 import com.cgcg.base.validate.annotation.Validate;
+import com.cgcg.context.SpringContextHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;

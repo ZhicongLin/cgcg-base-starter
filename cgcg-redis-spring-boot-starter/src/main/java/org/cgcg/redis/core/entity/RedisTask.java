@@ -1,9 +1,9 @@
 package org.cgcg.redis.core.entity;
 
+import com.cgcg.context.SpringContextHolder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.cgcg.redis.core.context.SpringCacheHolder;
 
 import java.util.concurrent.ExecutorService;
 
@@ -80,7 +80,7 @@ public abstract class RedisTask {
             this.fixedTime = fixedTime;
         }
         if (async) {
-            final Object cacheExecutor = SpringCacheHolder.getBean("cacheExecutor");
+            final Object cacheExecutor = SpringContextHolder.getBean("cacheExecutor");
             if (cacheExecutor != null) {
                 ExecutorService executorService = (ExecutorService) cacheExecutor;
                 executorService.execute(this::build);

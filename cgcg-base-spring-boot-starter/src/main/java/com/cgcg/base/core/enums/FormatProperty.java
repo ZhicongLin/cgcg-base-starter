@@ -1,7 +1,7 @@
 package com.cgcg.base.core.enums;
 
-import com.cgcg.base.core.context.SpringContextHolder;
 import com.cgcg.base.format.Result;
+import com.cgcg.context.SpringContextHolder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;

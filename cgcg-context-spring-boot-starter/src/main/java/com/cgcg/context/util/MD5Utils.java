@@ -1,6 +1,6 @@
-package com.cgcg.base.util;
+package com.cgcg.context.util;
 
-import com.cgcg.base.core.enums.CharsetCode;
+import com.cgcg.context.enums.CharsetCode;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,8 +19,7 @@ import java.util.Map;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MD5Utils {
 
-    private static final String[] HEX_DIGITS = { "0", "1", "2", "3", "4", "5",
-            "6", "7", "8", "9", "a", "b", "c", "d", "e", "f" };
+    private static final String[] HEX_DIGITS = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"};
 
     private static MessageDigest md = null;
 
@@ -35,6 +34,7 @@ public final class MD5Utils {
 
     /**
      * MD5加密
+     *
      * @param bytes
      * @return
      */
@@ -46,8 +46,7 @@ public final class MD5Utils {
 
     private static String byteToHexString(byte b) {
         int n = b;
-        if (n < 0)
-            n += 256;
+        if (n < 0) n += 256;
         int d1 = n / 16;
         int d2 = n % 16;
         return HEX_DIGITS[d1] + HEX_DIGITS[d2];
@@ -59,24 +58,21 @@ public final class MD5Utils {
             resultString = origin;
             MessageDigest md = MessageDigest.getInstance("MD5");
             if (charsetname == null || "".equals(charsetname))
-                resultString = byteArrayToHexString(md.digest(resultString
-                        .getBytes()));
-            else
-                resultString = byteArrayToHexString(md.digest(resultString
-                        .getBytes(charsetname)));
+                resultString = byteArrayToHexString(md.digest(resultString.getBytes()));
+            else resultString = byteArrayToHexString(md.digest(resultString.getBytes(charsetname)));
         } catch (Exception e) {
             log.warn(e.getMessage(), e);
         }
         return resultString;
     }
 
-    public static String createMD5Sign(String key, Map<String,String> paramMap) {
+    public static String createMD5Sign(String key, Map<String, String> paramMap) {
         StringBuilder sb = new StringBuilder();
-        for(String k : paramMap.keySet()) {
+        for (String k : paramMap.keySet()) {
             String v = paramMap.get(k);
             sb.append(k).append("=").append(v).append("&");
         }
-        String params= sb.append("key=").append(key).substring(0);
+        String params = sb.append("key=").append(key).substring(0);
         String sign = MD5Utils.MD5Encode(params, "utf8");
         return sign.toUpperCase();
     }
@@ -103,8 +99,7 @@ public final class MD5Utils {
             return null;
         } finally {
             try {
-                if (fis != null)
-                    fis.close();
+                if (fis != null) fis.close();
             } catch (IOException e) {
                 log.warn(e.getMessage(), e);
             }

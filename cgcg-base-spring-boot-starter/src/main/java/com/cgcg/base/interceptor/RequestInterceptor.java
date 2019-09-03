@@ -1,7 +1,7 @@
 package com.cgcg.base.interceptor;
 
-import com.cgcg.base.util.IpUtils;
 import com.cgcg.base.util.RequestApiUtils;
+import com.cgcg.context.util.IpUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
@@ -32,7 +32,7 @@ public class RequestInterceptor extends HandlerInterceptorAdapter {
     }
 
     @Override
-    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) {
         if (INFO_ENABLED) {
             try {
                 long e = Long.parseLong(request.getAttribute("_START_TIME").toString());

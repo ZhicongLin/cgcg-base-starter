@@ -1,4 +1,4 @@
-package com.cgcg.base.util;
+package com.cgcg.context.util;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -9,9 +9,8 @@ import java.lang.reflect.*;
 
 /**
  * 反射工具类.
- * 
+ * <p>
  * 提供访问私有变量,获取泛型类型Class, 提取集合中元素的属性, 转换字符串到对象等Util函数.
- * 
  */
 public class ReflectionUtils {
 
@@ -22,7 +21,7 @@ public class ReflectionUtils {
      */
     public static Object invokeGetterMethod(Object obj, String propertyName) {
         String getterMethodName = "get" + StringUtils.capitalize(propertyName);
-        return invokeMethod(obj, getterMethodName, new Class[] {}, new Object[] {});
+        return invokeMethod(obj, getterMethodName, new Class[]{}, new Object[]{});
     }
 
     /**
@@ -34,13 +33,13 @@ public class ReflectionUtils {
 
     /**
      * 调用Setter方法.
-     * 
+     *
      * @param propertyType 用于查找Setter方法,为空时使用value的Class替代.
      */
     public static void invokeSetterMethod(Object obj, String propertyName, Object value, Class<?> propertyType) {
         Class<?> type = propertyType != null ? propertyType : value.getClass();
         String setterMethodName = "set" + StringUtils.capitalize(propertyName);
-        invokeMethod(obj, setterMethodName, new Class[] { type }, new Object[] { value });
+        invokeMethod(obj, setterMethodName, new Class[]{type}, new Object[]{value});
     }
 
     /**
@@ -81,7 +80,7 @@ public class ReflectionUtils {
 
     /**
      * 循环向上转型, 获取对象的DeclaredField,     并强制设置为可访问.
-     * 
+     * <p>
      * 如向上转型到Object仍无法找到, 返回null.
      */
     public static Field getAccessibleField(final Object obj, final String fieldName) {
@@ -103,8 +102,7 @@ public class ReflectionUtils {
      * 直接调用对象方法, 无视private/protected修饰符.
      * 用于一次性调用的情况.
      */
-    public static Object invokeMethod(final Object obj, final String methodName, final Class<?>[] parameterTypes,
-            final Object[] args) {
+    public static Object invokeMethod(final Object obj, final String methodName, final Class<?>[] parameterTypes, final Object[] args) {
         Method method = getAccessibleMethod(obj, methodName, parameterTypes);
         if (method == null) {
             throw new IllegalArgumentException("Could not find method [" + methodName + "] on target [" + obj + "]");
@@ -120,11 +118,10 @@ public class ReflectionUtils {
     /**
      * 循环向上转型, 获取对象的DeclaredMethod,并强制设置为可访问.
      * 如向上转型到Object仍无法找到, 返回null.
-     * 
+     * <p>
      * 用于方法需要被多次调用的情况. 先使用本函数先取得Method,然后调用Method.invoke(Object obj, Object... args)
      */
-    public static Method getAccessibleMethod(final Object obj, final String methodName,
-            final Class<?>... parameterTypes) {
+    public static Method getAccessibleMethod(final Object obj, final String methodName, final Class<?>... parameterTypes) {
         if (parameterTypes == null) {
             return getAccessibleMethod(obj, methodName);
         }
@@ -148,7 +145,7 @@ public class ReflectionUtils {
     /**
      * 循环向上转型, 获取对象的DeclaredMethod,并强制设置为可访问.
      * 如向上转型到Object仍无法找到, 返回null.
-     *
+     * <p>
      * 用于方法需要被多次调用的情况. 先使用本函数先取得Method,然后调用Method.invoke(Object obj, Object... args)
      */
     public static Method getAccessibleMethod(final Object obj, final String methodName) {
@@ -176,7 +173,7 @@ public class ReflectionUtils {
      * @param clazz The class to introspect
      * @return the first generic declaration, or Object.class if cannot be determined
      */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public static <T> Class<T> getSuperClassGenricType(final Class clazz) {
         return getSuperClassGenricType(clazz, 0);
     }
@@ -184,7 +181,7 @@ public class ReflectionUtils {
     /**
      * 通过反射, 获得Class定义中声明的父类的泛型参数的类型.
      * 如无法找到, 返回Object.class.
-     * 
+     * <p>
      * 如public UserDao extends HibernateDao<User,Long>
      *
      * @param clazz clazz The class to introspect
@@ -204,8 +201,7 @@ public class ReflectionUtils {
         Type[] params = ((ParameterizedType) genType).getActualTypeArguments();
 
         if (index >= params.length || index < 0) {
-            logger.warn("Index: " + index + ", Size of " + clazz.getSimpleName() + "'s Parameterized Type: "
-                    + params.length);
+            logger.warn("Index: " + index + ", Size of " + clazz.getSimpleName() + "'s Parameterized Type: " + params.length);
             return Object.class;
         }
         if (!(params[index] instanceof Class)) {
@@ -220,8 +216,7 @@ public class ReflectionUtils {
      * 将反射时的checked exception转换为unchecked exception.
      */
     public static RuntimeException convertReflectionExceptionToUnchecked(Exception e) {
-        if (e instanceof IllegalAccessException || e instanceof IllegalArgumentException
-                || e instanceof NoSuchMethodException) {
+        if (e instanceof IllegalAccessException || e instanceof IllegalArgumentException || e instanceof NoSuchMethodException) {
             return new IllegalArgumentException("Reflection Exception.", e);
         } else if (e instanceof InvocationTargetException) {
             return new RuntimeException("Reflection Exception.", ((InvocationTargetException) e).getTargetException());

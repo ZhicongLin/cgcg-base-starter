@@ -1,4 +1,4 @@
-package com.cgcg.base.util;
+package com.cgcg.context.util;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -19,8 +19,7 @@ import java.util.List;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AnnotationUtil {
-    private static List<Class<?>> ignore = Arrays.asList(Documented.class, Target.class, Retention.class,
-            Controller.class, Component.class, Indexed.class, Inherited.class);
+    private static List<Class<?>> ignore = Arrays.asList(Documented.class, Target.class, Retention.class, Controller.class, Component.class, Indexed.class, Inherited.class);
 
     /**
      * 判断clzz注解是否包含了ResponseBody
@@ -34,6 +33,7 @@ public final class AnnotationUtil {
 
     /**
      * 判断clzz的注解是否包含annotationType
+     *
      * @auth zhicong.lin
      * @date 2019/7/4
      */

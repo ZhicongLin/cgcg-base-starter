@@ -1,6 +1,6 @@
 package com.cgcg.base.swagger;
 
-import com.cgcg.base.core.context.SpringContextHolder;
+import com.cgcg.context.SpringContextHolder;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

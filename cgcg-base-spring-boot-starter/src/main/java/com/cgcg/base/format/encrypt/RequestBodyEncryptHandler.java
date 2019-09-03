@@ -2,8 +2,8 @@ package com.cgcg.base.format.encrypt;
 
 import com.cgcg.base.core.enums.FormatProperty;
 import com.cgcg.base.core.exception.EncryptionParamWrongException;
-import com.cgcg.base.util.DES3Util;
-import com.cgcg.base.util.HttpHelper;
+import com.cgcg.context.util.DES3Util;
+import com.cgcg.context.util.HttpHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.MethodParameter;

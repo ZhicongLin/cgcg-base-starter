@@ -1,7 +1,7 @@
 package org.cgcg.redis.core;
 
+import com.cgcg.context.SpringContextHolder;
 import lombok.extern.slf4j.Slf4j;
-import org.cgcg.redis.core.context.SpringCacheHolder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -32,7 +32,7 @@ public class RedisManager {
             synchronized (RedisTemplateHolder.class) {
                 if (RedisTemplateHolder.redisTemplate == null) {
                     RedisTemplateHolder.redisTemplate = new RedisTemplate<>();
-                    RedisTemplateHolder.redisTemplate.setConnectionFactory(SpringCacheHolder.getBean(RedisConnectionFactory.class));
+                    RedisTemplateHolder.redisTemplate.setConnectionFactory(SpringContextHolder.getBean(RedisConnectionFactory.class));
                     JdkSerializationRedisSerializer jdkSerializationRedisSerializer = new JdkSerializationRedisSerializer();
                     RedisTemplateHolder.redisTemplate.setValueSerializer(jdkSerializationRedisSerializer);
                     RedisTemplateHolder.redisTemplate.setHashValueSerializer(jdkSerializationRedisSerializer);

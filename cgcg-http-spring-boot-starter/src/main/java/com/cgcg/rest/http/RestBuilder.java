@@ -1,7 +1,7 @@
 package com.cgcg.rest.http;
 
 import com.cgcg.rest.MappingProcessor;
-import com.cgcg.rest.SpringContextHolder;
+import com.cgcg.context.SpringContextHolder;
 import com.cgcg.rest.URLUtils;
 import com.cgcg.rest.annotation.DynamicMapping;
 import com.cgcg.rest.annotation.MappingFilter;

@@ -1,8 +1,9 @@
-package org.cgcg.redis.core.context;
+package com.cgcg.context;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
@@ -11,16 +12,10 @@ import org.springframework.util.Assert;
  */
 @Slf4j
 @Component
-public class SpringCacheHolder implements ApplicationContextAware {
+public class SpringContextHolder implements ApplicationContextAware {
     private static ApplicationContext applicationContext;
 
-    /**
-     * 实现ApplicationContextAware接口的context注入函数, 将其存入静态变量.
-     */
-    public void setApplicationContext(ApplicationContext applicationContext) {
-        Assert.notNull(applicationContext, "SpringCacheHolder Load Error");
-        SpringCacheHolder.applicationContext = applicationContext; // NOSONAR
-    }
+    private static Environment environment;
 
     /**
      * 从静态变量ApplicationContext中取得Bean, 自动转型为所赋值对象的类型.
@@ -37,4 +32,21 @@ public class SpringCacheHolder implements ApplicationContextAware {
         return applicationContext.getBean(clazz);
     }
 
+    public static <T> T getProperty(String name, Class<T> tClass) {
+        return environment.getProperty(name, tClass);
+    }
+
+    public static String getProperty(String name) {
+        return environment.getProperty(name);
+    }
+
+    /**
+     * 实现ApplicationContextAware接口的context注入函数, 将其存入静态变量.
+     */
+    public void setApplicationContext(ApplicationContext applicationContext) {
+        log.info("Initializing SpringContextHolder");
+        Assert.notNull(applicationContext, "SpringContextHolder Load Error");
+        SpringContextHolder.applicationContext = applicationContext; // NOSONAR
+        environment = getBean(Environment.class);  // NOSONAR
+    }
 }

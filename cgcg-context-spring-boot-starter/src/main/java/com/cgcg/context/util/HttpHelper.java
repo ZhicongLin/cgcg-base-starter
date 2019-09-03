@@ -1,6 +1,6 @@
-package com.cgcg.base.util;
+package com.cgcg.context.util;
 
-import com.cgcg.base.core.enums.CharsetCode;
+import com.cgcg.context.enums.CharsetCode;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,9 +29,7 @@ public final class HttpHelper {
      */
     public static String getStringBody(ServletRequest request) {
         final StringBuilder sb = new StringBuilder();
-        try (final InputStream is = request.getInputStream();
-             final InputStreamReader in = new InputStreamReader(is, CharsetCode.forUtf8());
-             final BufferedReader reader = new BufferedReader(in)) {
+        try (final InputStream is = request.getInputStream(); final InputStreamReader in = new InputStreamReader(is, CharsetCode.forUtf8()); final BufferedReader reader = new BufferedReader(in)) {
             String line;
             while ((line = reader.readLine()) != null) {
                 sb.append(line);
@@ -50,8 +48,7 @@ public final class HttpHelper {
      */
     public static String getStringBody(InputStream is) {
         final StringBuilder sb = new StringBuilder();
-        try (final InputStreamReader in = new InputStreamReader(is, CharsetCode.forUtf8());
-             final BufferedReader reader = new BufferedReader(in)) {
+        try (final InputStreamReader in = new InputStreamReader(is, CharsetCode.forUtf8()); final BufferedReader reader = new BufferedReader(in)) {
             String line;
             while ((line = reader.readLine()) != null) {
                 sb.append(line);
