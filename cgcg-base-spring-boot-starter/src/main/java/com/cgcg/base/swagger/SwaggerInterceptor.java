@@ -28,6 +28,7 @@ public class SwaggerInterceptor implements HandlerInterceptor {
         final String requestURI = request.getRequestURI();
         if (requestURI.contains("swagger-ui")) {
             response.sendRedirect("/doc.html");
+            return Boolean.FALSE;
         }
         if (!properties.isDisabled()) {
             return Boolean.TRUE;
