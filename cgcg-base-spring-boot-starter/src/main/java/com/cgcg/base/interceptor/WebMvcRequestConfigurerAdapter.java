@@ -19,7 +19,7 @@ import java.util.List;
 @Configuration
 public class WebMvcRequestConfigurerAdapter implements WebMvcConfigurer {
 
-    private List<String> DEFAULT_IGNORE = Arrays.asList("/swagger-resources/**", "/swagger-ui.html", "/error", "/webjars/**");
+    private List<String> DEFAULT_IGNORE = Arrays.asList("/swagger-resources/**", "/swagger-ui.html", "/error", "/webjars/**", "/v2/api-doc", "/v2/api-doc-ext");
 
     @Resource
     private IgnoreHandle ignore;

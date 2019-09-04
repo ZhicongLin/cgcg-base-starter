@@ -1,6 +1,8 @@
 package com.cgcg.base.swagger;
 
 import com.cgcg.context.SpringContextHolder;
+import com.github.xiaoymin.swaggerbootstrapui.annotations.EnableSwaggerBootstrapUI;
+import io.swagger.annotations.Api;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,6 +25,7 @@ import java.util.List;
 
 @EnableSwagger2
 @Configuration
+@EnableSwaggerBootstrapUI
 public class SwaggerConfig {
     @Resource
     private SwaggerProperties properties;
@@ -44,7 +47,8 @@ public class SwaggerConfig {
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
                 .select()
-                .apis(RequestHandlerSelectors.basePackage(properties.getApis()))
+                // 设置需要被扫描的类，这里设置为添加了@Api注解的类
+                .apis(RequestHandlerSelectors.withClassAnnotation(Api.class))
                 .paths(PathSelectors.any())
                 .build().pathProvider(pathProvider())
                 .globalOperationParameters(pars);

@@ -44,7 +44,7 @@ public class ResponseBodyFormatHandler implements ResponseBodyAdvice {
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
         final URI uri = request.getURI();
         final String path = uri.getPath();
-        if (path.contains("/swagger-resources") || path.equals("/error") || path.equals("/v2/api-docs")) {
+        if (path.contains("/swagger-resources") || path.equals("/error") || path.equals("/v2/api-docs")|| path.equals("/v2/api-docs-ext")) {
             return body;
         }
         if (returnType.hasMethodAnnotation(ExceptionHandler.class)) {
