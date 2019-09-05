@@ -3,6 +3,7 @@ package com.test.base.controller;
 import com.cgcg.base.core.exception.CommonException;
 import com.cgcg.base.format.Result;
 import com.cgcg.base.format.encrypt.Encrypt;
+import com.cgcg.base.format.encrypt.EncryptController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,7 @@ import java.util.Map;
  * @date 2019/6/24
  */
 @Api(tags = "测试接口文档")
-@RestController
+@EncryptController
 @RequestMapping("test")
 public class TestController {
     @Resource

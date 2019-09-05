@@ -23,4 +23,9 @@ public class SwaggerProperties {
     private String apis = "com";
     private List<String> headers;
     private String version = "1.0.0";
+    private boolean disabled = false;
+    private String redirectUri = "/";
+    private String contactName = "";
+    private String contactUrl = "";
+    private String contactEmail = "";
 }

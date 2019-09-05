@@ -14,5 +14,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @RestController
+@Encrypt
 public @interface EncryptController {
 }

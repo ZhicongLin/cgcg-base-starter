@@ -1,6 +1,6 @@
 package com.cgcg.base.format.encrypt;
 
-import com.cgcg.context.util.AnnotationUtil;
+import com.cgcg.base.util.AnnotationUtil;
 import org.springframework.core.MethodParameter;
 
 import java.util.Objects;
