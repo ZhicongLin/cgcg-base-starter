@@ -25,4 +25,7 @@ public class SwaggerProperties {
     private String version = "1.0.0";
     private boolean disabled = false;
     private String redirectUri = "/";
+    private String contactName = "";
+    private String contactUrl = "";
+    private String contactEmail = "";
 }

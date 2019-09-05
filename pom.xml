@@ -6,7 +6,7 @@
 
     <groupId>com.cgcg</groupId>
     <artifactId>cgcg-base-starter</artifactId>
-    <version>1.3.0.rc6</version>
+    <version>1.3.0.snapshot</version>
     <packaging>pom</packaging>
     <modules>
         <module>cgcg-base-spring-boot-starter</module>
@@ -18,7 +18,7 @@
     </modules>
     <properties>
         <java.version>1.8</java.version>
-        <base.version>1.3.0.rc6</base.version>
+        <base.version>1.3.0.snapshot</base.version>
     </properties>
     <dependencyManagement>
         <dependencies>
