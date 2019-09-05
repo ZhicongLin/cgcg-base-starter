@@ -238,7 +238,7 @@ public final class DES3Util {
         hashMap.put("id", "11");
         final String s1 = DES3Util.encryptMode(JSON.toJSONString(hashMap));
         System.out.println("s1 = " + s1);
-        final String s = DES3Util.decryptMode("7tzYCJtFFzfJxEd6AIqEr68xVPGgR+4zDQloN5GkEHTwyGURCdheRChXSh+nce5yyYIUJsHdtr6G7WW93M4cjA==");
+        final String s = DES3Util.decryptMode("flVC/ez9pMBPPOOJNzwSHeVkpyeZlRCp", "S5EXCbIx98nrWA7a");
         System.out.println("s = " + s);
     }
 

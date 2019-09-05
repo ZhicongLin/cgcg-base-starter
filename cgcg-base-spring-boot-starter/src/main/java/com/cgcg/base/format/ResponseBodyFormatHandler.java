@@ -2,7 +2,7 @@ package com.cgcg.base.format;
 
 import com.alibaba.fastjson.JSON;
 import com.cgcg.base.core.enums.FormatProperty;
-import com.cgcg.context.util.AnnotationUtil;
+import com.cgcg.base.util.AnnotationUtil;
 import com.cgcg.context.util.ReflectionUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;

@@ -1,5 +1,6 @@
-package com.cgcg.context.util;
+package com.cgcg.base.util;
 
+import io.swagger.annotations.Api;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -19,7 +20,8 @@ import java.util.List;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AnnotationUtil {
-    private static List<Class<?>> ignore = Arrays.asList(Documented.class, Target.class, Retention.class, Controller.class, Component.class, Indexed.class, Inherited.class);
+    private static List<Class<?>> ignore = Arrays.asList(Documented.class, Target.class, Retention.class,
+            Controller.class, Component.class, Indexed.class, Inherited.class, Api.class);
 
     /**
      * 判断clzz注解是否包含了ResponseBody
@@ -63,7 +65,10 @@ public final class AnnotationUtil {
                 return (T) annotation;
             }
             if (!ignore.contains(annoType)) {
-                return getAnnotation(annoType, annotationType);
+                final T result = getAnnotation(annoType, annotationType);
+                if (result != null) {
+                    return result;
+                }
             }
         }
         return null;
