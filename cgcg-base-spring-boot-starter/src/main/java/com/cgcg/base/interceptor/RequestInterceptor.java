@@ -3,11 +3,16 @@ package com.cgcg.base.interceptor;
 import com.cgcg.base.util.RequestApiUtils;
 import com.cgcg.context.util.IpUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 请求日志拦截器
@@ -17,16 +22,16 @@ import javax.servlet.http.HttpServletResponse;
  */
 @Slf4j
 public class RequestInterceptor extends HandlerInterceptorAdapter {
-
+    private static final Map<String, Logger> LOGGER_MAP = new HashMap<>();
     private static final boolean INFO_ENABLED = log.isInfoEnabled();
-
+    private static final String LOGGER_TIME_FLAG = "_START_TIME";
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         if (INFO_ENABLED) {
-            String apiOperationValue = RequestApiUtils.fetchApiOperationValue(handler);
-            String params = RequestApiUtils.fetchParam(request);
-            log.info("{} [{}] [{}] => [{}] {}", request.getMethod(), IpUtils.getIpAddress(request), apiOperationValue, request.getRequestURL(), params);
-            request.setAttribute("_START_TIME", System.currentTimeMillis());
+            final String apiOperationValue = RequestApiUtils.fetchApiOperationValue(handler);
+            final String params = RequestApiUtils.fetchParam(request);
+            this.getLogger(handler).info("{} [{}] [{}] => [{}] {}", request.getMethod(), IpUtils.getIpAddress(request), apiOperationValue, request.getRequestURL(), params);
+            request.setAttribute(LOGGER_TIME_FLAG, System.currentTimeMillis());
         }
         return super.preHandle(request, response, handler);
     }
@@ -35,12 +40,22 @@ public class RequestInterceptor extends HandlerInterceptorAdapter {
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) {
         if (INFO_ENABLED) {
             try {
-                long e = Long.parseLong(request.getAttribute("_START_TIME").toString());
-                log.info("END [{}] =>[{}] Time [{}]ms", IpUtils.getIpAddress(request), request.getRequestURL(), System.currentTimeMillis() - e);
+                final long e = Long.parseLong(request.getAttribute(LOGGER_TIME_FLAG).toString());
+                this.getLogger(handler).info("END [{}] =>[{}] Time [{}]ms", IpUtils.getIpAddress(request), request.getRequestURL(), System.currentTimeMillis() - e);
             } catch (NullPointerException var4) {
-                log.info("END [{}] =>[{}] ", IpUtils.getIpAddress(request), request.getRequestURL());
+                this.getLogger(handler).info("END [{}] =>[{}] ", IpUtils.getIpAddress(request), request.getRequestURL());
             }
         }
     }
 
+    private Logger getLogger(Object handler) {
+        final HandlerMethod handlerMethod = (HandlerMethod) handler;
+        final String methodName = handlerMethod.getBeanType().getName() + "#" + handlerMethod.getMethod().getName();
+        Logger logger = LOGGER_MAP.get(methodName);
+        if (logger == null) {
+            logger = LoggerFactory.getLogger(methodName);
+            LOGGER_MAP.put(methodName, logger);
+        }
+        return logger;
+    }
 }
