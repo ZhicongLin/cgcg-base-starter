@@ -1,11 +1,14 @@
 package com.test.base.controller;
 
 import com.cgcg.base.core.exception.CommonException;
-import com.cgcg.base.format.Result;
 import com.cgcg.base.format.encrypt.Encrypt;
-import com.cgcg.base.format.encrypt.EncryptController;
+import com.cgcg.context.thread.ExecutorTask;
+import com.cgcg.context.thread.ThreadPoolManager;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.SneakyThrows;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -13,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Future;
 
 /**
  * .
@@ -21,7 +25,7 @@ import java.util.Map;
  * @date 2019/6/24
  */
 @Api(tags = "测试接口文档")
-@EncryptController
+@RestController
 @RequestMapping("test")
 public class TestController {
     @Resource
@@ -37,10 +41,40 @@ public class TestController {
     }
     @ApiOperation("接口")
     @GetMapping
-    public Result get() {
-        final HashMap<String, Object> hashMap = new HashMap<>();
+    public Object get() throws Exception {
+        Map<String, Object> hashMap = new HashMap<>();
         hashMap.put("yes", "OK");
-        return Result.success(hashMap);
+        for (int i = 0; i < 20; i++) {
+            final int finalI = i;
+            final ExecutorTask task = new ExecutorTask() {
+                @Override
+                @SneakyThrows
+                public void call() {
+                    for (int j = 0; j < 10; j++) {
+                        Thread.sleep(300);
+                        Logger logger = LoggerFactory.getLogger(ExecutorTask.class.getName());
+                        logger.info(finalI + " - " + hashMap);
+                    }
+                }
+            };
+            ThreadPoolManager.execute(task);
+            ThreadPoolManager.execute(new Runnable() {
+                @Override
+                @SneakyThrows
+                public void run() {
+                    Thread.sleep(500);
+                    ThreadPoolManager.cancel(task);
+                }
+            });
+        }
+
+
+        final Future<Map<String, Object>> submit = ThreadPoolManager.submit(() -> {
+            final Map<String, Object> hashMap2 = new HashMap<>();
+            hashMap2.put("NoNo", "No");
+            return hashMap2;
+        });
+        return submit.get();
     }
 
     @ApiOperation("接口")
@@ -48,7 +82,7 @@ public class TestController {
     public Map<String, Object> put() {
         final HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("yes", "OK");
-        return null;
+        return hashMap;
     }
 
     @ApiOperation("POST接口")

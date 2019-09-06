@@ -26,6 +26,11 @@ spring boot 服务基础包
         返回结果只支持@ResponseBody的加密操作
             加密结果如{ "code": 200, "data": "xxxxxx加密后的字符串xxxx", "message": "操作成功"}
             如果返回对象不包含配置的加密字段名，则进行整个对象加密
+    六、线程池
+        ThreadPoolManager.executor(Runnable r); 没有返回值调用
+        ThreadPoolManager.submit(Runnable r); 有返回值调用
+        ThreadPoolManager.cancel(Runnable r); 取消线程执行
+        ExecutorTask 执行任务类，cancel和finish属性，能在finish之前停止执行当前线程
 ### 包引用
     
     git clone 代码到本地
