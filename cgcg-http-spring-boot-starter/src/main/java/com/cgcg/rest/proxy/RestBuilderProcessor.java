@@ -1,7 +1,7 @@
 package com.cgcg.rest.proxy;
 
-import com.cgcg.rest.ReflectionUtils;
 import com.cgcg.context.SpringContextHolder;
+import com.cgcg.context.util.ReflectionUtils;
 import com.cgcg.rest.annotation.LoadMapping;
 import com.cgcg.rest.http.RestBuilder;
 import com.cgcg.rest.http.RestTemplateFactory;

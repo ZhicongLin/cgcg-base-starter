@@ -22,7 +22,7 @@ public final class RequestApiUtils {
 
     public static String fetchApiOperationValue(Object handler) {
         if (handler instanceof HandlerMethod) {
-            ApiOperation annotation = ((HandlerMethod) handler).getMethod().getAnnotation(ApiOperation.class);
+            final ApiOperation annotation = ((HandlerMethod) handler).getMethodAnnotation(ApiOperation.class);
             return null == annotation ? "" : annotation.value();
         } else if (handler instanceof JoinPoint) {
             MethodSignature signature = (MethodSignature) ((JoinPoint) handler).getSignature();

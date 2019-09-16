@@ -60,10 +60,10 @@ public final class AnnotationUtil {
     public static <T extends Annotation> T getAnnotation(Class clzz, Class<T> annotationType) {
         final Annotation[] annotations = clzz.getAnnotations();
         for (Annotation annotation : annotations) {
-            final Class<? extends Annotation> annoType = annotation.annotationType();
-            if (annoType.equals(annotationType)) {
+            if (annotationType.isInstance(annotation)) {
                 return (T) annotation;
             }
+            final Class<? extends Annotation> annoType = annotation.annotationType();
             if (!ignore.contains(annoType)) {
                 final T result = getAnnotation(annoType, annotationType);
                 if (result != null) {
