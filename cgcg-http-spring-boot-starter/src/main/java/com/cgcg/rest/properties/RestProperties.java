@@ -18,4 +18,7 @@ import org.springframework.stereotype.Component;
 public class RestProperties {
 
     private String scanPackage;
+    private int connectTimeout = 60000;
+    private int readTimeout = 60000;
+    private int connectionRequestTimeout = 60000;
 }
