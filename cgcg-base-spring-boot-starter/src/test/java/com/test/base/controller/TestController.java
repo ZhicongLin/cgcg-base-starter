@@ -1,11 +1,14 @@
 package com.test.base.controller;
 
 import com.cgcg.base.core.exception.CommonException;
-import com.cgcg.base.format.Result;
 import com.cgcg.base.format.encrypt.Encrypt;
 import com.cgcg.base.format.encrypt.EncryptController;
+import com.cgcg.context.thread.ExecutorTask;
+import com.cgcg.context.thread.ThreadPoolManager;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -13,13 +16,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Future;
 
 /**
  * .
  *
  * @author zhng.lin
  * @date 2019/6/24
- */
+ */@Slf4j
 @Api(tags = "测试接口文档")
 @EncryptController
 @RequestMapping("test")
@@ -37,10 +41,27 @@ public class TestController {
     }
     @ApiOperation("接口")
     @GetMapping
-    public Result get() {
-        final HashMap<String, Object> hashMap = new HashMap<>();
+    public Object get() throws Exception {
+        Map<String, Object> hashMap = new HashMap<>();
         hashMap.put("yes", "OK");
-        return Result.success(hashMap);
+        final ExecutorTask task = new ExecutorTask() {
+            @Override
+            @SneakyThrows
+            public void call() {
+                for (int j = 0; j < 5; j++) {
+                    Thread.sleep(300);
+                    log.info(hashMap.toString());
+                }
+            }
+        };
+        ThreadPoolManager.execute(task);
+
+        final Future<Map<String, Object>> submit = ThreadPoolManager.submit(() -> {
+            final Map<String, Object> hashMap2 = new HashMap<>();
+            hashMap2.put("NoNo", "No");
+            return hashMap2;
+        });
+        return submit.get();
     }
 
     @ApiOperation("接口")
@@ -48,7 +69,7 @@ public class TestController {
     public Map<String, Object> put() {
         final HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("yes", "OK");
-        return null;
+        return hashMap;
     }
 
     @ApiOperation("POST接口")

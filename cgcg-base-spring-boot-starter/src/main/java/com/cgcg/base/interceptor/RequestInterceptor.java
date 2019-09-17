@@ -49,12 +49,15 @@ public class RequestInterceptor extends HandlerInterceptorAdapter {
     }
 
     private Logger getLogger(Object handler) {
-        final HandlerMethod handlerMethod = (HandlerMethod) handler;
-        final String methodName = handlerMethod.getBeanType().getName() + "#" + handlerMethod.getMethod().getName();
-        Logger logger = LOGGER_MAP.get(methodName);
-        if (logger == null) {
-            logger = LoggerFactory.getLogger(methodName);
-            LOGGER_MAP.put(methodName, logger);
+        Logger logger = log;
+        if (handler instanceof HandlerMethod) {
+            final HandlerMethod handlerMethod = (HandlerMethod) handler;
+            final String methodName = handlerMethod.getBeanType().getName() + "#" + handlerMethod.getMethod().getName();
+            logger = LOGGER_MAP.get(methodName);
+            if (logger == null) {
+                logger = LoggerFactory.getLogger(methodName);
+                LOGGER_MAP.put(methodName, logger);
+            }
         }
         return logger;
     }

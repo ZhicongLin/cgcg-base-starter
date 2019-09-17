@@ -1,6 +1,6 @@
 package com.cgcg.rest.param;
 
-import com.cgcg.rest.ReflectionUtils;
+import com.cgcg.context.util.ReflectionUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;

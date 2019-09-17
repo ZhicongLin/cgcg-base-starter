@@ -8,7 +8,6 @@ package com.cgcg.rest;
  */
 public interface Constant {
 
-    String REST_METHOD_NAME = "_REST_METHOD_NAME_";
     String REST_CLIENT_VALUE = "value";
     String REST_CLIENT_BASE_PACKAGES = "basePackages";
     String REST_CLIENT_BASE_PACKAGE_CLASSES = "basePackageClasses";
