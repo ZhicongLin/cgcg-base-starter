@@ -34,13 +34,10 @@
     日志打印存在的BUG
 ### 1.1.0.release
     * 优化Bean的加载方式，优化代码执行方式
-### 1.3.1.rc1
+### 1.3.1.release
     * 添加 rest.connect-timeout 相关配置 (DEFAULT: 启动类所在包)
     * 添加 rest.scan-packages 相关配置 (DEFAULT: 60000)
     * 添加 rest.read-timeout 相关配置 (DEFAULT: 60000)
     * 添加 rest.connection-request-timeout 相关配置 (DEFAULT: 60000)
-### 1.3.2.rc2
-    存在严重bug，请勿用
-### 1.3.1.rc3
     * 修改所有的rest相关配置到cgcg.rest
     
