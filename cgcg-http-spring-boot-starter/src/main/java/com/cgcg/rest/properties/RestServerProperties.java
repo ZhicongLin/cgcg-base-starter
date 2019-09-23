@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Setter
 @Getter
 @Component
-@ConfigurationProperties("rest.server")
+@ConfigurationProperties("cgcg.rest.server")
 public class RestServerProperties {
 
     private String host;

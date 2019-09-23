@@ -1,5 +1,6 @@
 package com.cgcg.rest.http;
 
+import com.cgcg.rest.properties.RestPoolProperties;
 import com.cgcg.rest.properties.RestProperties;
 import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -28,6 +29,8 @@ public class RestTemplateConfigure {
     private RestTemplateBuilder builder;
     @Resource
     private RestProperties restProperties;
+    @Resource
+    private RestPoolProperties restPoolProperties;
     /**
      * 让spring管理RestTemplate,参数相关配置
      */
@@ -76,9 +79,9 @@ public class RestTemplateConfigure {
     @Bean
     public HttpClientConnectionManager poolingConnectionManager() {
         final PoolingHttpClientConnectionManager poolingConnectionManager = new PoolingHttpClientConnectionManager();
-        poolingConnectionManager.setMaxTotal(1000);
-        poolingConnectionManager.setDefaultMaxPerRoute(5000);
-        poolingConnectionManager.setValidateAfterInactivity(3000);
+        poolingConnectionManager.setMaxTotal(this.restPoolProperties.getMaxTotal());
+        poolingConnectionManager.setDefaultMaxPerRoute(this.restPoolProperties.getMaxPerRoute());
+        poolingConnectionManager.setValidateAfterInactivity(this.restPoolProperties.getValidateAfterInactivity());
         return poolingConnectionManager;
     }
 
