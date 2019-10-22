@@ -14,8 +14,11 @@ import org.springframework.stereotype.Component;
 @Setter
 @Getter
 @Component
-@ConfigurationProperties(prefix = "rest")
+@ConfigurationProperties(prefix = "cgcg.rest")
 public class RestProperties {
 
     private String scanPackage;
+    private int connectTimeout = 60000;
+    private int readTimeout = 60000;
+    private int connectionRequestTimeout = 60000;
 }

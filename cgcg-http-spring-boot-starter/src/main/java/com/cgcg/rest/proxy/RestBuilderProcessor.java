@@ -58,7 +58,7 @@ public class RestBuilderProcessor implements BuilderCallBack {
         }
         final Map<Object, Object> fallbackMethod = fallBackResult.get(fallbackBean);
         final String timeKey = method.getName() + "time";
-        final Long expire = SpringContextHolder.getProperty("rest.fallback.expire", Long.class);
+        final Long expire = SpringContextHolder.getProperty("cgcg.rest.fallback.expire", Long.class);
         if (fallbackMethod != null && fallbackMethod.get(timeKey) != null) {
             final Object time = fallbackMethod.get(timeKey);
             final long timeSub = startTime - Long.valueOf(time.toString());

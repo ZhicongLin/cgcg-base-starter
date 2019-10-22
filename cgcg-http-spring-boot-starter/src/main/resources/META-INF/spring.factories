@@ -4,4 +4,5 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
       com.cgcg.rest.http.RestTemplateConfigure,\
       com.cgcg.rest.http.RestTemplateFactory,\
       com.cgcg.rest.properties.RestProperties,\
+      com.cgcg.rest.properties.RestPoolProperties,\
       com.cgcg.rest.properties.RestServerProperties

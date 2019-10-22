@@ -1,5 +1,7 @@
 package com.cgcg.rest.http;
 
+import com.cgcg.rest.properties.RestPoolProperties;
+import com.cgcg.rest.properties.RestProperties;
 import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
@@ -25,7 +27,10 @@ public class RestTemplateConfigure {
 
     @Resource
     private RestTemplateBuilder builder;
-
+    @Resource
+    private RestProperties restProperties;
+    @Resource
+    private RestPoolProperties restPoolProperties;
     /**
      * 让spring管理RestTemplate,参数相关配置
      */
@@ -48,9 +53,9 @@ public class RestTemplateConfigure {
     public ClientHttpRequestFactory clientHttpRequestFactory() {
         final HttpComponentsClientHttpRequestFactory chrf = new HttpComponentsClientHttpRequestFactory();
         chrf.setHttpClient(httpClientBuilder().build());
-        chrf.setConnectTimeout(60000); // 连接超时时间/毫秒
-        chrf.setReadTimeout(6000); // 读写超时时间/毫秒
-        chrf.setConnectionRequestTimeout(5000);// 请求超时时间/毫秒
+        chrf.setConnectTimeout(restProperties.getConnectTimeout()); // 连接超时时间/毫秒
+        chrf.setReadTimeout(restProperties.getReadTimeout()); // 读写超时时间/毫秒
+        chrf.setConnectionRequestTimeout(restProperties.getConnectionRequestTimeout());// 请求超时时间/毫秒
         return chrf;
     }
 
@@ -74,9 +79,9 @@ public class RestTemplateConfigure {
     @Bean
     public HttpClientConnectionManager poolingConnectionManager() {
         final PoolingHttpClientConnectionManager poolingConnectionManager = new PoolingHttpClientConnectionManager();
-        poolingConnectionManager.setMaxTotal(1000);
-        poolingConnectionManager.setDefaultMaxPerRoute(5000);
-        poolingConnectionManager.setValidateAfterInactivity(3000);
+        poolingConnectionManager.setMaxTotal(this.restPoolProperties.getMaxTotal());
+        poolingConnectionManager.setDefaultMaxPerRoute(this.restPoolProperties.getMaxPerRoute());
+        poolingConnectionManager.setValidateAfterInactivity(this.restPoolProperties.getValidateAfterInactivity());
         return poolingConnectionManager;
     }
 

@@ -50,7 +50,7 @@ public class RestClientsRegistrar implements ImportBeanDefinitionRegistrar, Envi
     private void registerRestClientBean(BeanDefinitionRegistry registry, RestClientGenericBeanDefinition candidateComponent) {
         final Class<?> beanClass = candidateComponent.getBeanClass();
         final AnnotationMetadata metadata = candidateComponent.getMetadata();
-        final Boolean proxyModel = this.environment.getProperty("rest.proxy-target-class", Boolean.class);
+        final Boolean proxyModel = this.environment.getProperty("cgcg.rest.proxy-target-class", Boolean.class);
         final Class proxyClass = proxyModel == null || proxyModel ? RestCglibFactoryBean.class : RestJdkFactoryBean.class;
         final BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(proxyClass); // BeanDefinitionBuilder.genericBeanDefinition(proxyClass);
         builder.addPropertyValue(Constant.PROXY_CLASS_KEY, beanClass);
@@ -58,7 +58,7 @@ public class RestClientsRegistrar implements ImportBeanDefinitionRegistrar, Envi
         definition.setAutowireCandidate(true);
         final Map<String, Object> attributes = metadata.getAnnotationAttributes(RestClient.class.getCanonicalName());
         if (attributes != null) {
-            final Boolean enableFallback = this.environment.getProperty("rest.fallback.enable", Boolean.class);
+            final Boolean enableFallback = this.environment.getProperty("cgcg.rest.fallback.enable", Boolean.class);
             final Object fallback = attributes.get(Constant.PROXY_FALLBACK_KEY);
             if ((enableFallback == null || enableFallback) && fallback != Void.class) {
                 final Object bean = ((Class<?>) fallback).newInstance();

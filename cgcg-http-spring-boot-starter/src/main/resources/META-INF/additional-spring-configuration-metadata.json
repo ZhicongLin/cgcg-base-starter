@@ -7,74 +7,74 @@
       "description": "Description for rest.server.port."
     },
     {
-      "name": "rest.fallback.enable",
+      "name": "cgcg.rest.fallback.enable",
       "type": "java.lang.Boolean",
       "defaultValue": true,
       "description": "default true."
     },
     {
-      "name": "rest.fallback.expire",
+      "name": "cgcg.rest.fallback.expire",
       "type": "java.lang.Long",
       "defaultValue": 60000,
       "description": "default 60 seconds."
     },
     {
-      "name": "rest.server.host",
+      "name": "cgcg.rest.server.host",
+      "type": "java.lang.String",
+      "description": "Description for rest.server.host."
+    },
+    {
+      "name": "cgcg.rest.server.port",
       "type": "java.lang.String",
       "description": "Description for rest.server.port."
     },
     {
-      "name": "rest.server.port",
-      "type": "java.lang.String",
-      "description": "Description for rest.server.port."
-    },
-    {
-      "name": "rest.scan-package",
+      "name": "cgcg.rest.scan-package",
       "type": "java.lang.String",
       "description": "Description for rest.scan-package."
     },
     {
-      "name": "rest.server.https",
+      "name": "cgcg.rest.server.https",
       "type": "java.lang.String",
       "description": "Description for rest.server.https."
     },
     {
-      "name": "rest.auth.server.host",
+      "name": "cgcg.rest.auth.server.host",
       "type": "java.lang.String",
       "description": "Description for rest.server.port."
     },
     {
-      "name": "rest.auth.key-info",
+      "name": "cgcg.rest.auth.key-info",
       "type": "java.lang.String",
       "description": "Description for rest.auth.key-info."
     },
     {
-      "name": "rest.auth.secret-info",
+      "name": "cgcg.rest.auth.secret-info",
       "type": "java.lang.String",
       "description": "Description for rest.auth.secret-info."
     },
     {
-      "name": "rest.auth.auth-prefix",
+      "name": "cgcg.rest.auth.auth-prefix",
       "type": "java.lang.String",
       "description": "Description for rest.auth.auth-prefix."
     },
     {
-      "name": "rest.auth.exclude",
+      "name": "cgcg.rest.auth.exclude",
       "type": "java.lang.String",
       "description": "Description for rest.auth.exclude."
     },
     {
-      "name": "rest.access-token.host",
+      "name": "cgcg.rest.access-token.host",
       "type": "java.lang.String",
       "description": "Description for rest.access-token.host."
     },
     {
-      "name": "rest.access-token.port",
+      "name": "cgcg.rest.access-token.port",
       "type": "java.lang.String",
       "description": "Description for rest.access-token.port."
     },
     {
-      "name": "rest.access-token.https",
+      "name": "cgcg.rest.access-token.https",
       "type": "java.lang.String",
       "description": "Description for rest.access-token.https."
     }
