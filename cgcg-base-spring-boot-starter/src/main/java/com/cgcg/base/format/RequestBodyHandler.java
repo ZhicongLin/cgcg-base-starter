@@ -4,6 +4,7 @@ import com.cgcg.context.util.HttpHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -32,8 +33,9 @@ public class RequestBodyHandler extends RequestBodyAdviceAdapter implements Requ
 
     @Override
     public HttpInputMessage beforeBodyRead(HttpInputMessage httpInputMessage, MethodParameter methodParameter, Type type, Class<? extends HttpMessageConverter<?>> aClass) throws IOException {
+        final HttpHeaders headers = httpInputMessage.getHeaders();
         final String requestBodyString = HttpHelper.getStringBody(httpInputMessage.getBody());
-        log.debug("body [{}]", requestBodyString);
-        return new CgCgInputStreamMessage(requestBodyString, httpInputMessage.getHeaders());
+        log.debug("body => {}", requestBodyString);
+        return new CgCgInputStreamMessage(requestBodyString, headers);
     }
 }

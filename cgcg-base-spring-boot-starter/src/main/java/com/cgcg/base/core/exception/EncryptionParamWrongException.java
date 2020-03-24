@@ -17,6 +17,6 @@ public class EncryptionParamWrongException extends CommonException {
      * @param parameterStr  the error msg
      */
     public EncryptionParamWrongException(String parameterStr) {
-        super(416, String.format(Translator.toLocale("EncryptionParamWrongFmt", "加密参数错误[%s]"), parameterStr));
+        super(416, String.format(Translator.toLocale("EncryptionParamWrongFmt", "加密参数错误【%s】"), parameterStr));
     }
 }
