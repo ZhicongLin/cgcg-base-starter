@@ -33,12 +33,14 @@
     </dependencyManagement>
     <distributionManagement>
         <repository>
-            <id>miguan-nexus</id>
-            <url>http://nexus.miguan.com/nexus/content/repositories/releases/</url>
+            <id>Well-Soft-Central</id>
+            <name>Well Soft Central Repository</name>
+            <url>http://nexus.well-soft.com:81/nexus/content/groups/public/</url>
         </repository>
         <snapshotRepository>
-            <id>miguan-nexus</id>
-            <url>http://nexus.miguan.com/nexus/content/repositories/snapshots/</url>
+            <id>Well-Soft-Snapshots</id>
+            <name>Well Soft Snapshots Repository</name>
+            <url>http://nexus.well-soft.com:81/nexus/content/repositories/snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
     <build>

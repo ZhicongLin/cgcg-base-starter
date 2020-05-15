@@ -113,7 +113,7 @@ public class Base64Util {
     /**
      * 将字符串转换base64字符串
      *
-     * @param data
+     * @param str
      */
     public static String encodeToStr(String str) {
         if (str == null || str.length() <= 0) return "";
