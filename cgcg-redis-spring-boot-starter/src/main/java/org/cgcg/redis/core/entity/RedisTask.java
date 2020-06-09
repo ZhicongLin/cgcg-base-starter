@@ -1,11 +1,14 @@
 package org.cgcg.redis.core.entity;
 
+import java.util.concurrent.ExecutorService;
+
+import org.cgcg.redis.core.RedisHelper;
+
 import com.cgcg.context.SpringContextHolder;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.concurrent.ExecutorService;
 
 /**
  * 定时任务缓存锁.
@@ -80,13 +83,8 @@ public abstract class RedisTask {
             this.fixedTime = fixedTime;
         }
         if (async) {
-            final Object cacheExecutor = SpringContextHolder.getBean("cacheExecutor");
-            if (cacheExecutor != null) {
-                ExecutorService executorService = (ExecutorService) cacheExecutor;
-                executorService.execute(this::build);
-            } else {
-                build();
-            }
+            final ExecutorService cacheExecutor = SpringContextHolder.getBean(ExecutorService.class);
+            cacheExecutor.execute(this::build);
         } else {
             build();
         }

@@ -1,8 +1,12 @@
 package org.cgcg.redis.core.annotation;
 
-import org.cgcg.redis.core.enums.RedisTimeUnit;
-
-import java.lang.annotation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Redis命名空间注解.
@@ -20,6 +24,6 @@ public @interface RedisNameSpace {
 
     String expire() default "";
 
-    RedisTimeUnit unit() default RedisTimeUnit.NULL;
+    TimeUnit unit() default TimeUnit.SECONDS;
 
 }

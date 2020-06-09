@@ -1,10 +1,14 @@
 package org.cgcg.redis.core.annotation;
 
-import org.cgcg.redis.core.enums.LockUnit;
-import org.cgcg.redis.core.enums.RedisEnum;
-import org.cgcg.redis.core.enums.RedisTimeUnit;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.util.concurrent.TimeUnit;
 
-import java.lang.annotation.*;
+import org.cgcg.redis.core.enums.RedisExecuteType;
 
 /**
  * Redis缓存注解.
@@ -21,13 +25,12 @@ public @interface RedisCache {
 
     String key() default "";
 
-    String expire() default "";
+    String expire() default "7200";
 
-    RedisTimeUnit timeUnit() default RedisTimeUnit.NULL;
+    TimeUnit timeUnit() default TimeUnit.SECONDS;
 
-    LockUnit lock() default LockUnit.NULL;
+    boolean lock() default false;
 
-    RedisEnum type() default RedisEnum.NULL;
+    RedisExecuteType type() default RedisExecuteType.SELECT;
 
-    String condition() default "";
 }

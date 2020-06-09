@@ -1,13 +1,19 @@
-package org.cgcg.redis.core.entity;
+package org.cgcg.redis.core;
 
-import lombok.extern.slf4j.Slf4j;
-import org.cgcg.redis.core.RedisManager;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import org.cgcg.redis.core.entity.RedisLock;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
-import java.util.concurrent.TimeUnit;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 通用Redis帮助类
@@ -24,7 +30,7 @@ public class RedisHelper {
     private static final Long DEFAULT_EXPIRE = 2L;
     private static final TimeUnit DEFAULT_TIME_UNIT = TimeUnit.HOURS;
 
-    private Map<String, RedisLock> locks = new HashMap<>();
+    private final Map<String, RedisLock> locks = new HashMap<>();
 
     /**
      * 最终加强分布式锁

@@ -1,15 +1,16 @@
 package com.cgcg.test;
 
-import com.alibaba.fastjson.JSON;
-import com.cgcg.service.TestService;
-import com.cgcg.service.User;
-import org.cgcg.redis.core.entity.RedisHelper;
+import javax.annotation.Resource;
+
+import org.cgcg.redis.core.RedisHelper;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.Resource;
+import com.alibaba.fastjson.JSON;
+import com.cgcg.service.TestService;
+import com.cgcg.service.User;
 
 /**
  * .

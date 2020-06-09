@@ -1,10 +1,11 @@
 package com.cgcg.service;
 
+import java.io.Serializable;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.io.Serializable;
 
 /**
  * .
@@ -15,6 +16,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Setter
 @Getter
+@NoArgsConstructor
 public class User implements Serializable {
     private String name;
     private String code;

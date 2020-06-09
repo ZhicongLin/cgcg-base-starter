@@ -2,7 +2,7 @@ package com.cgcg.service;
 
 import org.cgcg.redis.core.annotation.RedisCache;
 import org.cgcg.redis.core.annotation.RedisNameSpace;
-import org.cgcg.redis.core.enums.RedisEnum;
+import org.cgcg.redis.core.enums.RedisExecuteType;
 import org.springframework.stereotype.Service;
 
 /**
@@ -15,17 +15,17 @@ import org.springframework.stereotype.Service;
 @RedisNameSpace(cache = "TestService", expire = "test.time")
 public class TestService {
 
-    @RedisCache(key = "#p0", type = RedisEnum.SEL)
+    @RedisCache(key = "#p0", type = RedisExecuteType.SELECT)
     public User getSer(String key) {
         return new User("哈哈", key);
     }
 
-    @RedisCache(key = "#user.code", expire = "30", type = RedisEnum.FLUSH)
+    @RedisCache(key = "#user.code", expire = "30", type = RedisExecuteType.UPDATE, lock = true)
     public User update(User user) {
         return new User(user.getName() + "asd", "sdf");
     }
 
-    @RedisCache(key = "#user.code", type = RedisEnum.DEL)
+    @RedisCache(key = "#user.code", type = RedisExecuteType.DELETE)
     public int delete(User user) {
         return 1;
     }

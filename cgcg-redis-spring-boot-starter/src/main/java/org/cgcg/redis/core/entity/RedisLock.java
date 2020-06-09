@@ -1,12 +1,13 @@
 package org.cgcg.redis.core.entity;
 
-import lombok.Getter;
-import lombok.Setter;
+import java.util.concurrent.TimeUnit;
+
 import org.cgcg.redis.core.RedisManager;
 import org.cgcg.redis.core.exception.RedisLockException;
 import org.springframework.data.redis.core.RedisTemplate;
 
-import java.util.concurrent.TimeUnit;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * redis分布式锁的实现
@@ -64,7 +65,8 @@ public class RedisLock {
      * @return 获取锁成功返回ture，超时返回false
      */
     public synchronized boolean lock() {
-        Boolean result = redisTemplate.opsForValue().setIfAbsent(lockKey, DEFAULT_VAL, expireMsecs, TimeUnit.MILLISECONDS);
+        Boolean result = redisTemplate.opsForValue().setIfAbsent(lockKey, DEFAULT_VAL);
+        redisTemplate.expire(lockKey, expireMsecs, TimeUnit.MILLISECONDS);
         locked = result != null && result;
         return locked;
     }
