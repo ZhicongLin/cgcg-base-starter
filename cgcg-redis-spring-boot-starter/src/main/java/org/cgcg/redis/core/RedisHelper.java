@@ -27,8 +27,8 @@ public class RedisHelper {
 
     private static final String LOCK_PREFIX = "cgcg_redis";
     private static final String DEFAULT_CACHE_NAME = "DEFAULT_CG_NAMESPACES";
-    private static final Long DEFAULT_EXPIRE = 2L;
-    private static final TimeUnit DEFAULT_TIME_UNIT = TimeUnit.HOURS;
+    public static final Long DEFAULT_EXPIRE = 2L;
+    public static final TimeUnit DEFAULT_TIME_UNIT = TimeUnit.HOURS;
 
     private final Map<String, RedisLock> locks = new HashMap<>();
 
@@ -41,6 +41,7 @@ public class RedisHelper {
     public boolean lock(String key) {
         return lock(key, 100);
     }
+
     /**
      * 最终加强分布式锁
      *
