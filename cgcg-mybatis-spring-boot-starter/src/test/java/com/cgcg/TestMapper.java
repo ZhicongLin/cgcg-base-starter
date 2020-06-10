@@ -20,6 +20,7 @@ import org.cgcg.redis.core.annotation.RedisCache;
 public interface TestMapper {
 
     @Select("select * from cl_user")
+    @RedisCache(cache = "TestMapper")
     List<Map<String ,Object>> findAll();
     @Update("update sys_user set user_name = '2222' where id = '1'")
     int update();

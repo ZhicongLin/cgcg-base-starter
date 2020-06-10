@@ -2,11 +2,11 @@ package org.cgcg.redis.core.interceptor;
 
 import java.util.Set;
 
-import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.StringUtils;
 import org.cgcg.redis.core.RedisHelper;
+import org.cgcg.redis.core.annotation.RedisCache;
 import org.cgcg.redis.core.entity.Callback;
-import org.cgcg.redis.core.entity.RedisCacheHandle;
+import org.cgcg.redis.core.entity.RedisCacheMethod;
 import org.cgcg.redis.core.entity.RedisCacheResult;
 import org.cgcg.redis.core.entity.RedisTask;
 import org.cgcg.redis.core.enums.RedisExecuteType;
@@ -38,11 +38,10 @@ public class RedisCacheModifyExecutor extends AbstractRedisCacheExecutor {
      * 在方法执行之前执行
      *
      * @param redisTemplate
-     * @param redisCacheHandle
-     * @param methodInvocation
+     * @param rcm
      * @throws Throwable
      */
-    public static RedisCacheResult beforeMethodInvoke(RedisTemplate<String, Object> redisTemplate, RedisCacheHandle redisCacheHandle, MethodInvocation methodInvocation) {
+    public static RedisCacheResult beforeMethodInvoke(RedisTemplate<String, Object> redisTemplate, RedisCacheMethod rcm) {
         final RedisCacheResult redisCacheResult = new RedisCacheResult();
         redisCacheResult.setInvoke(true);
         return redisCacheResult;
@@ -53,25 +52,25 @@ public class RedisCacheModifyExecutor extends AbstractRedisCacheExecutor {
      *
      * @param redisTemplate
      * @param result
-     * @param redisCacheHandle
-     * @param methodInvocation
+     * @param rcm
      * @throws Throwable
      */
-    public static void afterMethodInvoke(RedisTemplate<String, Object> redisTemplate, Object result, RedisCacheHandle redisCacheHandle, MethodInvocation methodInvocation) {
-        final String cacheKey = getCacheKey(redisCacheHandle, methodInvocation.getMethod(), methodInvocation.getArguments());
-        if (RedisExecuteType.DELETE.equals(redisCacheHandle.getType())) {
+    public static void afterMethodInvoke(RedisTemplate<String, Object> redisTemplate, Object result,  RedisCacheMethod rcm) {
+        final RedisCache redisCache = rcm.getRedisCache();
+        final String cacheKey = getCacheKey(rcm, rcm.getMethod(), rcm.getArgs());
+        if (RedisExecuteType.DELETE.equals(redisCache.type())) {
             //DELETE，删除缓存
-            if (redisCacheHandle.isLock()) {
+            if (redisCache.lock()) {
                 AsyncTemplate.async(() -> redisTemplate.delete(cacheKey), cacheKey);
             } else {
                 redisTemplate.delete(cacheKey);
             }
-        } else if (RedisExecuteType.FLUSH.equals(redisCacheHandle.getType())) {
+        } else if (RedisExecuteType.FLUSH.equals(redisCache.type())) {
             //FLUSH, 清理所有想用cache的缓存
-            flushCache(redisTemplate, redisCacheHandle);
+            flushCache(redisTemplate, rcm);
         } else {
             //UPDATE
-            cacheMethodResult(redisTemplate, result, redisCacheHandle, cacheKey);
+            cacheMethodResult(redisTemplate, result, redisCache, cacheKey, rcm.getExpire());
         }
     }
 
@@ -81,9 +80,9 @@ public class RedisCacheModifyExecutor extends AbstractRedisCacheExecutor {
      * @auth zhicong.lin
      * @date 2019/6/26
      */
-    private static void flushCache(RedisTemplate<String, Object> redisTemplate, RedisCacheHandle redisCacheHandle) {
+    private static void flushCache(RedisTemplate<String, Object> redisTemplate, RedisCacheMethod rcm) {
 
-        final String cache = redisCacheHandle.getCache();
+        final String cache = rcm.getCache();
         if (StringUtils.isBlank(cache)) {
             log.error("Redis Cache FLUSH Error, @RedisCache.cache Value cannot be empty");
             return;
@@ -91,7 +90,7 @@ public class RedisCacheModifyExecutor extends AbstractRedisCacheExecutor {
         final Set<String> keys = redisTemplate.keys(cache + "_CHN::*");
         if (keys != null && !keys.isEmpty()) {
             //清空缓存数据
-            if (redisCacheHandle.isLock()) {
+            if (rcm.getRedisCache().lock()) {
                 log.info("Redis Flush Caches {}", StringUtils.join(keys));
                 AsyncTemplate.async(() -> redisTemplate.delete(keys), cache);
             } else {

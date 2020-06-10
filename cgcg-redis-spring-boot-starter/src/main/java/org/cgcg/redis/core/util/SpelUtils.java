@@ -1,12 +1,14 @@
 package org.cgcg.redis.core.util;
 
+import java.lang.reflect.Method;
+
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.expression.MethodBasedEvaluationContext;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
+import org.springframework.core.env.Environment;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
-
-import java.lang.reflect.Method;
 
 /**
  * 解析SPEL 表达式
@@ -15,6 +17,24 @@ import java.lang.reflect.Method;
  * @date 2019/6/20
  */
 public class SpelUtils {
+    private static final String TIME_REGEX = "^\\d+$";
+    private static final long DEFAULT_EXPIRE = 7200L;
+
+    public static long getExpireTime(String expire, Environment environment) {
+        if (StringUtils.isNotBlank(expire)) {
+            final boolean matches = expire.matches(TIME_REGEX);
+            if (matches) {
+                return Long.parseLong(expire);
+            } else if (StringUtils.isNotBlank(expire)) {
+                final String property = environment.getProperty(expire);
+                if (property != null && property.matches(TIME_REGEX)) {
+                    return Long.parseLong(property);
+                }
+            }
+        }
+        return DEFAULT_EXPIRE;
+    }
+
     public static String parse(String spel, Method method, Object[] args) {
         //获取被拦截方法参数名列表(使用Spring支持类库)
         LocalVariableTableParameterNameDiscoverer u =

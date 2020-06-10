@@ -1,7 +1,7 @@
 package org.cgcg.redis.core.interceptor;
 
-import org.aopalliance.intercept.MethodInvocation;
-import org.cgcg.redis.core.entity.RedisCacheHandle;
+import org.cgcg.redis.core.annotation.RedisCache;
+import org.cgcg.redis.core.entity.RedisCacheMethod;
 import org.cgcg.redis.core.entity.RedisCacheResult;
 import org.cgcg.redis.core.entity.RedisHitRate;
 import org.cgcg.redis.core.enums.RedisExecuteType;
@@ -34,13 +34,13 @@ public class RedisCacheExecutor extends AbstractRedisCacheExecutor {
      * 在方法执行之前执行
      *
      * @param redisTemplate
-     * @param redisCacheHandle
-     * @param methodInvocation
+     * @param rcm
      * @throws Throwable
      */
-    public static RedisCacheResult beforeMethodInvoke(RedisTemplate<String, Object> redisTemplate, RedisCacheHandle redisCacheHandle, MethodInvocation methodInvocation) {
+    public static RedisCacheResult beforeMethodInvoke(RedisTemplate<String, Object> redisTemplate, RedisCacheMethod rcm) {
         final RedisCacheResult redisCacheResult = new RedisCacheResult();
-        final String cacheKey = getCacheKey(redisCacheHandle, methodInvocation.getMethod(), methodInvocation.getArguments());
+        final RedisCache redisCache = rcm.getRedisCache();
+        final String cacheKey = getCacheKey(rcm, rcm.getMethod(), rcm.getArgs());
         final ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
 
         final Object result = valueOperations.get(cacheKey);
@@ -50,30 +50,30 @@ public class RedisCacheExecutor extends AbstractRedisCacheExecutor {
         } else {
             RedisHitRate.addHitCount(cacheKey, redisTemplate);
             log.info("Hit Redis Cache [{}], Rate {} .", cacheKey, RedisHitRate.getRate(cacheKey, redisTemplate));
-            final Class<?> returnType = methodInvocation.getMethod().getReturnType();
+            final Class<?> returnType = rcm.getReturnType();
             redisCacheResult.setResult(JSON.parseObject(result.toString(), returnType));
         }
         return redisCacheResult;
     }
+
 
     /**
      * 在方法执行结束后执行
      *
      * @param redisTemplate
      * @param result
-     * @param redisCacheHandle
-     * @param methodInvocation
+     * @param rcm
      * @throws Throwable
      */
-    public static void afterMethodInvoke(RedisTemplate<String, Object> redisTemplate, Object result, RedisCacheHandle redisCacheHandle, MethodInvocation methodInvocation) {
+    public static void afterMethodInvoke(RedisTemplate<String, Object> redisTemplate, Object result, RedisCacheMethod rcm) {
+        final RedisCache redisCache = rcm.getRedisCache();
+        final String cacheKey = getCacheKey(rcm, rcm.getMethod(), rcm.getArgs());
 
-        final String cacheKey = getCacheKey(redisCacheHandle, methodInvocation.getMethod(), methodInvocation.getArguments());
-
-        if (!RedisExecuteType.SELECT.equals(redisCacheHandle.getType())) {
+        if (!RedisExecuteType.SELECT.equals(redisCache.type())) {
             return;
         }
 
-        cacheMethodResult(redisTemplate, result, redisCacheHandle, cacheKey);
+        cacheMethodResult(redisTemplate, result, redisCache, cacheKey, rcm.getExpire());
     }
 
 }

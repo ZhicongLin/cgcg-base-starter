@@ -32,7 +32,8 @@ public class TestService {
         return 1;
     }
 
-    @RedisLock(key = "#p0", time = 10, unlock = true)
+    @RedisLock(key = "#p0", unlock = false)
+    @RedisCache(key = "#p0", type = RedisExecuteType.SELECT)
     public User lockTest(String key) {
         return new User("haLock", key);
     }

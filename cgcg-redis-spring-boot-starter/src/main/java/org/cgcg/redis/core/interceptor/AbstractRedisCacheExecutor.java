@@ -4,8 +4,9 @@ import java.lang.reflect.Method;
 
 import org.apache.commons.lang3.StringUtils;
 import org.cgcg.redis.core.RedisHelper;
+import org.cgcg.redis.core.annotation.RedisCache;
 import org.cgcg.redis.core.entity.Callback;
-import org.cgcg.redis.core.entity.RedisCacheHandle;
+import org.cgcg.redis.core.entity.RedisCacheMethod;
 import org.cgcg.redis.core.entity.RedisHitRate;
 import org.cgcg.redis.core.entity.RedisTask;
 import org.cgcg.redis.core.util.SpelUtils;
@@ -35,7 +36,8 @@ public class AbstractRedisCacheExecutor {
 
     protected static final String KEY_TEMP = "%s::%s(%s)";
 
-    protected static void cacheMethodResult(RedisTemplate<String, Object> redisTemplate, Object result, RedisCacheHandle redisCacheHandle, String cacheKey) {
+    protected static void cacheMethodResult(RedisTemplate<String, Object> redisTemplate, Object result,
+                                            RedisCache redisCache, String cacheKey, long expire) {
         final ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
 
         //方法执行结果为null
@@ -47,42 +49,40 @@ public class AbstractRedisCacheExecutor {
             return;
         }
         //更新，刷新，查询，缓存方法执行结果
-        if (redisCacheHandle.isLock()) {
+        if (redisCache.lock()) {
             //加锁一般放在更新操作
-            AbstractRedisCacheExecutor.AsyncTemplate.async(() -> setValue(result, redisCacheHandle, cacheKey, valueOperations), redisCacheHandle.getCache());
+            AbstractRedisCacheExecutor.AsyncTemplate.async(() -> setValue(result, redisCache, cacheKey, valueOperations, expire), redisCache.cache());
         } else {
-            setValue(result, redisCacheHandle, cacheKey, valueOperations);
+            setValue(result, redisCache, cacheKey, valueOperations, expire);
         }
         RedisHitRate.addMissCount(cacheKey, redisTemplate);
         log.info("Redis Cache [{}] Success, Rate {}.", cacheKey, RedisHitRate.getRate(cacheKey, redisTemplate));
     }
 
-    protected static void setValue(Object result, RedisCacheHandle redisCacheHandle, String cacheKey, ValueOperations<String, Object> valueOperations) {
-        final long expire = redisCacheHandle.getExpire();
+    protected static void setValue(Object result, RedisCache redisCache, String cacheKey, ValueOperations<String, Object> valueOperations, long expire) {
         if (expire <= 0) {
             log.warn("When the redis expire time is less than or equal to zero, the system defaults to two hours");
             valueOperations.set(cacheKey, JSON.toJSONString(result), RedisHelper.DEFAULT_EXPIRE, RedisHelper.DEFAULT_TIME_UNIT);
         } else {
-            valueOperations.set(cacheKey, JSON.toJSONString(result), expire, redisCacheHandle.getTimeUnit());
+            valueOperations.set(cacheKey, JSON.toJSONString(result), expire, redisCache.timeUnit());
         }
     }
 
     /**
      * 获取缓存key
      *
-     * @param redisCacheHandle
      * @param method
      * @param args
      * @return
      */
-    protected static String getCacheKey(RedisCacheHandle redisCacheHandle, Method method, Object[] args) {
-        String cacheKey = redisCacheHandle.getKey();
+    protected static String getCacheKey(RedisCacheMethod rcm, Method method, Object[] args) {
+        String cacheKey = rcm.getKey();
         if (StringUtils.isBlank(cacheKey)) {
             cacheKey = JSON.toJSONString(args);
         } else if (cacheKey.contains("#")) {
             cacheKey = SpelUtils.parse(method.getDeclaringClass().getName(), cacheKey, method, args);
         }
-        return redisCacheHandle.getCache() + "_CHN::" + cacheKey;
+        return rcm.getCache() + "_CHN::" + cacheKey;
     }
 
     static class AsyncTemplate {

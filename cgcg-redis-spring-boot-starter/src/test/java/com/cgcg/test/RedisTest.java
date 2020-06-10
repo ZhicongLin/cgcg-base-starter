@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alibaba.fastjson.JSON;
 import com.cgcg.service.TestService;
 import com.cgcg.service.User;
 
@@ -39,20 +38,15 @@ public class RedisTest {
         for (int i = 0; i < 10; i++) {
             testService.getSer(key + i);
         }
-        Object o = this.redisHelper.get("TestService:keys4");
-        String s = JSON.toJSONString(o);
-        System.out.println("s = " + s);
-        User ser = testService.getSer(key);
-        String s1 = JSON.toJSONString(ser);
 
-/*        for (int i = 0; i < 3; i++) {
+       /*for (int i = 0; i < 30; i++) {
             final int index = i;
             executorService.execute(()->{
                 final User user = testService.lockTest(key);
                 System.out.println(index + "user = " + user);
             });
         }*/
-        return  s1;
+        return  testService.getSer(key);
     }
     @PostMapping("/get")
     public User pu() {
