@@ -1,9 +1,9 @@
 package com.cgcg.context.enums;
 
+import java.nio.charset.Charset;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-
-import java.nio.charset.Charset;
 
 /**
  * 字符编码.
@@ -14,7 +14,7 @@ import java.nio.charset.Charset;
 @Getter
 @AllArgsConstructor
 public enum CharsetCode {UTF8("UTF-8");
-    private String name;
+    private final String name;
 
     public static Charset forUtf8() {
         return Charset.forName(UTF8.getName());

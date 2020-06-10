@@ -1,7 +1,10 @@
 package org.cgcg.redis.core;
 
-import com.cgcg.context.SpringContextHolder;
-import lombok.extern.slf4j.Slf4j;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -9,10 +12,9 @@ import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.stereotype.Component;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import com.cgcg.context.SpringContextHolder;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * .
@@ -25,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 public class RedisManager {
     /**
      * Gets redis template.
+     *
      * @return the redis template
      */
     public static RedisTemplate<String, Object> getRedisTemplate() {
@@ -53,8 +56,6 @@ public class RedisManager {
 
     @Bean("cacheExecutor")
     public ExecutorService executorService() {
-        return new ThreadPoolExecutor(0, Integer.MAX_VALUE,
-                120L, TimeUnit.SECONDS,
-                new SynchronousQueue<>());
+        return new ThreadPoolExecutor(0, Integer.MAX_VALUE, 120L, TimeUnit.SECONDS, new SynchronousQueue<>());
     }
 }

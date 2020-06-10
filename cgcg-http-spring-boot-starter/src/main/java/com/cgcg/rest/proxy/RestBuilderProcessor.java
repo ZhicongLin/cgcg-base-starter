@@ -1,16 +1,17 @@
 package com.cgcg.rest.proxy;
 
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.cgcg.context.SpringContextHolder;
 import com.cgcg.context.util.ReflectionUtils;
 import com.cgcg.rest.annotation.LoadMapping;
 import com.cgcg.rest.http.RestBuilder;
 import com.cgcg.rest.http.RestTemplateFactory;
 import com.cgcg.rest.param.RestHandle;
-import lombok.extern.slf4j.Slf4j;
 
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 代理处理器.
@@ -22,8 +23,8 @@ import java.util.Map;
 public class RestBuilderProcessor implements BuilderCallBack {
 
     private static final long DEFAULT_EXPIRE = 60000L;
-    private static RestBuilderProcessor restBuilderProcessor = new RestBuilderProcessor();
-    private static Map<Object, Map<Object, Object>> fallBackResult = new HashMap<>();
+    private static final RestBuilderProcessor REST_BUILDER_PROCESSOR = new RestBuilderProcessor();
+    private static final Map<Object, Map<Object, Object>> FALL_BACK_RESULT = new HashMap<>();
 
     /**
      * 包装调用方法：进行预处理、调用后处理
@@ -38,9 +39,9 @@ public class RestBuilderProcessor implements BuilderCallBack {
         try {
             if (valid) {
                 proceeding.getLogger().info("RestClient Hit Fallback.");
-                return fallBackResult.get(fallbackBean).get(method);
+                return FALL_BACK_RESULT.get(fallbackBean).get(method);
             }
-            return builder.addArgs(args).execute(restBuilderProcessor);
+            return builder.addArgs(args).execute(REST_BUILDER_PROCESSOR);
         } catch (Exception e) {
             if (fallbackBean != null) {
                 return fallback(method, args, fallbackBean, start, valid);
@@ -56,19 +57,19 @@ public class RestBuilderProcessor implements BuilderCallBack {
         if (fallbackBean == null) {
             return false;
         }
-        final Map<Object, Object> fallbackMethod = fallBackResult.get(fallbackBean);
+        final Map<Object, Object> fallbackMethod = FALL_BACK_RESULT.get(fallbackBean);
         final String timeKey = method.getName() + "time";
         final Long expire = SpringContextHolder.getProperty("cgcg.rest.fallback.expire", Long.class);
         if (fallbackMethod != null && fallbackMethod.get(timeKey) != null) {
             final Object time = fallbackMethod.get(timeKey);
-            final long timeSub = startTime - Long.valueOf(time.toString());
+            final long timeSub = startTime - Long.parseLong(time.toString());
             return timeSub <= (expire == null ? DEFAULT_EXPIRE : expire);
         }
         return false;
     }
 
     private static Object fallback(Method method, Object[] args, Object fallbackBean, long startTime, boolean validate) {
-        Map<Object, Object> fallbackMethod = fallBackResult.get(fallbackBean);
+        Map<Object, Object> fallbackMethod = FALL_BACK_RESULT.get(fallbackBean);
         Object result = null;
         if (fallbackMethod == null || fallbackMethod.get(method) == null || !validate) {
             result = ReflectionUtils.invokeMethod(fallbackBean, method.getName(), method.getParameterTypes(), args);
@@ -78,7 +79,7 @@ public class RestBuilderProcessor implements BuilderCallBack {
         }
         fallbackMethod.put(method.getName() + "time", startTime);
         fallbackMethod.put(method, result);
-        fallBackResult.put(fallbackBean, fallbackMethod);
+        FALL_BACK_RESULT.put(fallbackBean, fallbackMethod);
         return result;
     }
 

@@ -1,10 +1,16 @@
 package com.cgcg.context.thread;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
 import com.cgcg.context.SpringContextHolder;
+
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.concurrent.*;
 
 /**
  * 线程池工具类
@@ -69,8 +75,7 @@ public class ThreadPoolManager {
         final ThreadPoolManager poolManager = getInstance();
         ThreadPoolExecutor executor = poolManager.getExecutor();
         if (executor == null) {
-            final ThreadPoolExecutor bean = SpringContextHolder.getBean(ThreadPoolExecutor.class);
-            executor = bean != null ? bean : createExecutor(new LinkedBlockingQueue<>(), new ThreadPoolExecutor.AbortPolicy());
+            executor = SpringContextHolder.getBean(ThreadPoolExecutor.class);
             poolManager.setExecutor(executor);
         }
         return executor;

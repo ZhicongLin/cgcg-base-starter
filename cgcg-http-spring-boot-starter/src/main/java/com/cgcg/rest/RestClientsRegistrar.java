@@ -1,12 +1,10 @@
 package com.cgcg.rest;
 
-import com.cgcg.rest.annotation.EnableRestClients;
-import com.cgcg.rest.annotation.RestClient;
-import com.cgcg.rest.proxy.RestCglibFactoryBean;
-import com.cgcg.rest.proxy.RestJdkFactoryBean;
-import lombok.Setter;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -19,10 +17,14 @@ import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import com.cgcg.rest.annotation.EnableRestClients;
+import com.cgcg.rest.annotation.RestClient;
+import com.cgcg.rest.proxy.RestCglibFactoryBean;
+import com.cgcg.rest.proxy.RestJdkFactoryBean;
+
+import lombok.Setter;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * RestClient Registrar SpringContext
@@ -78,9 +80,7 @@ public class RestClientsRegistrar implements ImportBeanDefinitionRegistrar, Envi
             basePackages.addAll(Arrays.asList((String[]) attributes.get(Constant.REST_CLIENT_VALUE)));
             basePackages.addAll(Arrays.asList((String[]) attributes.get(Constant.REST_CLIENT_BASE_PACKAGES)));
             final Class[] classes = (Class[]) attributes.get(Constant.REST_CLIENT_BASE_PACKAGE_CLASSES);
-            for (Class clazz : classes) {
-                basePackages.add(ClassUtils.getPackageName(clazz));
-            }
+            Arrays.stream(classes).forEach(clazz -> basePackages.add(ClassUtils.getPackageName(clazz)));
         }
         if (basePackages.isEmpty()) {
             basePackages.add(ClassUtils.getPackageName(importingClassMetadata.getClassName()));

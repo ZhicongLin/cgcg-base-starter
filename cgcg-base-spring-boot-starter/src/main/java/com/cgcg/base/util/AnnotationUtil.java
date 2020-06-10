@@ -1,16 +1,21 @@
 package com.cgcg.base.util;
 
-import io.swagger.annotations.Api;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import java.lang.annotation.Annotation;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import java.util.Arrays;
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Indexed;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.lang.annotation.*;
-import java.util.Arrays;
-import java.util.List;
+import io.swagger.annotations.Api;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 /**
  * 注解工具类.
@@ -20,7 +25,7 @@ import java.util.List;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AnnotationUtil {
-    private static List<Class<?>> ignore = Arrays.asList(Documented.class, Target.class, Retention.class,
+    private static final List<Class<?>> IGNORE = Arrays.asList(Documented.class, Target.class, Retention.class,
             Controller.class, Component.class, Indexed.class, Inherited.class, Api.class);
 
     /**
@@ -47,7 +52,7 @@ public final class AnnotationUtil {
                 return true;
             }
             boolean flag = false;
-            if (!ignore.contains(annoType)) {
+            if (!IGNORE.contains(annoType)) {
                 flag = hasAnnotation(annoType, annotationType);
             }
             if (flag) {
@@ -57,15 +62,16 @@ public final class AnnotationUtil {
         return false;
     }
 
-    public static <T extends Annotation> T getAnnotation(Class clzz, Class<T> annotationType) {
-        final Annotation[] annotations = clzz.getAnnotations();
+    @SuppressWarnings({"unchecked"})
+    public static <T extends Annotation> T getAnnotation(Class<?> clazz, Class<T> annotationType) {
+        final Annotation[] annotations = clazz.getAnnotations();
         for (Annotation annotation : annotations) {
             if (annotationType.isInstance(annotation)) {
                 return (T) annotation;
             }
-            final Class<? extends Annotation> annoType = annotation.annotationType();
-            if (!ignore.contains(annoType)) {
-                final T result = getAnnotation(annoType, annotationType);
+            final Class<? extends Annotation> annType = annotation.annotationType();
+            if (!IGNORE.contains(annType)) {
+                final T result = getAnnotation(annType, annotationType);
                 if (result != null) {
                     return result;
                 }

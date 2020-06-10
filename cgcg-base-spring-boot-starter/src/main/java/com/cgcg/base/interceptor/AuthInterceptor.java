@@ -1,18 +1,20 @@
 package com.cgcg.base.interceptor;
 
-import com.alibaba.fastjson.JSON;
-import com.cgcg.base.core.enums.CharsetCode;
-import com.cgcg.base.interceptor.auth.AuthService;
-import com.cgcg.base.language.Translator;
-import com.cgcg.context.SpringContextHolder;
-import lombok.extern.slf4j.Slf4j;
+import java.util.HashMap;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
+import com.alibaba.fastjson.JSON;
+import com.cgcg.base.interceptor.auth.AuthService;
+import com.cgcg.base.language.Translator;
+import com.cgcg.context.SpringContextHolder;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 权限拦截器.
@@ -46,7 +48,7 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
                     unauthorized.put("code", HttpStatus.UNAUTHORIZED.value());
                     unauthorized.put("message", Translator.toLocale("Unauthorized", "没有访问权限"));
                     response.addHeader("Content-Type", MediaType.APPLICATION_JSON_UTF8_VALUE);
-                    response.setCharacterEncoding(CharsetCode.forUtf8().name());
+                    response.setCharacterEncoding("utf-8");
                     response.getWriter().write(JSON.toJSONString(unauthorized));
                     return false;
                 }

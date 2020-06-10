@@ -1,10 +1,12 @@
 package com.cgcg.base.core.enums;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.cgcg.base.format.Result;
 import com.cgcg.context.SpringContextHolder;
+
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * 格式化配置文件的枚举类.
@@ -27,7 +29,7 @@ public enum FormatProperty {
     //数据加密返回结果密钥配置
     DES_RESULT("cgcg.format.des3.result");
 
-    private String key;
+    private final String key;
     private Object property;
 
     FormatProperty(String key) {
@@ -65,7 +67,7 @@ public enum FormatProperty {
         return null;
     }
 
-    public static Class getFormatClass() {
+    public static Class<?> getFormatClass() {
         final String className = CLASS_NAME.getString();
         Class<?> formatClass = Result.class;
         try {

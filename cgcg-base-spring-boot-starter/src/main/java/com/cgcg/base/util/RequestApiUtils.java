@@ -1,15 +1,17 @@
 package com.cgcg.base.util;
 
-import io.swagger.annotations.ApiOperation;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import java.util.Enumeration;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.web.method.HandlerMethod;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.Enumeration;
+import io.swagger.annotations.ApiOperation;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 /**
  * Description : 接口参数处理
@@ -37,16 +39,14 @@ public final class RequestApiUtils {
         Enumeration parameterNames = request.getParameterNames();
         if (!parameterNames.hasMoreElements()) {
             return "";
-        } else {
-            StringBuilder sb = new StringBuilder();
-
-            while (parameterNames.hasMoreElements()) {
-                String param = (String) parameterNames.nextElement();
-                String[] values = request.getParameterValues(param);
-                sb.append("[").append(param).append(":").append(ArrayUtils.toString(values)).append("]");
-            }
-            return sb.toString();
         }
+        final StringBuilder sb = new StringBuilder();
+        while (parameterNames.hasMoreElements()) {
+            String param = (String) parameterNames.nextElement();
+            String[] values = request.getParameterValues(param);
+            sb.append("[").append(param).append(":").append(ArrayUtils.toString(values)).append("]");
+        }
+        return sb.toString();
     }
 
 }

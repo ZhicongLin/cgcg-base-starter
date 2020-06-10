@@ -1,15 +1,16 @@
 package com.cgcg.base.interceptor;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.annotation.Resource;
+
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Request请求的拦截器和过滤器配置
@@ -19,7 +20,7 @@ import java.util.List;
 @Configuration
 public class WebMvcRequestConfigurerAdapter implements WebMvcConfigurer {
 
-    private List<String> DEFAULT_IGNORE = Arrays.asList("/swagger-resources/**", "/swagger-ui.html","/doc.html", "/error", "/webjars/**", "/v2/api-doc", "/v2/api-docs-ext");
+    private  static final List<String> DEFAULT_IGNORE = Arrays.asList("/swagger-resources/**", "/swagger-ui.html","/doc.html", "/error", "/webjars/**", "/v2/api-doc", "/v2/api-docs-ext");
 
     @Resource
     private IgnoreHandle ignore;

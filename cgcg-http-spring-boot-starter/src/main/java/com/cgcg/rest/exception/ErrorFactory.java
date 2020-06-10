@@ -30,7 +30,6 @@ public class ErrorFactory {
      * 获取异常结果 .
      *
      * @Param: [errorBody]
-     * @Return: com.restframework.core.exception.ErrorFactory
      * @Author: ZhiCong Lin
      * @Date: 2018/8/13 9:30
      */

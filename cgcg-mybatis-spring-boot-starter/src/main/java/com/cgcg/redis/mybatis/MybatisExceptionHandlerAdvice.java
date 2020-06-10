@@ -1,9 +1,12 @@
 package com.cgcg.redis.mybatis;
 
-import com.cgcg.base.format.Result;
-import com.cgcg.base.language.Translator;
-import com.mysql.cj.jdbc.exceptions.MysqlDataTruncation;
-import lombok.extern.slf4j.Slf4j;
+import java.sql.SQLSyntaxErrorException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -12,11 +15,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import java.sql.SQLSyntaxErrorException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.cgcg.base.format.Result;
+import com.cgcg.base.language.Translator;
+import com.mysql.cj.jdbc.exceptions.MysqlDataTruncation;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Description : 使用Advice方式处理异常
@@ -43,7 +46,7 @@ public class MybatisExceptionHandlerAdvice {
         String message = Translator.toLocale("DataIntegrityViolationException");
         if (cause instanceof MysqlDataTruncation) {
             final List<String> msgResult = getMessage(cause.getMessage());
-            message = String.format(Translator.toLocale("MysqlDataTruncation"), msgResult.get(0));
+            message = String.format(Objects.requireNonNull(Translator.toLocale("MysqlDataTruncation")), msgResult.get(0));
         }
         log.error(message, e);
         return Result.error(100400, message);
@@ -58,9 +61,9 @@ public class MybatisExceptionHandlerAdvice {
     @ExceptionHandler(SQLSyntaxErrorException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Result handleException(SQLSyntaxErrorException e) {
-        final String emsg = e.getMessage();
-        log.error(emsg, e);
-        return Result.error(100400, emsg.replace("Table", "表").replace("doesn't exist", "不存在"));
+        final String msg = e.getMessage();
+        log.error(msg, e);
+        return Result.error(100400, msg.replace("Table", "表").replace("doesn't exist", "不存在"));
     }
 
     private Throwable getCause(Throwable t) {
@@ -72,7 +75,7 @@ public class MybatisExceptionHandlerAdvice {
     }
 
     private List<String> getMessage(String msg) {
-        Pattern p = Pattern.compile("\'(.*?)\'");
+        Pattern p = Pattern.compile("'(.*?)'");
         Matcher m = p.matcher(msg);
         final ArrayList<String> result = new ArrayList<>();
         while (m.find()) {

@@ -1,15 +1,16 @@
 package com.cgcg.redis.mybatis;
 
-import lombok.extern.slf4j.Slf4j;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 import org.apache.ibatis.cache.Cache;
 import org.cgcg.redis.core.RedisManager;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.Assert;
 
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * redis缓存管理工具.
@@ -24,7 +25,7 @@ public class RedisCacheManager implements Cache {
     // 读写锁
     private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock(true);
     private RedisTemplate<String, Object> redisTemplate;
-    private String id;
+    private final String id;
 
     public RedisCacheManager(final String id) {
         Assert.notNull(id, "require id must not null");
@@ -53,7 +54,7 @@ public class RedisCacheManager implements Cache {
     @Override
     public Object removeObject(Object cacheKey) {
         final String key = id + ":" + cacheKey.toString();
-        log.debug("Redis Remvoe {}" , key);
+        log.debug("Redis Remove {}" , key);
         return getRedisTemplate().delete(key);
     }
 

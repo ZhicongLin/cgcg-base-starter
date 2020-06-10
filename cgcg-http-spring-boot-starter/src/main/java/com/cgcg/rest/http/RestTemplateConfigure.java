@@ -1,7 +1,9 @@
 package com.cgcg.rest.http;
 
-import com.cgcg.rest.properties.RestPoolProperties;
-import com.cgcg.rest.properties.RestProperties;
+import java.util.List;
+
+import javax.annotation.Resource;
+
 import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
@@ -13,8 +15,8 @@ import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.Resource;
-import java.util.List;
+import com.cgcg.rest.properties.RestPoolProperties;
+import com.cgcg.rest.properties.RestProperties;
 
 /**
  * rest temp conf.
@@ -51,12 +53,12 @@ public class RestTemplateConfigure {
      */
     @Bean
     public ClientHttpRequestFactory clientHttpRequestFactory() {
-        final HttpComponentsClientHttpRequestFactory chrf = new HttpComponentsClientHttpRequestFactory();
-        chrf.setHttpClient(httpClientBuilder().build());
-        chrf.setConnectTimeout(restProperties.getConnectTimeout()); // 连接超时时间/毫秒
-        chrf.setReadTimeout(restProperties.getReadTimeout()); // 读写超时时间/毫秒
-        chrf.setConnectionRequestTimeout(restProperties.getConnectionRequestTimeout());// 请求超时时间/毫秒
-        return chrf;
+        final HttpComponentsClientHttpRequestFactory cerf = new HttpComponentsClientHttpRequestFactory();
+        cerf.setHttpClient(httpClientBuilder().build());
+        cerf.setConnectTimeout(restProperties.getConnectTimeout()); // 连接超时时间/毫秒
+        cerf.setReadTimeout(restProperties.getReadTimeout()); // 读写超时时间/毫秒
+        cerf.setConnectionRequestTimeout(restProperties.getConnectionRequestTimeout());// 请求超时时间/毫秒
+        return cerf;
     }
 
     /**

@@ -1,19 +1,20 @@
 package com.cgcg.base.format;
 
-import lombok.Getter;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+
 import org.apache.commons.io.IOUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
 
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
+import lombok.Getter;
 
 @Getter
 public class CgCgInputStreamMessage implements HttpInputMessage {
 
-    private InputStream body;
+    private final InputStream body;
 
-    private HttpHeaders headers;
+    private final HttpHeaders headers;
 
     public CgCgInputStreamMessage(String body, HttpHeaders headers) {
         this.body = IOUtils.toInputStream(body, StandardCharsets.UTF_8);

@@ -1,9 +1,10 @@
 package com.cgcg.rest;
 
-import com.cgcg.rest.annotation.RestClient;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
@@ -15,10 +16,11 @@ import org.springframework.core.type.classreading.SimpleMetadataReaderFactory;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.util.ClassUtils;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import com.cgcg.rest.annotation.RestClient;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Setter
@@ -36,16 +38,15 @@ public class RestClientScannerConfigurer {
     }
 
     public Set<RestClientGenericBeanDefinition> findCandidateComponents(Collection<String> basePackages) {
-        try {
-            final Set<RestClientGenericBeanDefinition> definitions = new HashSet<>();
-            for (String basePackage : basePackages) {
-                definitions.addAll(this.findCandidateClasses(basePackage));
+        final Set<RestClientGenericBeanDefinition> definitions = new HashSet<>();
+        basePackages.forEach(pkg -> {
+            try {
+                definitions.addAll(this.findCandidateClasses(pkg));
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
             }
-            return definitions;
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
-        return null;
+        });
+        return definitions;
     }
 
     /**

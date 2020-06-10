@@ -1,10 +1,11 @@
 package com.cgcg.base.format;
 
-import com.alibaba.fastjson.JSON;
-import com.cgcg.base.core.enums.FormatProperty;
-import com.cgcg.base.util.AnnotationUtil;
-import com.cgcg.context.util.ReflectionUtils;
-import lombok.extern.slf4j.Slf4j;
+import java.net.URI;
+import java.util.List;
+import java.util.Objects;
+
+import javax.annotation.Resource;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.Order;
@@ -17,10 +18,12 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
-import javax.annotation.Resource;
-import java.net.URI;
-import java.util.List;
-import java.util.Objects;
+import com.alibaba.fastjson.JSON;
+import com.cgcg.base.core.enums.FormatProperty;
+import com.cgcg.base.util.AnnotationUtil;
+import com.cgcg.context.util.ReflectionUtils;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 结果集格式化处理
@@ -60,7 +63,7 @@ public class ResponseBodyFormatHandler implements ResponseBodyAdvice {
         return this.getFormatResult(body, selectedConverterType);
     }
 
-    private Object getFormatResult(Object body, Class selectedConverterType) {
+    private Object getFormatResult(Object body, Class<?> selectedConverterType) {
         final Class<?> formatClass = FormatProperty.getFormatClass();
         if (body != null && body.getClass().getName().equals(formatClass.getName())) {
             //判断ResultMap类型，直接返回，不进行格式化
