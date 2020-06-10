@@ -1,2 +1,5 @@
 server:
-  port: 5678
+  port: 8080
+cgcg:
+  redis:
+    disable: false

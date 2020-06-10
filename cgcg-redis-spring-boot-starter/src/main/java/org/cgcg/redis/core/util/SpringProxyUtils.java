@@ -26,16 +26,14 @@ import org.springframework.aop.framework.AdvisedSupport;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.aop.target.EmptyTargetSource;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 /**
  * Proxy tools base on spring
- *
- * @author zhangsen
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SpringProxyUtils {
-
-    private SpringProxyUtils() {
-
-    }
 
     /**
      * Find target class class.

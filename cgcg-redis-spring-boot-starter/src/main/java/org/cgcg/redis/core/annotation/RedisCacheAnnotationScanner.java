@@ -1,6 +1,8 @@
 package org.cgcg.redis.core.annotation;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.function.Predicate;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.cgcg.redis.core.RedisCacheProperties;
@@ -17,7 +19,6 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Service;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -38,7 +39,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Setter
 @Getter
-@Slf4j@Service
+@Slf4j
 public class RedisCacheAnnotationScanner extends AbstractAutoProxyCreator implements ApplicationContextAware, EnvironmentAware {
     private MethodInterceptor interceptor;
     private RedisTemplate<String, Object> redisTemplate;
@@ -74,11 +75,9 @@ public class RedisCacheAnnotationScanner extends AbstractAutoProxyCreator implem
             if (!AopUtils.isAopProxy(bean)) {
                 bean = super.wrapIfNecessary(bean, beanName, cacheKey);
             } else {
-                AdvisedSupport advised = SpringProxyUtils.getAdvisedSupport(bean);
-                Advisor[] advisor = buildAdvisors(beanName, getAdvicesAndAdvisorsForBean(null, null, null));
-                for (Advisor avr : advisor) {
-                    advised.addAdvisor(0, avr);
-                }
+                final AdvisedSupport advised = SpringProxyUtils.getAdvisedSupport(bean);
+                final Advisor[] advisor = buildAdvisors(beanName, getAdvicesAndAdvisorsForBean(Void.TYPE, beanName, null));
+                Arrays.stream(advisor).forEach(avr -> advised.addAdvisor(0, avr));
             }
             return bean;
         } catch (Exception e) {
@@ -93,11 +92,10 @@ public class RedisCacheAnnotationScanner extends AbstractAutoProxyCreator implem
         }
         for (Class<?> clazz : classes) {
             if (clazz != null) {
-                final Method[] methods = clazz.getMethods();
-                for (Method method : methods) {
-                    if (method.getAnnotation(RedisCache.class) != null) {
-                        return true;
-                    }
+                final Predicate<Method> methodPredicate = method -> method.getAnnotation(RedisCache.class) != null;
+                final long count = Arrays.stream(clazz.getMethods()).filter(methodPredicate).count();
+                if (count > 0) {
+                    return true;
                 }
             }
         }
