@@ -1,5 +1,7 @@
 package org.cgcg.redis.core.interceptor;
 
+import javax.annotation.Resource;
+
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.cgcg.redis.core.RedisHelper;
@@ -11,6 +13,7 @@ import org.cgcg.redis.core.enums.RedisExecuteType;
 import org.cgcg.redis.core.exception.RedisLockException;
 import org.springframework.core.env.Environment;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
 
 import com.cgcg.context.SpringContextHolder;
 
@@ -30,7 +33,13 @@ import lombok.extern.slf4j.Slf4j;
  * @date 2020/6/5
  */
 @Slf4j
+@Component("redisCacheInterceptor")
 public class RedisCacheInterceptor extends AbstractRedisCacheInterceptor implements MethodInterceptor {
+    @Resource
+    private RedisTemplate<String, Object> redisTemplate;
+
+    public RedisCacheInterceptor() {
+    }
 
     public RedisCacheInterceptor(RedisTemplate<String, Object> redisTemplate, Environment environment) {
         super(redisTemplate, environment);
@@ -74,4 +83,7 @@ public class RedisCacheInterceptor extends AbstractRedisCacheInterceptor impleme
         return result;
     }
 
+    public void setEnvironment(Environment environment) {
+        this.environment = environment;
+    }
 }

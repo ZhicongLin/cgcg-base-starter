@@ -2,6 +2,8 @@ package org.cgcg.redis.core.interceptor;
 
 import java.lang.reflect.Method;
 
+import javax.annotation.Resource;
+
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.StringUtils;
@@ -38,9 +40,13 @@ public abstract class AbstractRedisCacheInterceptor implements MethodInterceptor
 
     private static final String TIME_REGEX = "^\\d+$";
     private static final long DEFAULT_EXPIRE = 7200L;
-    protected final RedisTemplate<String, Object> redisTemplate;
-    protected final Environment environment;
+    @Resource
+    protected RedisTemplate<String, Object> redisTemplate;
+    protected Environment environment;
     private boolean disable;
+
+    public AbstractRedisCacheInterceptor() {
+    }
 
     public AbstractRedisCacheInterceptor(RedisTemplate<String, Object> redisTemplate, Environment environment) {
         this.redisTemplate = redisTemplate;

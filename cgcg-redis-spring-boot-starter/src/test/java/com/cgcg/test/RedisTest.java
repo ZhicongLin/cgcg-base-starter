@@ -45,13 +45,13 @@ public class RedisTest {
         User ser = testService.getSer(key);
         String s1 = JSON.toJSONString(ser);
 
-        for (int i = 0; i < 10; i++) {
+/*        for (int i = 0; i < 3; i++) {
             final int index = i;
             executorService.execute(()->{
                 final User user = testService.lockTest(key);
                 System.out.println(index + "user = " + user);
             });
-        }
+        }*/
         return  s1;
     }
     @PostMapping("/get")

@@ -2,7 +2,6 @@ package org.cgcg.redis.core;
 
 import javax.annotation.Resource;
 
-import org.cgcg.redis.core.annotation.RedisCacheAnnotationScanner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -37,10 +36,10 @@ public class RedisAutoConfiguration {
     @Resource
     private RedisConnectionFactory redisConnectionFactory;
 
-    @Bean
+/*    @Bean
     public RedisCacheAnnotationScanner getRedisCacheScanner() {
         return new RedisCacheAnnotationScanner(redisCacheProperties, redisTemplate());
-    }
+    }*/
 
     @Bean
     public RedisTemplate<String, Object> redisTemplate() {

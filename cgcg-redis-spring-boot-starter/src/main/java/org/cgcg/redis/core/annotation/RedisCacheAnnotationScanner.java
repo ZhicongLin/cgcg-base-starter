@@ -4,7 +4,8 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.function.Predicate;
 
-import org.aopalliance.intercept.MethodInterceptor;
+import javax.annotation.Resource;
+
 import org.cgcg.redis.core.RedisCacheProperties;
 import org.cgcg.redis.core.interceptor.RedisCacheInterceptor;
 import org.cgcg.redis.core.util.SpringProxyUtils;
@@ -14,11 +15,15 @@ import org.springframework.aop.framework.AdvisedSupport;
 import org.springframework.aop.framework.autoproxy.AbstractAutoProxyCreator;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
+
+import com.cgcg.context.util.AnnotationUtils;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -40,12 +45,21 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @Getter
 @Slf4j
+@Component
 public class RedisCacheAnnotationScanner extends AbstractAutoProxyCreator implements ApplicationContextAware, EnvironmentAware {
-    private MethodInterceptor interceptor;
+    @Resource
+    @Qualifier("redisCacheInterceptor")
+    private RedisCacheInterceptor interceptor;
+    @Resource
     private RedisTemplate<String, Object> redisTemplate;
-    private final boolean disable;
+    @Resource
+    private RedisCacheProperties redisCacheProperties;
+    private boolean disable;
     private ApplicationContext applicationContext;
     private Environment environment;
+
+    public RedisCacheAnnotationScanner() {
+    }
 
     public RedisCacheAnnotationScanner(RedisCacheProperties redisCacheProperties, RedisTemplate<String, Object> redisTemplate) {
         this.disable = redisCacheProperties.isDisable();
@@ -63,9 +77,7 @@ public class RedisCacheAnnotationScanner extends AbstractAutoProxyCreator implem
             return bean;
         }
         try {
-            final Class<?> serviceInterface = SpringProxyUtils.findTargetClass(bean);
-            final Class<?>[] interfacesIfJdk = SpringProxyUtils.findInterfaces(bean);
-            if (!existsAnnotation(serviceInterface) && !existsAnnotation(interfacesIfJdk)) {
+            if (!AnnotationUtils.existMethodAnn(bean, RedisCache.class) && !AnnotationUtils.existMethodAnn(bean, RedisLock.class)) {
                 return bean;
             }
             if (interceptor == null) {
@@ -108,4 +120,9 @@ public class RedisCacheAnnotationScanner extends AbstractAutoProxyCreator implem
         this.setBeanFactory(applicationContext);
     }
 
+    public void setEnvironment(Environment environment) {
+        this.environment = environment;
+        this.interceptor.setEnvironment(this.environment);
+        this.disable = redisCacheProperties.isDisable();
+    }
 }

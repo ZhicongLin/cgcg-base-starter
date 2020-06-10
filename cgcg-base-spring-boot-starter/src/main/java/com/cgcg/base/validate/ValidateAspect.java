@@ -1,18 +1,19 @@
 package com.cgcg.base.validate;
 
-import com.cgcg.base.core.exception.CommonException;
-import com.cgcg.base.validate.annotation.Validate;
-import com.cgcg.context.SpringContextHolder;
-import lombok.extern.slf4j.Slf4j;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.stereotype.Component;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import com.cgcg.base.core.exception.CommonException;
+import com.cgcg.base.validate.annotation.ParameterValidate;
+import com.cgcg.context.SpringContextHolder;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * .
@@ -22,11 +23,11 @@ import java.lang.reflect.Method;
  */
 @Slf4j
 @Aspect
-@Component
+//@Component
 public class ValidateAspect {
 
     @Around("@annotation(vldAnn)")
-    public Object specification(ProceedingJoinPoint pjp, Validate vldAnn) throws Throwable {
+    public Object specification(ProceedingJoinPoint pjp, ParameterValidate vldAnn) throws Throwable {
         final Object[] args = pjp.getArgs();
         if (args == null || args.length == 0) { //没有参数，无需对参数进行校验
             return pjp.proceed();

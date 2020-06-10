@@ -1,7 +1,8 @@
 package com.test.base.controller;
 
-import com.cgcg.base.validate.annotation.Validate;
 import org.springframework.stereotype.Service;
+
+import com.cgcg.base.validate.annotation.ParameterValidate;
 
 /**
  * .
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class TestService {
-    @Validate(value = AuthServiceImpl.class, method = "test")
+    @ParameterValidate(value = AuthServiceImpl.class, method = "test")
     public void test(String vld) {
     }
 

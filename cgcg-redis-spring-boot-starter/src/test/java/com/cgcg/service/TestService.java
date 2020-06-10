@@ -6,6 +6,7 @@ import org.cgcg.redis.core.annotation.RedisNameSpace;
 import org.cgcg.redis.core.enums.RedisExecuteType;
 import org.springframework.stereotype.Service;
 
+
 /**
  * .
  *
@@ -21,7 +22,7 @@ public class TestService {
         return new User("哈哈", key);
     }
 
-    @RedisCache(key = "#user.code", expire = "30", type = RedisExecuteType.UPDATE, lock = true)
+    @RedisCache(key = "#user.code", expire = "30", type = RedisExecuteType.FLUSH, lock = true)
     public User update(User user) {
         return new User(user.getName() + "asd", "sdf");
     }
