@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.cgcg.redis.core.RedisCacheProperties;
+import org.cgcg.redis.core.interceptor.RedisCacheInterceptor;
 import org.cgcg.redis.core.util.SpringProxyUtils;
 import org.springframework.aop.Advisor;
 import org.springframework.aop.TargetSource;
@@ -49,7 +50,7 @@ public class RedisCacheScanner extends AbstractAutoProxyCreator implements Appli
 
     public RedisCacheScanner(RedisCacheProperties redisCacheProperties, RedisTemplate<String, Object> redisTemplate) {
         this.disable = redisCacheProperties.isDisable();
-        this.redisTemplate =redisTemplate;
+        this.redisTemplate = redisTemplate;
     }
 
     @Override
@@ -105,7 +106,8 @@ public class RedisCacheScanner extends AbstractAutoProxyCreator implements Appli
             Method[] methods = clazz.getMethods();
             for (Method method : methods) {
                 final RedisCache redisCacheAnnotation = method.getAnnotation(RedisCache.class);
-                if (redisCacheAnnotation != null) {
+                final RedisLock redisLockAnnotation = method.getAnnotation(RedisLock.class);
+                if (redisCacheAnnotation != null || redisLockAnnotation != null) {
                     return true;
                 }
             }

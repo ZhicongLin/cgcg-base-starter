@@ -6,13 +6,17 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.StringUtils;
 import org.cgcg.redis.core.annotation.RedisCache;
+import org.cgcg.redis.core.annotation.RedisLock;
 import org.cgcg.redis.core.annotation.RedisNameSpace;
 import org.cgcg.redis.core.entity.RedisCacheHandle;
+import org.cgcg.redis.core.util.SpelUtils;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.core.BridgeMethodResolver;
 import org.springframework.core.env.Environment;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.ClassUtils;
+
+import com.alibaba.fastjson.JSON;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -50,14 +54,28 @@ public abstract class AbstractRedisCacheInterceptor implements MethodInterceptor
         Method specificMethod = ClassUtils.getMostSpecificMethod(methodInvocation.getMethod(), targetClass);
         final Method method = BridgeMethodResolver.findBridgedMethod(specificMethod);
         final RedisCache redisCacheAnnotation = method.getAnnotation(RedisCache.class);
-        if (disable || redisCacheAnnotation == null) {
+        final RedisLock redisLockAnnotation = method.getAnnotation(RedisLock.class);
+        if (disable || (redisCacheAnnotation == null && redisLockAnnotation == null)) {
             return methodInvocation.proceed();
         }
-        return invoke(methodInvocation, redisCacheAnnotation);
+        if (redisCacheAnnotation != null) {
+            return invoke(methodInvocation, redisCacheAnnotation);
+        }
+        return invoke(methodInvocation, redisLockAnnotation);
     }
+    /**
+     * 执行缓存操作
+     *
+     * @param methodInvocation
+     * @param redisLockAnnotation
+     * @return
+     * @throws Throwable
+     */
+    public abstract Object invoke(MethodInvocation methodInvocation, RedisLock redisLockAnnotation) throws Throwable;
 
     /**
      * 执行缓存操作
+     *
      * @param methodInvocation
      * @param redisCacheAnnotation
      * @return
@@ -115,6 +133,22 @@ public abstract class AbstractRedisCacheInterceptor implements MethodInterceptor
             return null;
         }
         return new RedisCacheHandle(nameSpace.cache(), "", this.getExpireTime(nameSpace.expire()), nameSpace.unit(), null, false);
+    }
+    /**
+     * 获取缓存锁key
+     *
+     * @param method
+     * @param args
+     * @return
+     */
+    protected static String getLockKey(RedisLock redisLock, Method method, Object[] args) {
+        String lockKey = redisLock.key();
+        if (StringUtils.isBlank(lockKey)) {
+            lockKey = JSON.toJSONString(args);
+        } else if (lockKey.contains("#")) {
+            lockKey = SpelUtils.parse(method.getDeclaringClass().getName(), lockKey, method, args);
+        }
+        return method.getDeclaringClass().getName() + "." + method.getName() + "::" + lockKey;
     }
 
 }

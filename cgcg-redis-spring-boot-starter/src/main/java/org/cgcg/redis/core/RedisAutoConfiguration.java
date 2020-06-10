@@ -4,6 +4,7 @@ import javax.annotation.Resource;
 
 import org.cgcg.redis.core.annotation.RedisCacheAnnotationScanner;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
@@ -29,15 +30,14 @@ import lombok.extern.slf4j.Slf4j;
  * @date 2020/6/5
  */
 @Slf4j
+@Configuration
 public class RedisAutoConfiguration {
     @Resource
     private RedisCacheProperties redisCacheProperties;
-    @Resource
-    private RedisTemplate<String, Object> redisTemplate;
 
     @Bean
-    public RedisCacheAnnotationScanner getRedisCacheScanner() {
-        return new RedisCacheAnnotationScanner(redisCacheProperties, redisTemplate);
+    public RedisCacheAnnotationScanner getRedisCacheScanner(RedisConnectionFactory factory) {
+        return new RedisCacheAnnotationScanner(redisCacheProperties, redisTemplate(factory));
     }
 
     @Bean

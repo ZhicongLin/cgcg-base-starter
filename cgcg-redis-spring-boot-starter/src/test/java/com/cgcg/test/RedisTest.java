@@ -1,5 +1,7 @@
 package com.cgcg.test;
 
+import java.util.concurrent.ExecutorService;
+
 import javax.annotation.Resource;
 
 import org.cgcg.redis.core.RedisHelper;
@@ -24,6 +26,8 @@ public class RedisTest {
     private TestService testService;
     @Resource
     private RedisHelper redisHelper;
+    @Resource
+    private ExecutorService executorService;
     @GetMapping("/")
     public Object test() {
        return "hello";
@@ -40,6 +44,14 @@ public class RedisTest {
         System.out.println("s = " + s);
         User ser = testService.getSer(key);
         String s1 = JSON.toJSONString(ser);
+
+        for (int i = 0; i < 10; i++) {
+            final int index = i;
+            executorService.execute(()->{
+                final User user = testService.lockTest(key);
+                System.out.println(index + "user = " + user);
+            });
+        }
         return  s1;
     }
     @PostMapping("/get")

@@ -17,6 +17,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -37,7 +38,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Setter
 @Getter
-@Slf4j
+@Slf4j@Service
 public class RedisCacheAnnotationScanner extends AbstractAutoProxyCreator implements ApplicationContextAware, EnvironmentAware {
     private MethodInterceptor interceptor;
     private RedisTemplate<String, Object> redisTemplate;
