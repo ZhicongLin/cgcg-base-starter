@@ -34,14 +34,13 @@ public class RestBuilderProcessor implements BuilderCallBack {
         final Object fallbackBean = proceeding.getInstance();
         final Object[] args = proceeding.getArguments();
         final long start = System.currentTimeMillis();
-        final RestBuilder builder = RestBuilder.getInstance(proceeding);
         final boolean valid = validateFallback(method, fallbackBean, start);
         try {
             if (valid) {
                 proceeding.getLogger().info("RestClient Hit Fallback.");
                 return FALL_BACK_RESULT.get(fallbackBean).get(method);
             }
-            return builder.addArgs(args).execute(REST_BUILDER_PROCESSOR);
+            return RestBuilder.execute(proceeding, args, REST_BUILDER_PROCESSOR);
         } catch (Exception e) {
             if (fallbackBean != null) {
                 return fallback(method, args, fallbackBean, start, valid);

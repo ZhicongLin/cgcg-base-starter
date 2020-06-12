@@ -1,5 +1,6 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
       com.cgcg.rest.RestClientsRegistrar,\
+      com.cgcg.rest.RestClientRunner,\
       com.cgcg.rest.exception.RestExceptionHandlerAdvice,\
       com.cgcg.rest.http.RestTemplateConfigure,\
       com.cgcg.rest.http.RestTemplateFactory,\

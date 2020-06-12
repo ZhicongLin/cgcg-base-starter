@@ -83,7 +83,7 @@ public abstract class RedisTask {
             this.fixedTime = fixedTime;
         }
         if (async) {
-            final ExecutorService cacheExecutor = SpringContextHolder.getBean(ExecutorService.class);
+            final ExecutorService cacheExecutor = SpringContextHolder.getBean("cacheExecutor");
             cacheExecutor.execute(this::build);
         } else {
             build();

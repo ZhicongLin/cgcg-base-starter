@@ -1,14 +1,11 @@
 package com.cgcg.base.core.context;
 
-import com.cgcg.base.core.enums.FormatProperty;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
-/**
- * @author lnj
- * createTime 2018-11-07 22:37
- **/
+import com.cgcg.base.core.enums.FormatProperty;
+
 @Component
 public class ApplicationRunnerImpl implements ApplicationRunner {
     @Override

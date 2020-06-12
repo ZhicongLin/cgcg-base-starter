@@ -1,29 +1,32 @@
 package com.cgcg.rest.http;
 
-import com.cgcg.rest.MappingProcessor;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.core.env.Environment;
+import org.springframework.http.HttpMethod;
+
 import com.cgcg.context.SpringContextHolder;
+import com.cgcg.rest.MappingProcessor;
 import com.cgcg.rest.URLUtils;
 import com.cgcg.rest.annotation.DynamicMapping;
 import com.cgcg.rest.annotation.MappingFilter;
 import com.cgcg.rest.annotation.RestClient;
+import com.cgcg.rest.exception.RestBuilderException;
 import com.cgcg.rest.filter.RestFilter;
 import com.cgcg.rest.param.RestHandle;
 import com.cgcg.rest.param.RestParamUtils;
 import com.cgcg.rest.proxy.BuilderCallBack;
 import com.cgcg.rest.proxy.Proceeding;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.core.env.Environment;
-import org.springframework.http.HttpMethod;
-
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 
 /**
  * Rest请求建立者.
@@ -42,7 +45,7 @@ public final class RestBuilder {
     private static final String SEPARATOR = ".";
     private static final String HOST = "host";
     private static final String PORT = "port";
-    private static volatile Map<Method, RestBuilder> builderMap = new HashMap<>();
+    private static final Map<String, RestBuilder> REST_BUILDER_CONTEXT = new HashMap<>();
 
     private Method method;
 
@@ -60,19 +63,58 @@ public final class RestBuilder {
 
     private String methodLogger;
 
+    /**
+     * 执行http请求
+     *
+     * @param call
+     * @return
+     */
+    public static Object execute(Proceeding proceeding, Object[] args, BuilderCallBack call) {
+        final RestBuilder restBuilder = RestBuilder.getInstance(proceeding).addArgs(args);
+        restBuilder.params.setHttpMethod(restBuilder.httpMethod);
+        if (restBuilder.filter != null) {
+            restBuilder.filter.postServer(restBuilder.url, restBuilder.httpMethod,
+                    restBuilder.params, restBuilder.params.getHeaders(), restBuilder.method.getReturnType());
+        }
+        final Object result = call.execute(restBuilder.method, restBuilder.args, restBuilder.url, restBuilder.params);
+        if (restBuilder.filter != null) {
+            return restBuilder.filter.end(result, restBuilder.method.getReturnType());
+        }
+        return result;
+    }
+
+    /**
+     * 初始化方法操作
+     * @param proceeding
+     * @return
+     */
     public static RestBuilder getInstance(Proceeding proceeding) {
-        final Method method = proceeding.getMethod();
-        RestBuilder restBuilder = builderMap.get(method);
-        if (restBuilder == null) {
-            synchronized (RestBuilder.class) {
-                restBuilder = builderMap.get(method);
-                if (restBuilder == null) {
-                    restBuilder = new RestBuilder(method);
-                    restBuilder.setMethodLogger(proceeding.getLogName());
+        return getInstance(proceeding.getMethod(), proceeding.getLogName());
+    }
+
+    /**
+     * 初始化方法操作
+     * @param method
+     * @return
+     */
+    public static RestBuilder getInstance(Method method, String logName) {
+        RestBuilder restBuilder = REST_BUILDER_CONTEXT.get(logName);
+        if (restBuilder != null) {
+            return restBuilder;
+        }
+        synchronized (REST_BUILDER_CONTEXT) {
+            restBuilder = REST_BUILDER_CONTEXT.get(logName);
+            if (restBuilder == null) {
+                try {
+                    restBuilder = new RestBuilder(method, logName);
+                    REST_BUILDER_CONTEXT.put(logName, restBuilder);
+                    log.debug("Builder Rest Http Method '{}'", logName);
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
                 }
             }
+            return restBuilder;
         }
-        return restBuilder;
     }
 
     /**
@@ -80,8 +122,9 @@ public final class RestBuilder {
      *
      * @param method
      */
-    private RestBuilder(Method method) {
+    private RestBuilder(Method method, String methodLogger) {
         this.method = method;
+        this.methodLogger = methodLogger;
         this.buildFilter(method);
         this.initURI(method);
         this.builderSchema();
@@ -93,19 +136,19 @@ public final class RestBuilder {
      * @param args
      * @return
      */
-    public RestBuilder addArgs(Object[] args) {
+    private RestBuilder addArgs(Object[] args) {
         if (args == null) {
             return this;
         }
         this.args = args;
-        if (method.getDeclaredAnnotation(DynamicMapping.class) != null) {
+        if (this.method.getDeclaredAnnotation(DynamicMapping.class) != null) {
             for (Object parameter : this.args) {
                 if (parameter instanceof HttpMethod) {
                     this.httpMethod = (HttpMethod) parameter;
                 }
             }
         }
-        this.params = RestParamUtils.getRestParam(method, args, url);
+        this.params = RestParamUtils.getRestParam(this.method, args, this.url);
         this.buildHeader();
         return this;
     }
@@ -148,12 +191,15 @@ public final class RestBuilder {
      * @param method
      */
     private void initURI(Method method) {
-        RestClient restClient = method.getDeclaringClass().getAnnotation(RestClient.class);
+        final RestClient restClient = method.getDeclaringClass().getAnnotation(RestClient.class);
         this.url = StringUtils.isNotBlank(restClient.url()) ? this.getUrlProperties(restClient) : this.getProperties(restClient.value());
         final MappingProcessor.MappingHandle handle = MappingProcessor.execute(method);
         if (handle != null) {
             this.httpMethod = handle.getHttpMethod();
             this.url = URLUtils.add(url, handle.getValue());
+        } else {
+            final String message = String.format("Builder Rest Http Method '%s' Cannot Found Mapping.", this.methodLogger);
+            throw new RestBuilderException(message);
         }
     }
 
@@ -179,32 +225,22 @@ public final class RestBuilder {
         return httpString + host + (StringUtils.isNotBlank(port) ? ":" + port : "");
     }
 
-    public Object execute(BuilderCallBack call) {
-        params.setHttpMethod(this.httpMethod);
-        if (this.filter != null) {
-            this.filter.postServer(url, httpMethod, params, params.getHeaders(), method.getReturnType());
-        }
-        final Object result = call.execute(method, args, url, this.params);
-        if (this.filter != null) {
-            return this.filter.end(result, method.getReturnType());
-        }
-        return result;
-    }
-
-
+    /**
+     * 处理http前缀
+     */
     private void builderSchema() {
-        String schema = "http://";
-        if (isHttps) {
-            schema = "https://";
+        final String http = HTTP + HTTP_SEPARATOR;
+        final String https = HTTPS + HTTP_SEPARATOR;
+        final String schema = this.isHttps ? https : http;
+        if (this.url.toLowerCase().startsWith(schema)) {
+            return;
         }
-        if (!this.url.toLowerCase().startsWith(schema)) {
-            if (this.url.toLowerCase().startsWith("http://")) {
-                this.url = this.url.replace("http://", schema);
-            } else if (this.url.toLowerCase().startsWith("https://")) {
-                this.url = this.url.replace("https://", schema);
-            } else {
-                this.url = schema + this.url;
-            }
+        if (this.url.toLowerCase().startsWith(http)) {
+            this.url = this.url.replace(http, schema);
+        } else if (this.url.toLowerCase().startsWith(https)) {
+            this.url = this.url.replace(https, schema);
+        } else {
+            this.url = schema + this.url;
         }
     }
 }

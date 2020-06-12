@@ -1,15 +1,26 @@
 package com.cgcg.rest.http;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.cgcg.rest.URLUtils;
-import com.cgcg.rest.exception.ErrorFactory;
-import com.cgcg.rest.exception.RestException;
-import com.cgcg.rest.param.RestHandle;
-import lombok.extern.slf4j.Slf4j;
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -18,13 +29,14 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.*;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.cgcg.rest.URLUtils;
+import com.cgcg.rest.exception.ErrorFactory;
+import com.cgcg.rest.exception.RestException;
+import com.cgcg.rest.param.RestHandle;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * RestTemplate
@@ -142,7 +154,7 @@ public class RestTemplateFactory {
      * @date 2017/11/15 10:50
      */
     private RestException httpErrorMsg(HttpServerErrorException e) {
-        log.error("服务异常原始信息：{}" , e.getResponseBodyAsString(), e);
+        log.error(e.getResponseBodyAsString(), e);
         // 异常码
         int errorCode = e.getRawStatusCode();
         // 异常消息
