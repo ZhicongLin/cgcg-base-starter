@@ -28,13 +28,13 @@ public class RedisTest {
     @Resource
     private ExecutorService executorService;
     @GetMapping("/")
-    public Object test() {
+    public Object test(String key) {
        return "hello";
     }
 
     @GetMapping("/get")
-    public Object get() {
-        String key = "keys";
+    public Object get(String key) {
+        key = "keys";
         for (int i = 0; i < 10; i++) {
             testService.getSer(key + i);
         }
@@ -49,13 +49,13 @@ public class RedisTest {
         return  testService.getSer(key);
     }
     @PostMapping("/get")
-    public User pu() {
-        String key = "test-key";
+    public User pu(String key) {
+        key = "test-key";
         return testService.update(new User("u", "keys"));
     }
     @DeleteMapping("/get")
-    public int de() {
-        String key = "test-key";
+    public int de(String key) {
+         key = "test-key";
         return testService.delete(new User("u", "keys"));
     }
 }

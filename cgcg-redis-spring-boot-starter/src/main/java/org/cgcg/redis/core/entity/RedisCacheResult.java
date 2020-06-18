@@ -1,5 +1,6 @@
 package org.cgcg.redis.core.entity;
 
+import lombok.Builder;
 import lombok.Data;
 
 /**
@@ -16,7 +17,8 @@ import lombok.Data;
  * @date 2020/6/5
  */
 @Data
+@Builder
 public class RedisCacheResult {
     private Object result;
-    private boolean invoke;
+    private boolean executeMethod;
 }

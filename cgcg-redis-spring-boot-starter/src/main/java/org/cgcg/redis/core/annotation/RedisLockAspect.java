@@ -11,6 +11,8 @@ import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import lombok.val;
+
 /**
  * Description: 缓存aop
  *
@@ -35,16 +37,15 @@ public class RedisLockAspect {
 
     @Around(value = "@annotation(redisLock)")
     public Object round(ProceedingJoinPoint proceedingJoinPoint, RedisLock redisLock) throws Throwable {
-        final Object[] args = proceedingJoinPoint.getArgs();
+        val key = redisLock.key();
         try {
-            final boolean lock = redisHelper.lock(redisLock.key(), redisLock.time());
-            if (lock) {
-                return proceedingJoinPoint.proceed(args);
+            if (redisHelper.lock(key, redisLock.time())) {
+                return proceedingJoinPoint.proceed(proceedingJoinPoint.getArgs());
             }
             throw new RedisLockException();
         } finally {
             if (redisLock.unlock()) {
-                redisHelper.delete(redisLock.key());
+                redisHelper.delete(key);
             }
         }
     }

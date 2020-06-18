@@ -12,7 +12,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Documented
-public @interface ParameterValidate {
+public @interface MethodValidate {
 
     Class<?> value();
 

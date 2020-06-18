@@ -3,6 +3,7 @@ server:
 logging:
   level:
     com.cgcg: debug
+    org.springframework: debug
 cgcg:
   rest:
     fallback:

@@ -10,7 +10,7 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
 import com.cgcg.base.core.exception.CommonException;
-import com.cgcg.base.validate.annotation.ParameterValidate;
+import com.cgcg.base.validate.annotation.MethodValidate;
 import com.cgcg.context.SpringContextHolder;
 
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ValidateAspect {
 
     @Around("@annotation(vldAnn)")
-    public Object specification(ProceedingJoinPoint pjp, ParameterValidate vldAnn) throws Throwable {
+    public Object specification(ProceedingJoinPoint pjp, MethodValidate vldAnn) throws Throwable {
         final Object[] args = pjp.getArgs();
         if (args == null || args.length == 0) { //没有参数，无需对参数进行校验
             return pjp.proceed();

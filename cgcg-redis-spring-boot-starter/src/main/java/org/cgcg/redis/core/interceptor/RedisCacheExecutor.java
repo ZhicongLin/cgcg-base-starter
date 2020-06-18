@@ -1,16 +1,15 @@
 package org.cgcg.redis.core.interceptor;
 
-import org.cgcg.redis.core.annotation.RedisCache;
 import org.cgcg.redis.core.entity.RedisCacheMethod;
 import org.cgcg.redis.core.entity.RedisCacheResult;
 import org.cgcg.redis.core.entity.RedisHitRate;
 import org.cgcg.redis.core.enums.RedisExecuteType;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 
 import com.alibaba.fastjson.JSON;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 /**
  * Description: 缓存执行器
@@ -38,22 +37,20 @@ public class RedisCacheExecutor extends AbstractRedisCacheExecutor {
      * @throws Throwable
      */
     public static RedisCacheResult beforeMethodInvoke(RedisTemplate<String, Object> redisTemplate, RedisCacheMethod rcm) {
-        final RedisCacheResult redisCacheResult = new RedisCacheResult();
-        final RedisCache redisCache = rcm.getRedisCache();
-        final String cacheKey = getCacheKey(rcm, rcm.getMethod(), rcm.getArgs());
-        final ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
-
-        final Object result = valueOperations.get(cacheKey);
+        val redisCache = rcm.getRedisCache();
+        val cacheKey = getCacheKey(rcm, rcm.getMethod(), rcm.getArgs());
+        val valueOperations = redisTemplate.opsForValue();
+        val result = valueOperations.get(cacheKey);
         //SELECT， 有缓存，则不执行方法返回缓存结果，无缓存则执行方法
+        val builder = RedisCacheResult.builder();
         if (result == null) {
-            redisCacheResult.setInvoke(true);
-        } else {
-            RedisHitRate.addHitCount(cacheKey, redisTemplate);
-            log.info("Hit Redis Cache [{}], Rate {} .", cacheKey, RedisHitRate.getRate(cacheKey, redisTemplate));
-            final Class<?> returnType = rcm.getReturnType();
-            redisCacheResult.setResult(JSON.parseObject(result.toString(), returnType));
+            return builder.executeMethod(true).build();
         }
-        return redisCacheResult;
+        RedisHitRate.addHitCount(cacheKey, redisTemplate);
+        log.info("Hit Redis Cache [{}], Rate {} .", cacheKey, RedisHitRate.getRate(cacheKey, redisTemplate));
+
+        val object = JSON.parseObject(result.toString(), rcm.getReturnType());
+        return builder.executeMethod(false).result(object).build();
     }
 
 
@@ -66,8 +63,8 @@ public class RedisCacheExecutor extends AbstractRedisCacheExecutor {
      * @throws Throwable
      */
     public static void afterMethodInvoke(RedisTemplate<String, Object> redisTemplate, Object result, RedisCacheMethod rcm) {
-        final RedisCache redisCache = rcm.getRedisCache();
-        final String cacheKey = getCacheKey(rcm, rcm.getMethod(), rcm.getArgs());
+        val redisCache = rcm.getRedisCache();
+        val cacheKey = getCacheKey(rcm, rcm.getMethod(), rcm.getArgs());
 
         if (!RedisExecuteType.SELECT.equals(redisCache.type())) {
             return;

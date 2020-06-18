@@ -17,6 +17,7 @@ import com.alibaba.fastjson.JSON;
 import com.cgcg.context.SpringContextHolder;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.var;
 
 /**
  * Description: 缓存执行器
@@ -93,7 +94,7 @@ public class AbstractRedisCacheExecutor {
          * @param callback
          */
         public static void async(Callback callback, String key) {
-            final RedisHelper redisHelper = SpringContextHolder.getBean(RedisHelper.class);
+            var redisHelper = SpringContextHolder.getBean(RedisHelper.class);
             RedisTask.executeAsync(redisHelper, key, callback);
         }
     }

@@ -1,10 +1,7 @@
 package org.cgcg.redis.core.interceptor;
 
-import java.util.Set;
-
 import org.apache.commons.lang3.StringUtils;
 import org.cgcg.redis.core.RedisHelper;
-import org.cgcg.redis.core.annotation.RedisCache;
 import org.cgcg.redis.core.entity.Callback;
 import org.cgcg.redis.core.entity.RedisCacheMethod;
 import org.cgcg.redis.core.entity.RedisCacheResult;
@@ -15,6 +12,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import com.cgcg.context.SpringContextHolder;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 /**
  * Description: 缓存执行器
@@ -42,9 +40,7 @@ public class RedisCacheModifyExecutor extends AbstractRedisCacheExecutor {
      * @throws Throwable
      */
     public static RedisCacheResult beforeMethodInvoke(RedisTemplate<String, Object> redisTemplate, RedisCacheMethod rcm) {
-        final RedisCacheResult redisCacheResult = new RedisCacheResult();
-        redisCacheResult.setInvoke(true);
-        return redisCacheResult;
+        return RedisCacheResult.builder().executeMethod(true).build();
     }
 
     /**
@@ -56,8 +52,8 @@ public class RedisCacheModifyExecutor extends AbstractRedisCacheExecutor {
      * @throws Throwable
      */
     public static void afterMethodInvoke(RedisTemplate<String, Object> redisTemplate, Object result,  RedisCacheMethod rcm) {
-        final RedisCache redisCache = rcm.getRedisCache();
-        final String cacheKey = getCacheKey(rcm, rcm.getMethod(), rcm.getArgs());
+        val redisCache = rcm.getRedisCache();
+        val cacheKey = getCacheKey(rcm, rcm.getMethod(), rcm.getArgs());
         if (RedisExecuteType.DELETE.equals(redisCache.type())) {
             //DELETE，删除缓存
             if (redisCache.lock()) {
@@ -82,12 +78,12 @@ public class RedisCacheModifyExecutor extends AbstractRedisCacheExecutor {
      */
     private static void flushCache(RedisTemplate<String, Object> redisTemplate, RedisCacheMethod rcm) {
 
-        final String cache = rcm.getCache();
+        val cache = rcm.getCache();
         if (StringUtils.isBlank(cache)) {
             log.error("Redis Cache FLUSH Error, @RedisCache.cache Value cannot be empty");
             return;
         }
-        final Set<String> keys = redisTemplate.keys(cache + "_CHN::*");
+        val keys = redisTemplate.keys(cache + "_CHN::*");
         if (keys != null && !keys.isEmpty()) {
             //清空缓存数据
             if (rcm.getRedisCache().lock()) {
@@ -107,7 +103,7 @@ public class RedisCacheModifyExecutor extends AbstractRedisCacheExecutor {
          * @param callback
          */
         public static void async(Callback callback, String key) {
-            final RedisHelper redisHelper = SpringContextHolder.getBean(RedisHelper.class);
+            val redisHelper = SpringContextHolder.getBean(RedisHelper.class);
             RedisTask.executeAsync(redisHelper, key, callback);
         }
     }

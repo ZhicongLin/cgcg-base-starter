@@ -12,6 +12,5 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
     com.cgcg.base.swagger.SwaggerInterceptorConfig,\
     com.cgcg.base.core.context.ApplicationRunnerImpl,\
     com.cgcg.base.core.exception.ExceptionHandlerAdvice,\
-    com.cgcg.base.validate.ValidateAnnotationScanner,\
-    com.cgcg.base.validate.ValidateInterceptor
+    com.cgcg.base.validate.ValidateAnnotationScanner
 

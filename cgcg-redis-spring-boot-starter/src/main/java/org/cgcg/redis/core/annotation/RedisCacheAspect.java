@@ -1,7 +1,5 @@
 package org.cgcg.redis.core.annotation;
 
-import java.lang.reflect.Method;
-
 import javax.annotation.Resource;
 
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -19,6 +17,9 @@ import org.springframework.core.env.Environment;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import lombok.Setter;
+import lombok.val;
+
 /**
  * Description: 缓存aop
  *
@@ -32,6 +33,7 @@ import org.springframework.stereotype.Component;
  * </pre>
  * @date 2020/6/10
  */
+@Setter
 @Aspect
 @Component
 public class RedisCacheAspect implements EnvironmentAware {
@@ -42,11 +44,11 @@ public class RedisCacheAspect implements EnvironmentAware {
 
     @Around(value = "@annotation(redisCache)")
     public Object round(ProceedingJoinPoint proceedingJoinPoint, RedisCache redisCache) throws Throwable {
-        final Object[] args = proceedingJoinPoint.getArgs();
-        final MethodSignature signature = (MethodSignature) proceedingJoinPoint.getSignature();
-        final Method method = signature.getMethod();
-        final long expireTime = SpelUtils.getExpireTime(redisCache.expire(), environment);
-        final RedisCacheMethod rcm = RedisCacheMethod.build(proceedingJoinPoint, redisCache, environment);
+        val args = proceedingJoinPoint.getArgs();
+        val signature = (MethodSignature) proceedingJoinPoint.getSignature();
+        val method = signature.getMethod();
+        val expireTime = SpelUtils.getExpireTime(redisCache.expire(), environment);
+        val rcm = RedisCacheMethod.build(proceedingJoinPoint, redisCache, environment);
         //方法执行前查询缓存，并判断是否需要执行方法
         RedisCacheResult cacheResult;
         if (redisCache.type().equals(RedisExecuteType.SELECT)) {
@@ -54,21 +56,17 @@ public class RedisCacheAspect implements EnvironmentAware {
         } else {
             cacheResult = RedisCacheModifyExecutor.beforeMethodInvoke(redisTemplate, rcm);
         }
-        Object result = cacheResult.getResult();
-        if (cacheResult.isInvoke()) {
-            result = proceedingJoinPoint.proceed(args);
-            //方法执行后操作缓存
-            if (redisCache.type().equals(RedisExecuteType.SELECT)) {
-                RedisCacheExecutor.afterMethodInvoke(redisTemplate, result, rcm);
-            } else {
-                RedisCacheModifyExecutor.afterMethodInvoke(redisTemplate, result, rcm);
-            }
+        if (!cacheResult.isExecuteMethod()) {
+            return cacheResult.getResult();
+        }
+        val result = proceedingJoinPoint.proceed(args);
+        //方法执行后操作缓存
+        if (redisCache.type().equals(RedisExecuteType.SELECT)) {
+            RedisCacheExecutor.afterMethodInvoke(redisTemplate, result, rcm);
+        } else {
+            RedisCacheModifyExecutor.afterMethodInvoke(redisTemplate, result, rcm);
         }
         return result;
     }
 
-    @Override
-    public void setEnvironment(Environment environment) {
-        this.environment = environment;
-    }
 }
