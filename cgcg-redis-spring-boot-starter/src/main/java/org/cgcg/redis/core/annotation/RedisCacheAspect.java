@@ -1,5 +1,7 @@
 package org.cgcg.redis.core.annotation;
 
+import java.lang.reflect.Method;
+
 import javax.annotation.Resource;
 
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -9,15 +11,16 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.cgcg.redis.core.entity.RedisCacheMethod;
 import org.cgcg.redis.core.entity.RedisCacheResult;
 import org.cgcg.redis.core.enums.RedisExecuteType;
+import org.cgcg.redis.core.interceptor.AbstractRedisCacheExecutor;
 import org.cgcg.redis.core.interceptor.RedisCacheExecutor;
 import org.cgcg.redis.core.interceptor.RedisCacheModifyExecutor;
-import org.cgcg.redis.core.util.SpelUtils;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 /**
@@ -33,6 +36,7 @@ import lombok.val;
  * </pre>
  * @date 2020/6/10
  */
+@Slf4j
 @Setter
 @Aspect
 @Component
@@ -43,12 +47,14 @@ public class RedisCacheAspect implements EnvironmentAware {
     private Environment environment;
 
     @Around(value = "@annotation(redisCache)")
-    public Object round(ProceedingJoinPoint proceedingJoinPoint, RedisCache redisCache) throws Throwable {
-        val args = proceedingJoinPoint.getArgs();
-        val signature = (MethodSignature) proceedingJoinPoint.getSignature();
-        val method = signature.getMethod();
-        val expireTime = SpelUtils.getExpireTime(redisCache.expire(), environment);
-        val rcm = RedisCacheMethod.build(proceedingJoinPoint, redisCache, environment);
+    public Object round(ProceedingJoinPoint pjp, RedisCache redisCache) throws Throwable {
+        if (!AbstractRedisCacheExecutor.connection) {
+            log.warn("Miss Redis Cache Server Connection");
+            return pjp.proceed(pjp.getArgs());
+        }
+        final Method method = ((MethodSignature) pjp.getSignature()).getMethod();
+        final RedisCacheMethod rcm = new RedisCacheMethod(method, pjp.getArgs(), environment, redisCache);
+
         //方法执行前查询缓存，并判断是否需要执行方法
         RedisCacheResult cacheResult;
         if (redisCache.type().equals(RedisExecuteType.SELECT)) {
@@ -59,7 +65,7 @@ public class RedisCacheAspect implements EnvironmentAware {
         if (!cacheResult.isExecuteMethod()) {
             return cacheResult.getResult();
         }
-        val result = proceedingJoinPoint.proceed(args);
+        val result = pjp.proceed(rcm.getArgs());
         //方法执行后操作缓存
         if (redisCache.type().equals(RedisExecuteType.SELECT)) {
             RedisCacheExecutor.afterMethodInvoke(redisTemplate, result, rcm);

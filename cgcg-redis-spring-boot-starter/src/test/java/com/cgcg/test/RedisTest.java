@@ -1,5 +1,7 @@
 package com.cgcg.test;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 import javax.annotation.Resource;
@@ -35,18 +37,13 @@ public class RedisTest {
     @GetMapping("/get")
     public Object get(String key) {
         key = "keys";
+        List<User> users = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            testService.getSer(key + i);
+            final User ser = testService.getSer(key + i);
+            users.add(ser);
         }
 
-       /*for (int i = 0; i < 30; i++) {
-            final int index = i;
-            executorService.execute(()->{
-                final User user = testService.lockTest(key);
-                System.out.println(index + "user = " + user);
-            });
-        }*/
-        return  testService.getSer(key);
+        return  users;
     }
     @PostMapping("/get")
     public User pu(String key) {

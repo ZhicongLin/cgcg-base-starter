@@ -27,8 +27,6 @@ import lombok.val;
 @Slf4j
 public class RedisCacheExecutor extends AbstractRedisCacheExecutor {
 
-    private static final String KEY_TEMP = "%s::%s(%s)";
-
     /**
      * 在方法执行之前执行
      *
@@ -38,19 +36,30 @@ public class RedisCacheExecutor extends AbstractRedisCacheExecutor {
      */
     public static RedisCacheResult beforeMethodInvoke(RedisTemplate<String, Object> redisTemplate, RedisCacheMethod rcm) {
         val redisCache = rcm.getRedisCache();
-        val cacheKey = getCacheKey(rcm, rcm.getMethod(), rcm.getArgs());
-        val valueOperations = redisTemplate.opsForValue();
-        val result = valueOperations.get(cacheKey);
+        val cacheKey = rcm.getKey();
         //SELECT， 有缓存，则不执行方法返回缓存结果，无缓存则执行方法
         val builder = RedisCacheResult.builder();
-        if (result == null) {
+        if (!connection) {
+            log.warn("Miss Redis Cache Server Connection");
             return builder.executeMethod(true).build();
         }
-        RedisHitRate.addHitCount(cacheKey, redisTemplate);
-        log.info("Hit Redis Cache [{}], Rate {} .", cacheKey, RedisHitRate.getRate(cacheKey, redisTemplate));
 
-        val object = JSON.parseObject(result.toString(), rcm.getReturnType());
-        return builder.executeMethod(false).result(object).build();
+        val valueOperations = redisTemplate.opsForValue();
+        try {
+            val result = valueOperations.get(cacheKey);
+            if (result == null) {
+                return builder.executeMethod(true).build();
+            }
+            RedisHitRate.addHitCount(cacheKey, redisTemplate);
+            log.info("Hit Redis Cache [{}] Rate {}", cacheKey, RedisHitRate.getRate(cacheKey, redisTemplate));
+
+            val object = JSON.parseObject(result.toString(), rcm.getReturnType());
+            return builder.executeMethod(false).result(object).build();
+        } catch (Exception e) {
+            log.warn("Miss Redis Cache Server Connection", e);
+            connection = false;
+            return builder.executeMethod(true).build();
+        }
     }
 
 
@@ -63,14 +72,21 @@ public class RedisCacheExecutor extends AbstractRedisCacheExecutor {
      * @throws Throwable
      */
     public static void afterMethodInvoke(RedisTemplate<String, Object> redisTemplate, Object result, RedisCacheMethod rcm) {
+        if (!connection) {
+            log.warn("Miss Redis Cache Server Connection");
+            return;
+        }
         val redisCache = rcm.getRedisCache();
-        val cacheKey = getCacheKey(rcm, rcm.getMethod(), rcm.getArgs());
 
         if (!RedisExecuteType.SELECT.equals(redisCache.type())) {
             return;
         }
-
-        cacheMethodResult(redisTemplate, result, redisCache, cacheKey, rcm.getExpire());
+        try {
+            cacheMethodResult(redisTemplate, result, redisCache, rcm.getKey(), rcm.getExpire());
+        } catch (Exception e) {
+            log.warn("Miss Redis Cache Server Connection", e);
+            connection = false;
+        }
     }
 
 }

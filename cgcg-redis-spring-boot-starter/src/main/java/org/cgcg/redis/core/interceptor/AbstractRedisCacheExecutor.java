@@ -1,15 +1,10 @@
 package org.cgcg.redis.core.interceptor;
 
-import java.lang.reflect.Method;
-
-import org.apache.commons.lang3.StringUtils;
 import org.cgcg.redis.core.RedisHelper;
 import org.cgcg.redis.core.annotation.RedisCache;
 import org.cgcg.redis.core.entity.Callback;
-import org.cgcg.redis.core.entity.RedisCacheMethod;
 import org.cgcg.redis.core.entity.RedisHitRate;
 import org.cgcg.redis.core.entity.RedisTask;
-import org.cgcg.redis.core.util.SpelUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 
@@ -35,10 +30,15 @@ import lombok.var;
 @Slf4j
 public class AbstractRedisCacheExecutor {
 
-    protected static final String KEY_TEMP = "%s::%s(%s)";
+    public static boolean connection = true;
 
     protected static void cacheMethodResult(RedisTemplate<String, Object> redisTemplate, Object result,
                                             RedisCache redisCache, String cacheKey, long expire) {
+
+        if (!connection) {
+            log.warn("Miss Redis Cache Server Connection");
+            return;
+        }
         final ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
 
         //方法执行结果为null
@@ -52,12 +52,13 @@ public class AbstractRedisCacheExecutor {
         //更新，刷新，查询，缓存方法执行结果
         if (redisCache.lock()) {
             //加锁一般放在更新操作
-            AbstractRedisCacheExecutor.AsyncTemplate.async(() -> setValue(result, redisCache, cacheKey, valueOperations, expire), redisCache.cache());
+            AsyncTemplate.async(() -> setValue(result, redisCache, cacheKey, valueOperations, expire), redisCache.cache());
         } else {
             setValue(result, redisCache, cacheKey, valueOperations, expire);
         }
         RedisHitRate.addMissCount(cacheKey, redisTemplate);
-        log.info("Redis Cache [{}] Success, Rate {}.", cacheKey, RedisHitRate.getRate(cacheKey, redisTemplate));
+        log.info("Redis Cache [{}] Success Rate {}", cacheKey, RedisHitRate.getRate(cacheKey, redisTemplate));
+
     }
 
     protected static void setValue(Object result, RedisCache redisCache, String cacheKey, ValueOperations<String, Object> valueOperations, long expire) {
@@ -67,23 +68,6 @@ public class AbstractRedisCacheExecutor {
         } else {
             valueOperations.set(cacheKey, JSON.toJSONString(result), expire, redisCache.timeUnit());
         }
-    }
-
-    /**
-     * 获取缓存key
-     *
-     * @param method
-     * @param args
-     * @return
-     */
-    protected static String getCacheKey(RedisCacheMethod rcm, Method method, Object[] args) {
-        String cacheKey = rcm.getKey();
-        if (StringUtils.isBlank(cacheKey)) {
-            cacheKey = JSON.toJSONString(args);
-        } else if (cacheKey.contains("#")) {
-            cacheKey = SpelUtils.parse(method.getDeclaringClass().getName(), cacheKey, method, args);
-        }
-        return rcm.getCache() + "_CHN::" + cacheKey;
     }
 
     static class AsyncTemplate {

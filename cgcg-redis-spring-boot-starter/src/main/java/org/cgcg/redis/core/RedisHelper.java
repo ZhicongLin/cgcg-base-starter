@@ -78,10 +78,10 @@ public class RedisHelper {
      * @date 2019/6/21
      */
     public void hset(String name, Object key, Object value, long time, TimeUnit unit) {
-        final HashOperations<String, Object, Object> hashOperations = RedisManager.getRedisTemplate().opsForHash();
+        final HashOperations<String, Object, Object> hashOperations = RedisManager.getCurrent().opsForHash();
         hashOperations.put(name, key, value);
         if (time > 0) {
-            RedisManager.getRedisTemplate().expire(name, time, unit);
+            RedisManager.getCurrent().expire(name, time, unit);
         }
     }
 
@@ -94,12 +94,12 @@ public class RedisHelper {
     }
 
     public Object hget(String name, Object key) {
-        final HashOperations<String, Object, Object> hashOperations = RedisManager.getRedisTemplate().opsForHash();
+        final HashOperations<String, Object, Object> hashOperations = RedisManager.getCurrent().opsForHash();
         return hashOperations.get(name, key);
     }
 
     public List<Object> hgetList(String name) {
-        final HashOperations<String, Object, Object> hashOperations = RedisManager.getRedisTemplate().opsForHash();
+        final HashOperations<String, Object, Object> hashOperations = RedisManager.getCurrent().opsForHash();
         return hashOperations.values(name);
     }
 
@@ -114,7 +114,7 @@ public class RedisHelper {
      * @date 2019/6/21
      */
     public void set(String key, Object value, long time, TimeUnit unit) {
-        final ValueOperations<String, Object> opsForValue = RedisManager.getRedisTemplate().opsForValue();
+        final ValueOperations<String, Object> opsForValue = RedisManager.getCurrent().opsForValue();
         opsForValue.set(key, value, time, unit);
     }
 
@@ -123,16 +123,16 @@ public class RedisHelper {
     }
 
     public Object get(String key) {
-        return RedisManager.getRedisTemplate().opsForValue().get(key);
+        return RedisManager.getCurrent().opsForValue().get(key);
     }
 
     public void rpush(String key, Object value) {
-        RedisManager.getRedisTemplate().opsForList().rightPushAll(key, value);
-        RedisManager.getRedisTemplate().expire(key, DEFAULT_EXPIRE, DEFAULT_TIME_UNIT);
+        RedisManager.getCurrent().opsForList().rightPushAll(key, value);
+        RedisManager.getCurrent().expire(key, DEFAULT_EXPIRE, DEFAULT_TIME_UNIT);
     }
 
     public Object lpop(String key) {
-        return RedisManager.getRedisTemplate().opsForList().leftPop(key);
+        return RedisManager.getCurrent().opsForList().leftPop(key);
     }
 
     public List<Object> list(String key) {
@@ -140,27 +140,27 @@ public class RedisHelper {
     }
 
     public List<Object> list(String key, long start, long end) {
-        return RedisManager.getRedisTemplate().opsForList().range(key, start, end);
+        return RedisManager.getCurrent().opsForList().range(key, start, end);
     }
 
     public void del(String... key) {
-        RedisManager.getRedisTemplate().delete(Arrays.asList(key));
+        RedisManager.getCurrent().delete(Arrays.asList(key));
     }
 
     public void del(Collection<String> keys) {
-        RedisManager.getRedisTemplate().delete(keys);
+        RedisManager.getCurrent().delete(keys);
     }
 
     public Set<String> keys(String name) {
-        return RedisManager.getRedisTemplate().keys(name + "*");
+        return RedisManager.getCurrent().keys(name + "*");
     }
 
     public void remove(String name, Object... key) {
-        RedisManager.getRedisTemplate().opsForHash().delete(name, key);
+        RedisManager.getCurrent().opsForHash().delete(name, key);
     }
 
     public void expire(String key, long time, TimeUnit unit) {
-        RedisManager.getRedisTemplate().expire(key, time, unit);
+        RedisManager.getCurrent().expire(key, time, unit);
     }
 
 }

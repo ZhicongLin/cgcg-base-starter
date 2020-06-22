@@ -17,7 +17,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Documented
-public @interface RedisLock {
+public @interface Lock {
 
     String key() default "";
     /**
@@ -29,5 +29,5 @@ public @interface RedisLock {
      * true 执行结束后解锁
      * false 时间过期后解锁
      */
-    boolean unlock() default true;
+    boolean autoLock() default true;
 }

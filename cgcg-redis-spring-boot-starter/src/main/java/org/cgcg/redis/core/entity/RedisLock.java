@@ -45,7 +45,7 @@ public class RedisLock {
      * @param lockKey 锁的key
      */
     public RedisLock(String lockKey) {
-        this.redisTemplate = RedisManager.getRedisTemplate();
+        this.redisTemplate = RedisManager.getCurrent();
         this.lockKey = lockKey + LOCK_SUFFIX;
     }
 
@@ -92,24 +92,27 @@ public class RedisLock {
         }
     }
 
-    public static void lockHear(String lockKey) throws RedisLockException {
+    public static RedisLock lockHear(String lockKey) throws RedisLockException {
         final RedisLock redisLock = new RedisLock(lockKey);
         if (!redisLock.lock()) {
             throw new RedisLockException();
         }
+        return redisLock;
     }
 
-    public static void lockHear(String lockKey, long timeMillis) throws RedisLockException {
+    public static RedisLock lockHear(String lockKey, long timeMillis) throws RedisLockException {
         final RedisLock redisLock = new RedisLock(lockKey, timeMillis);
         if (!redisLock.lock()) {
             throw new RedisLockException();
         }
+        return redisLock;
     }
 
-    public static void lockHearForever(String lockKey) throws RedisLockException {
+    public static RedisLock lockHearForever(String lockKey) throws RedisLockException {
         final RedisLock redisLock = new RedisLock(lockKey);
         if (!redisLock.foreverLock()) {
             throw new RedisLockException();
         }
+        return redisLock;
     }
 }

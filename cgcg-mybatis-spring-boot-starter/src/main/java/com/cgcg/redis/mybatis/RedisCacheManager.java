@@ -80,7 +80,7 @@ public class RedisCacheManager implements Cache {
 
     public RedisTemplate<String, Object> getRedisTemplate() {
         if (redisTemplate == null) {
-            redisTemplate = RedisManager.getRedisTemplate();
+            redisTemplate = RedisManager.getCurrent();
         }
         return redisTemplate;
     }

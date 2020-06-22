@@ -25,7 +25,7 @@ public @interface RedisCache {
 
     String key() default "";
 
-    String expire() default "7200";
+    String expire() default "";
 
     TimeUnit timeUnit() default TimeUnit.SECONDS;
 

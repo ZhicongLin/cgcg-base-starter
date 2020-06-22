@@ -1,7 +1,7 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
     org.cgcg.redis.core.RedisManager,\
-    org.cgcg.redis.core.RedisCacheProperties,\
     org.cgcg.redis.core.RedisAutoConfiguration,\
+    org.cgcg.redis.core.interceptor.CheckRedisConnectionScheduled,\
     org.cgcg.redis.core.annotation.RedisLockAspect,\
     org.cgcg.redis.core.annotation.RedisCacheAspect,\
     org.cgcg.redis.core.RedisHelper

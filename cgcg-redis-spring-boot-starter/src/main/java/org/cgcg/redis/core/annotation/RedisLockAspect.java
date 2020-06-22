@@ -1,17 +1,11 @@
 package org.cgcg.redis.core.annotation;
 
-import javax.annotation.Resource;
-
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.cgcg.redis.core.RedisHelper;
-import org.cgcg.redis.core.exception.RedisLockException;
+import org.cgcg.redis.core.entity.RedisLock;
 import org.springframework.core.annotation.Order;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
-
-import lombok.val;
 
 /**
  * Description: 缓存aop
@@ -30,24 +24,16 @@ import lombok.val;
 @Aspect
 @Component
 public class RedisLockAspect {
-    @Resource
-    private RedisTemplate<String, Object> redisTemplate;
-    @Resource
-    private RedisHelper redisHelper;
 
-    @Around(value = "@annotation(redisLock)")
-    public Object round(ProceedingJoinPoint proceedingJoinPoint, RedisLock redisLock) throws Throwable {
-        val key = redisLock.key();
-        try {
-            if (redisHelper.lock(key, redisLock.time())) {
-                return proceedingJoinPoint.proceed(proceedingJoinPoint.getArgs());
-            }
-            throw new RedisLockException();
-        } finally {
-            if (redisLock.unlock()) {
-                redisHelper.delete(key);
-            }
+    @Around(value = "@annotation(lockAnnotation)")
+    public Object round(ProceedingJoinPoint proceedingJoinPoint, Lock lockAnnotation) throws Throwable {
+        final String key = lockAnnotation.key();
+        final RedisLock redisLock = RedisLock.lockHear(key, lockAnnotation.time());
+        final Object proceed = proceedingJoinPoint.proceed(proceedingJoinPoint.getArgs());
+        if (lockAnnotation.autoLock()) {
+            redisLock.unlock();
         }
+        return proceed;
     }
 
 }

@@ -1,7 +1,7 @@
 package com.cgcg.service;
 
 import org.cgcg.redis.core.annotation.RedisCache;
-import org.cgcg.redis.core.annotation.RedisLock;
+import org.cgcg.redis.core.annotation.Lock;
 import org.cgcg.redis.core.annotation.RedisNameSpace;
 import org.cgcg.redis.core.enums.RedisExecuteType;
 import org.springframework.stereotype.Service;
@@ -32,7 +32,7 @@ public class TestService {
         return 1;
     }
 
-    @RedisLock(key = "#p0", unlock = false)
+    @Lock(key = "#p0", autoLock = false)
     @RedisCache(key = "#p0", type = RedisExecuteType.SELECT)
     public User lockTest(String key) {
         return new User("haLock", key);
