@@ -10,6 +10,8 @@ import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
+import lombok.val;
+
 /**
  * 解析SPEL 表达式
  *
@@ -20,16 +22,20 @@ public class SpelUtils {
     private static final String TIME_REGEX = "^\\d+$";
     private static final long DEFAULT_EXPIRE = 7200L;
 
+    /**
+     * 解析缓存时间
+     * @param expire 参数值或者表达式
+     * @param environment properties配置参数
+     * @return
+     */
     public static long getExpireTime(String expire, Environment environment) {
         if (StringUtils.isNotBlank(expire)) {
-            final boolean matches = expire.matches(TIME_REGEX);
-            if (matches) {
+            if (expire.matches(TIME_REGEX)) {
                 return Long.parseLong(expire);
-            } else if (StringUtils.isNotBlank(expire)) {
-                final String property = environment.getProperty(expire);
-                if (property != null && property.matches(TIME_REGEX)) {
-                    return Long.parseLong(property);
-                }
+            }
+            final String property = environment.getProperty(expire);
+            if (property != null && property.matches(TIME_REGEX)) {
+                return Long.parseLong(property);
             }
         }
         return DEFAULT_EXPIRE;
@@ -37,13 +43,12 @@ public class SpelUtils {
 
     public static String parse(String spel, Method method, Object[] args) {
         //获取被拦截方法参数名列表(使用Spring支持类库)
-        LocalVariableTableParameterNameDiscoverer u =
-                new LocalVariableTableParameterNameDiscoverer();
-        String[] paraNameArr = u.getParameterNames(method);
+        val u = new LocalVariableTableParameterNameDiscoverer();
+        final String[] paraNameArr = u.getParameterNames(method);
         //使用SPEL进行key的解析
-        ExpressionParser parser = new SpelExpressionParser();
+        final ExpressionParser parser = new SpelExpressionParser();
         //SPEL上下文
-        StandardEvaluationContext context = new StandardEvaluationContext();
+        final StandardEvaluationContext context = new StandardEvaluationContext();
         //把方法参数放入SPEL上下文中
         return getString(spel, args, paraNameArr, parser, context);
     }
@@ -59,13 +64,12 @@ public class SpelUtils {
      */
     public static String parse(Object rootObject, String spel, Method method, Object[] args) {
         //获取被拦截方法参数名列表(使用Spring支持类库)
-        LocalVariableTableParameterNameDiscoverer u =
-                new LocalVariableTableParameterNameDiscoverer();
-        String[] paraNameArr = u.getParameterNames(method);
+        val u = new LocalVariableTableParameterNameDiscoverer();
+        final String[] paraNameArr = u.getParameterNames(method);
         //使用SPEL进行key的解析
-        ExpressionParser parser = new SpelExpressionParser();
+        final ExpressionParser parser = new SpelExpressionParser();
         //SPEL上下文
-        StandardEvaluationContext context = new MethodBasedEvaluationContext(rootObject, method, args, u);
+        final StandardEvaluationContext context = new MethodBasedEvaluationContext(rootObject, method, args, u);
         //把方法参数放入SPEL上下文中
         return getString(spel, args, paraNameArr, parser, context);
     }

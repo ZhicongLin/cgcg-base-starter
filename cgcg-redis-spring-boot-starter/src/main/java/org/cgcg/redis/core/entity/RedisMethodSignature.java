@@ -31,7 +31,7 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class RedisCacheMethod {
+public class RedisMethodSignature {
 
     private static final String KEY_TEMP = "chk::%s::%s";
 
@@ -53,7 +53,7 @@ public class RedisCacheMethod {
      * @param args
      * @param environment
      */
-    public RedisCacheMethod(Method method, Object[] args, Environment environment, RedisCache redisCache) {
+    public RedisMethodSignature(Method method, Object[] args, Environment environment, RedisCache redisCache) {
         this.method = method;
         this.args = args;
         this.returnType = method.getReturnType();

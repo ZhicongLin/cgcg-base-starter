@@ -11,8 +11,8 @@ import org.springframework.data.redis.core.ValueOperations;
 import com.alibaba.fastjson.JSON;
 import com.cgcg.context.SpringContextHolder;
 
+import io.lettuce.core.RedisConnectionException;
 import lombok.extern.slf4j.Slf4j;
-import lombok.var;
 
 /**
  * Description: 缓存执行器
@@ -36,8 +36,7 @@ public class AbstractRedisCacheExecutor {
                                             RedisCache redisCache, String cacheKey, long expire) {
 
         if (!connection) {
-            log.warn("Miss Redis Cache Server Connection");
-            return;
+            throw new RedisConnectionException("Miss Redis Cache Server Connection");
         }
         final ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
 
@@ -78,8 +77,7 @@ public class AbstractRedisCacheExecutor {
          * @param callback
          */
         public static void async(Callback callback, String key) {
-            var redisHelper = SpringContextHolder.getBean(RedisHelper.class);
-            RedisTask.executeAsync(redisHelper, key, callback);
+            RedisTask.executeAsync(SpringContextHolder.getBean(RedisHelper.class), key, callback);
         }
     }
 }

@@ -1,16 +1,12 @@
 package org.cgcg.redis.core.interceptor;
 
 import org.apache.commons.lang3.StringUtils;
-import org.cgcg.redis.core.RedisHelper;
-import org.cgcg.redis.core.entity.Callback;
-import org.cgcg.redis.core.entity.RedisCacheMethod;
 import org.cgcg.redis.core.entity.RedisCacheResult;
-import org.cgcg.redis.core.entity.RedisTask;
+import org.cgcg.redis.core.entity.RedisMethodSignature;
 import org.cgcg.redis.core.enums.RedisExecuteType;
 import org.springframework.data.redis.core.RedisTemplate;
 
-import com.cgcg.context.SpringContextHolder;
-
+import io.lettuce.core.RedisConnectionException;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
@@ -30,16 +26,14 @@ import lombok.val;
 @Slf4j
 public class RedisCacheModifyExecutor extends AbstractRedisCacheExecutor {
 
-    private static final String KEY_TEMP = "%s::%s(%s)";
-
     /**
      * 在方法执行之前执行
      *
      * @param redisTemplate
-     * @param rcm
+     * @param signature
      * @throws Throwable
      */
-    public static RedisCacheResult beforeMethodInvoke(RedisTemplate<String, Object> redisTemplate, RedisCacheMethod rcm) {
+    public static RedisCacheResult beforeMethodInvoke(RedisTemplate<String, Object> redisTemplate, RedisMethodSignature signature) {
         if (!connection) {
             log.warn("Miss Redis Cache Server Connection");
         }
@@ -51,17 +45,16 @@ public class RedisCacheModifyExecutor extends AbstractRedisCacheExecutor {
      *
      * @param redisTemplate
      * @param result
-     * @param rcm
+     * @param signature
      * @throws Throwable
      */
-    public static void afterMethodInvoke(RedisTemplate<String, Object> redisTemplate, Object result, RedisCacheMethod rcm) {
-        if (!connection) {
-            log.warn("Miss Redis Cache Server Connection");
-            return;
-        }
-        val redisCache = rcm.getRedisCache();
-        val cacheKey = rcm.getKey();
+    public static void afterMethodInvoke(RedisTemplate<String, Object> redisTemplate, Object result, RedisMethodSignature signature) {
         try {
+            if (!connection) {
+                throw new RedisConnectionException("Miss Redis Cache Server Connection");
+            }
+            val redisCache = signature.getRedisCache();
+            val cacheKey = signature.getKey();
             if (RedisExecuteType.DELETE.equals(redisCache.type())) {
                 //DELETE，删除缓存
                 if (redisCache.lock()) {
@@ -71,10 +64,10 @@ public class RedisCacheModifyExecutor extends AbstractRedisCacheExecutor {
                 }
             } else if (RedisExecuteType.FLUSH.equals(redisCache.type())) {
                 //FLUSH, 清理所有想用cache的缓存
-                flushCache(redisTemplate, rcm);
+                flushCache(redisTemplate, signature);
             } else {
                 //UPDATE
-                cacheMethodResult(redisTemplate, result, redisCache, rcm.getKey(), rcm.getExpire());
+                cacheMethodResult(redisTemplate, result, redisCache, signature.getKey(), signature.getExpire());
             }
         } catch (Exception e) {
             log.warn("Miss Redis Cache Server Connection", e);
@@ -88,9 +81,9 @@ public class RedisCacheModifyExecutor extends AbstractRedisCacheExecutor {
      * @auth zhicong.lin
      * @date 2019/6/26
      */
-    private static void flushCache(RedisTemplate<String, Object> redisTemplate, RedisCacheMethod rcm) {
+    private static void flushCache(RedisTemplate<String, Object> redisTemplate, RedisMethodSignature signature) {
 
-        val cache = rcm.getCache();
+        val cache = signature.getCache();
         if (StringUtils.isBlank(cache)) {
             log.error("Redis Cache FLUSH Error, @RedisCache.cache Value cannot be empty");
             return;
@@ -98,7 +91,7 @@ public class RedisCacheModifyExecutor extends AbstractRedisCacheExecutor {
         val keys = redisTemplate.keys("chk::" + cache + "::*");
         if (keys != null && !keys.isEmpty()) {
             //清空缓存数据
-            if (rcm.getRedisCache().lock()) {
+            if (signature.getRedisCache().lock()) {
                 log.info("Redis Flush Caches {}", StringUtils.join(keys));
                 AsyncTemplate.async(() -> redisTemplate.delete(keys), cache);
             } else {
@@ -107,16 +100,4 @@ public class RedisCacheModifyExecutor extends AbstractRedisCacheExecutor {
         }
     }
 
-    static class AsyncTemplate {
-
-        /**
-         * 异步执行
-         *
-         * @param callback
-         */
-        public static void async(Callback callback, String key) {
-            val redisHelper = SpringContextHolder.getBean(RedisHelper.class);
-            RedisTask.executeAsync(redisHelper, key, callback);
-        }
-    }
 }
