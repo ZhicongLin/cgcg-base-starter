@@ -4,8 +4,11 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.cgcg.redis.core.entity.RedisLock;
+import org.cgcg.redis.core.interceptor.AbstractRedisCacheExecutor;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Description: 缓存aop
@@ -20,16 +23,21 @@ import org.springframework.stereotype.Component;
  * </pre>
  * @date 2020/6/10
  */
+@Slf4j
 @Order(-1)
 @Aspect
 @Component
 public class RedisLockAspect {
 
     @Around(value = "@annotation(lockAnnotation)")
-    public Object round(ProceedingJoinPoint proceedingJoinPoint, Lock lockAnnotation) throws Throwable {
+    public Object round(ProceedingJoinPoint pjp, Lock lockAnnotation) throws Throwable {
+        if (!AbstractRedisCacheExecutor.connection) {
+            log.warn("Miss Redis Cache Server Connection");
+            return pjp.proceed(pjp.getArgs());
+        }
         final String key = lockAnnotation.key();
         final RedisLock redisLock = RedisLock.lockHear(key, lockAnnotation.time());
-        final Object proceed = proceedingJoinPoint.proceed(proceedingJoinPoint.getArgs());
+        final Object proceed = pjp.proceed(pjp.getArgs());
         if (lockAnnotation.autoLock()) {
             redisLock.unlock();
         }
