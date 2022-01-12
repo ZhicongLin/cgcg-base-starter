@@ -1,0 +1,27 @@
+server:
+  port: 1235
+spring:
+  thymeleaf:
+    enable: true
+    prefix: classpath:/templates/
+    #后缀
+    suffix: .html
+    #模式
+    mode: HTML5
+    servlet.content-type: text/html
+    #编码格式
+    encoding: utf-8
+    #不用缓存
+    cache: false
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: root
+    url: jdbc:mysql://localhost:3306/cgcg_jobs?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+logging:
+  level:
+    com.cgcg: debug

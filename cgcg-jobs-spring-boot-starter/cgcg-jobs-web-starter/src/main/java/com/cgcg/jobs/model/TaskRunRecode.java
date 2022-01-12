@@ -1,0 +1,18 @@
+package com.cgcg.jobs.model;
+
+import lombok.Getter;
+import lombok.Setter;
+
+import java.time.LocalDateTime;
+
+@Setter
+@Getter
+public class TaskRunRecode {
+    private Long id;
+    private Long taskId;
+    private Long runTime;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
+    private Boolean result;
+    private String remark;
+}

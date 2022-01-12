@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.cgcg</groupId>
+        <artifactId>cgcg-jobs-spring-boot-starter</artifactId>
+        <version>1.3.2.snapshot</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+    <artifactId>cgcg-jobs-core-starter</artifactId>
+    <name>cgcg-jobs-core-starter</name>
+    <description>Demo project for Spring Boot</description>
+    <dependencies>
+
+        <dependency>
+            <groupId>com.cgcg</groupId>
+            <artifactId>cgcg-context-spring-boot-starter</artifactId>
+            <version>1.3.2.snapshot</version>
+        </dependency>
+        <dependency>
+            <groupId>com.cgcg</groupId>
+            <artifactId>cgcg-base-spring-boot-starter</artifactId>
+            <version>1.3.2.snapshot</version>
+        </dependency>
+    </dependencies>
+
+</project>
