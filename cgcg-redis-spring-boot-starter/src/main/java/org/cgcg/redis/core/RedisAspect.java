@@ -30,6 +30,10 @@ public class RedisAspect {
 
     @Around("@annotation(redisCache)")
     public Object processor(ProceedingJoinPoint pjp, RedisCache redisCache) throws Throwable {
+        if(!RedisManager.online) {
+            //缓存不在线则不缓存数据
+            return pjp.proceed();
+        }
         final RedisCacheObject rco = new RedisCacheObject(pjp, redisCache, env);
         final CacheNameObject cno = rco.getCno();
         final String cacheKey = rco.getCacheKey();

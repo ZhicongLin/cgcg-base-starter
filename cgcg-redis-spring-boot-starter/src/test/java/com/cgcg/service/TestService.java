@@ -20,7 +20,7 @@ public class TestService {
         return new User("哈哈", key);
     }
 
-    @RedisCache(key = "#user.code", expire = "30", type = RedisEnum.FLUSH)
+    @RedisCache(key = "#user.code", expire = {"30", "50"}, type = RedisEnum.FLUSH)
     public User update(User user) {
         return new User(user.getName() + "asd", "sdf");
     }

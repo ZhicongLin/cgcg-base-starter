@@ -64,6 +64,9 @@ public class RedisLock {
      * @return 获取锁成功返回ture，超时返回false
      */
     public synchronized boolean lock() {
+        if (expireMsecs == 0) {
+            expireMsecs = 100;
+        }
         Boolean result = redisTemplate.opsForValue().setIfAbsent(lockKey, DEFAULT_VAL, expireMsecs, TimeUnit.MILLISECONDS);
         locked = result != null && result;
         return locked;

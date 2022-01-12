@@ -18,7 +18,7 @@ public @interface RedisNameSpace {
 
     String cache();
 
-    String expire() default "";
+    String[] expire() default {};
 
     RedisTimeUnit unit() default RedisTimeUnit.NULL;
 
