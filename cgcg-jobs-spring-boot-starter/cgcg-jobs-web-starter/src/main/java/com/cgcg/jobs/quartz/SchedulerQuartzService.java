@@ -8,6 +8,9 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Slf4j
 @Component
 public class SchedulerQuartzService {
@@ -17,6 +20,12 @@ public class SchedulerQuartzService {
     private Scheduler scheduler;
 
     public void startTaskInfo(TaskInfo info) throws SchedulerException {
+        CronTrigger cronTrigger = startSimpleTaskInfo(info);
+        final List<String> collect = info.getServers().stream().map(i -> i.getHost() + ":" + i.getPort()).collect(Collectors.toList());
+        log.info(">>> 注册定时任务[{}.{}]发现服务{},下次执行时间{} <<<", info.getGroupKey(), info.getTaskKey(), JSON.toJSONString(collect), cronTrigger.getNextFireTime());
+    }
+
+    private CronTrigger startSimpleTaskInfo(TaskInfo info) throws SchedulerException {
         // 通过JobBuilder构建JobDetail实例，JobDetail规定只能是实现Job接口的实例
         // JobDetail 是具体Job实例
         JobDetail jobDetail = JobBuilder.newJob(SchedulerQuartzJob.class).withIdentity(info.getTaskKey(), info.getGroupKey()).build();
@@ -28,7 +37,7 @@ public class SchedulerQuartzService {
         CronTrigger cronTrigger = TriggerBuilder.newTrigger().withIdentity(info.getTaskKey(), info.getGroupKey())
                 .withSchedule(cronScheduleBuilder).build();
         scheduler.scheduleJob(jobDetail, cronTrigger);
-        log.info(">>> 注册定时任务[{}.{}],下次执行时间{} <<<", info.getGroupKey(), info.getTaskKey(), cronTrigger.getNextFireTime());
+        return cronTrigger;
     }
 
     /**
@@ -99,9 +108,9 @@ public class SchedulerQuartzService {
     public void pauseJob(String name, String group) throws SchedulerException {
         JobKey jobKey = new JobKey(name, group);
         JobDetail jobDetail = scheduler.getJobDetail(jobKey);
-        if (jobDetail == null)
-            return;
-        scheduler.pauseJob(jobKey);
+        if (jobDetail != null) {
+            scheduler.pauseJob(jobKey);
+        }
         log.info(">>> 暂停任务[{}.{}] <<<", group, name);
     }
 
@@ -129,6 +138,25 @@ public class SchedulerQuartzService {
             return;
         scheduler.resumeJob(jobKey);
         log.info(">>> 恢复任务[{}.{}] <<<", group, name);
+    }
+    /**
+     * 恢复某个任务
+     *
+     * @param name
+     * @param group
+     * @throws SchedulerException
+     */
+    public void resumeJob(String name, String group, TaskInfo taskInfo) throws SchedulerException {
+        JobKey jobKey = new JobKey(name, group);
+        JobDetail jobDetail = scheduler.getJobDetail(jobKey);
+        if (jobDetail == null) {
+            startTaskInfo(taskInfo);
+        } else {
+            scheduler.deleteJob(jobKey);
+            startSimpleTaskInfo(taskInfo);
+            final List<String> collect = taskInfo.getServers().stream().map(i -> i.getHost() + ":" + i.getPort()).collect(Collectors.toList());
+            log.info(">>> 重启任务[{}.{}] 发现服务{}<<<", group, name, JSON.toJSONString(collect));
+        }
     }
 
     /**

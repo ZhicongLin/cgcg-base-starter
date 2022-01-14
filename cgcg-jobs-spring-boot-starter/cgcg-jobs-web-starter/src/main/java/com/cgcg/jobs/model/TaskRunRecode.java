@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 public class TaskRunRecode {
     private Long id;
     private Long taskId;
+    private Long serverId;
     private Long runTime;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
