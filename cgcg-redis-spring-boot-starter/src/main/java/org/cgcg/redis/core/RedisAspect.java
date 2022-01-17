@@ -1,5 +1,6 @@
 package org.cgcg.redis.core;
 
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Redis缓存处理Aop.
@@ -22,7 +24,10 @@ import java.util.Set;
 @Order(-1)
 @Aspect
 @Component
+@Slf4j
 public class RedisAspect {
+    public static final String PENETRATE_KEY = "redis-dangerous-keys";
+    public static final String PENETRATE_VALUE = "method-null-value";
     @Resource
     private Environment env;
     @Resource
@@ -37,12 +42,21 @@ public class RedisAspect {
         final RedisCacheObject rco = new RedisCacheObject(pjp, redisCache, env);
         final CacheNameObject cno = rco.getCno();
         final String cacheKey = rco.getCacheKey();
+        boolean selectCache = false;
+        final String key = cno.getName() + ":" + cacheKey;
         if (!RedisEnum.UPD.equals(cno.getSuffix()) && !RedisEnum.DEL.equals(cno.getSuffix()) && !RedisEnum.FLUSH.equals(cno.getSuffix())) {
             //查询的注解，先去查询缓存
-            final String key = cno.getName() + ":" + cacheKey;
             final Object cacheResult = redisHelper.get(key);
             if (cacheResult != null) {
+                if (PENETRATE_VALUE.equals(cacheResult.toString())) {
+                    log.warn("[key={}]缓存穿透超过3次，1分钟内由缓存直接返回null值", key);
+                    //防止缓存穿透，直接返回null
+                    return null;
+                }
+                log.info("Hit Redis Cache[{}]", key);
                 return cacheResult;
+            } else {
+                selectCache = true;
             }
         }
         //执行方法
@@ -57,6 +71,10 @@ public class RedisAspect {
         } else {
             //其他的注解，则缓存数据
             this.cacheMethodValue(rco, cno.getName(), cacheKey, proceed);
+            log.info("Serializer 2 Redis Cache[{}]", key);
+        }
+        if (selectCache && proceed == null) {
+            this.cacheDangerousKey(key);
         }
         return proceed;
     }
@@ -102,9 +120,27 @@ public class RedisAspect {
     private void cacheMethodValue(RedisCacheObject rco, String cacheName, String cacheKey, Object proceed) {
         final String key = cacheName + ":" + cacheKey;
         if (rco.getCno() != null && rco.getCno().isLock()) {
-            RedisTask.executeAsync(this.redisHelper, key, () -> redisHelper.set(key, proceed, rco.getTime(), rco.getUnit()));
+            RedisTask.executeAsync(this.redisHelper, key, () -> {
+                redisHelper.set(key, proceed, rco.getTime(), rco.getUnit());
+            });
         } else {
             redisHelper.set(key, proceed, rco.getTime(), rco.getUnit());
+        }
+    }
+
+    private void cacheDangerousKey(String key) {
+        final String name = PENETRATE_KEY;
+        final Object val = redisHelper.hget(name, key);
+        if (val != null) {
+            final int count = Integer.parseInt(val.toString());
+            final int currentValue = count + 1;
+            redisHelper.hset(name, key, currentValue);
+            //如果缓存查询为空，且执行方法后也为空，超过3次的话，则将缓存"method-null-value"字符串, 接下来1分钟内不会穿透到数据库
+            if (currentValue >= 3) {
+                redisHelper.set(key, PENETRATE_VALUE, 60L, TimeUnit.SECONDS);
+            }
+        } else {
+            redisHelper.hset(name, key, 1);
         }
     }
 

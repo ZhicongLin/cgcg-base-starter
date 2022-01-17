@@ -29,22 +29,23 @@ public class RedisTest {
     }
 
     @GetMapping("/get")
-    public Object get() {
-        String key = "keys";
-        for (int i = 0; i < 10; i++) {
-            testService.getSer(key + i);
-        }
-        Object o = this.redisHelper.get("TestService:keys4");
-        String s = JSON.toJSONString(o);
-        System.out.println("s = " + s);
-        User ser = testService.getSer(key);
-        String s1 = JSON.toJSONString(ser);
-        return  s1;
+    public Object get(String key) {
+//        String key = "keys";
+//        for (int i = 0; i < 10; i++) {
+//            testService.getSer(key + i);
+//        }
+//        Object o = this.redisHelper.get("TestService:keys4");
+//        String s = JSON.toJSONString(o);
+//        System.out.println("s = " + s);
+//        User ser = testService.getSer(key);
+//        String s1 = JSON.toJSONString(ser);
+        return  testService.get(key);
     }
     @PostMapping("/get")
-    public User pu() {
-        String key = "test-key";
-        return testService.update(new User("u", "keys"));
+    public Object pu(String key) {
+//        String key = "test-key";
+//        final User update = testService.update(new User("u", "keys"));
+        return testService.cache(key);
     }
     @DeleteMapping("/get")
     public int de() {
