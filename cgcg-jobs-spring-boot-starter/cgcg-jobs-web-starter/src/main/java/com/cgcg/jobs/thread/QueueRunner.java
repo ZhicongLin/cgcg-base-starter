@@ -20,7 +20,8 @@ public class QueueRunner {
 
     @Bean
     public ExecutorService executorService() {
-        final ThreadPoolExecutor poolExecutor = new ThreadPoolExecutor(2, 5, 2L, TimeUnit.MINUTES, new LinkedBlockingQueue<>());
+        final int corePoolSize = Runtime.getRuntime().availableProcessors();
+        final ThreadPoolExecutor poolExecutor = new ThreadPoolExecutor(corePoolSize, corePoolSize * 2 + 1, 2, TimeUnit.MINUTES, new LinkedBlockingQueue<>());
         poolExecutor.execute(queueRestartRunner);
         poolExecutor.execute(queueStopTaskRunner);
         return poolExecutor;
