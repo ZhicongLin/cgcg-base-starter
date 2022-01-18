@@ -20,6 +20,6 @@ public @interface Rmqp {
     //推送失败重试次数 <=1不重试
     int retry() default 1;
     //回调方法
-    Class<? extends RedisMqPushFailCallback> back() default RedisMqPushFailCallback.class;
+    Class<? extends RedisMqPushFailCallback> fallback() default RedisMqPushFailCallback.class;
 
 }
