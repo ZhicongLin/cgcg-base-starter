@@ -7,6 +7,9 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+import java.lang.annotation.Annotation;
+import java.util.Map;
+
 /**
  * 以静态变量保存Spring ApplicationContext, 可在任何代码任何地方任何时候中取出ApplicaitonContext.
  */
@@ -38,6 +41,10 @@ public class SpringContextHolder implements ApplicationContextAware {
 
     public static String getProperty(String name) {
         return environment.getProperty(name);
+    }
+
+    public static Map<String, Object> getBeansWithAnnotation(Class<? extends Annotation> clazz) {
+        return applicationContext.getBeansWithAnnotation(clazz);
     }
 
     /**

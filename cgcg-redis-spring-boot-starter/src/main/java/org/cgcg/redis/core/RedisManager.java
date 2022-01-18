@@ -2,12 +2,12 @@ package org.cgcg.redis.core;
 
 import com.cgcg.context.SpringContextHolder;
 import lombok.extern.slf4j.Slf4j;
-import org.cgcg.redis.core.config.KryoRedisSerializer;
+import org.cgcg.redis.core.serializer.KryoRedisSerializer;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -36,27 +36,24 @@ public class RedisManager {
      * @return the redis template
      */
     public static RedisTemplate<String, Object> getRedisTemplate() {
+        if (RedisTemplateHolder.redisTemplate == null) {
+            RedisTemplateHolder.redisTemplate = new RedisTemplate<>();
+            RedisTemplateHolder.redisTemplate.setConnectionFactory(SpringContextHolder.getBean(RedisConnectionFactory.class));
+            // 设置键（key）的序列化采用StringRedisSerializer。
+            final RedisSerializer<String> keySerializer = RedisSerializer.string();
+            RedisTemplateHolder.redisTemplate.setKeySerializer(keySerializer);
+            RedisTemplateHolder.redisTemplate.setHashKeySerializer(keySerializer);
+            // KryoRedisSerializer 替换默认序列化
+            final KryoRedisSerializer<?> valueSerializer = new KryoRedisSerializer<>();
+            RedisTemplateHolder.redisTemplate.setValueSerializer(valueSerializer);
+            RedisTemplateHolder.redisTemplate.setHashValueSerializer(valueSerializer);
+            RedisTemplateHolder.redisTemplate.afterPropertiesSet();
+        }
         return RedisTemplateHolder.redisTemplate;
     }
 
     static class RedisTemplateHolder {
         private static volatile RedisTemplate<String, Object> redisTemplate;
-
-        static {
-            if (RedisTemplateHolder.redisTemplate == null) {
-                RedisTemplateHolder.redisTemplate = new RedisTemplate<>();
-                RedisTemplateHolder.redisTemplate.setConnectionFactory(SpringContextHolder.getBean(RedisConnectionFactory.class));
-                // KryoRedisSerializer 替换默认序列化
-                final KryoRedisSerializer<?> redisSerializer = new KryoRedisSerializer<>();
-                RedisTemplateHolder.redisTemplate.setValueSerializer(redisSerializer);
-                RedisTemplateHolder.redisTemplate.setHashValueSerializer(redisSerializer);
-                // 设置键（key）的序列化采用StringRedisSerializer。
-                StringRedisSerializer serializer = new StringRedisSerializer();
-                RedisTemplateHolder.redisTemplate.setKeySerializer(serializer);
-                RedisTemplateHolder.redisTemplate.setHashKeySerializer(serializer);
-                RedisTemplateHolder.redisTemplate.afterPropertiesSet();
-            }
-        }
     }
 
     @Bean("cacheExecutor")
@@ -64,10 +61,16 @@ public class RedisManager {
         // new SynchronousQueue<Runnable>() 队列没有空间，表示一旦有任务就马上会被执行, 这里会无限制的开辟线程，适合时间较短的操作
         return Executors.newCachedThreadPool();
     }
+    @Bean("executorMQService")
+    public ExecutorService executorMQService() {
+        final int corePoolSize = Runtime.getRuntime().availableProcessors();
+        final int maximumPoolSize = corePoolSize * 2 + 1;
+        return new ThreadPoolExecutor(corePoolSize, maximumPoolSize, 180L, TimeUnit.SECONDS,
+                new LinkedBlockingQueue<>());
+    }
 
     @Scheduled(fixedDelay = 5000L)
     public void hearts() {
-
         try {
             Jedis jedis = new Jedis(this.redisProperties.getHost(), this.redisProperties.getPort());
             if (this.redisProperties.getPassword() != null) {

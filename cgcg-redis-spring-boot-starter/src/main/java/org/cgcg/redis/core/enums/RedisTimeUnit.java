@@ -20,6 +20,6 @@ public enum RedisTimeUnit {
     HOURS(TimeUnit.HOURS),
     DAYS(TimeUnit.DAYS)
     ;
-    private TimeUnit timeUnit;
+    private final TimeUnit timeUnit;
 
 }

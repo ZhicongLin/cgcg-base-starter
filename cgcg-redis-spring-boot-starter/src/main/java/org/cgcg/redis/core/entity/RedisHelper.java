@@ -24,7 +24,7 @@ public class RedisHelper {
     private static final Long DEFAULT_EXPIRE = 2L;
     private static final TimeUnit DEFAULT_TIME_UNIT = TimeUnit.HOURS;
 
-    private Map<String, RedisLock> locks = new HashMap<>();
+    private final Map<String, RedisLock> locks = new HashMap<>();
 
     /**
      * 最终加强分布式锁

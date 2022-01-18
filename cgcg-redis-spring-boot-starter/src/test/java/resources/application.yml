@@ -1,3 +1,6 @@
 server:
   port: 5678
 test.time: 1000
+logging:
+  level:
+    org.cgcg: debug

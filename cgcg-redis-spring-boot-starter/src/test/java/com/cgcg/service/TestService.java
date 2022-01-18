@@ -1,5 +1,6 @@
 package com.cgcg.service;
 
+import org.cgcg.redis.core.annotation.Rmqp;
 import org.cgcg.redis.core.annotation.RedisCache;
 import org.cgcg.redis.core.annotation.RedisNameSpace;
 import org.cgcg.redis.core.enums.RedisEnum;
@@ -28,6 +29,7 @@ public class TestService {
         return new User(user.getName() + "asd", "sdf");
     }
 
+    @Rmqp(value = {"Redis::MQ1", "Redis::MQ2"})
     @RedisCache(key = "#key", expire = {"30", "500"}, type = RedisEnum.UPD)
     public Map<String, Object> cache(String key) {
         final Map<String, Object> map = new HashMap<>();
@@ -35,6 +37,7 @@ public class TestService {
         return map;
     }
 
+    @Rmqp(value = {"Redis::MQ1"}, retry = 3)
     @RedisCache(key = "#key", expire = {"30", "500"})
     public Map<String, Object> get(String key) {
         if (key.equals("key2")) {

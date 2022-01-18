@@ -54,7 +54,7 @@ public class RedisAspect {
                     //防止缓存穿透，直接返回null
                     return null;
                 }
-                log.info("Hit Redis Cache[{}]", key);
+                log.debug("Hit Redis Cache[{}=>{}]", key, cacheResult);
                 return cacheResult;
             } else {
                 selectCache = true;
@@ -72,9 +72,12 @@ public class RedisAspect {
         } else {
             //其他的注解，则缓存数据
             this.cacheMethodValue(rco, cno.getName(), cacheKey, proceed);
-            log.info("Serializer 2 Redis Cache[{}]", key);
+            if (proceed != null) {
+                log.debug("Serializer Redis Cache[{}=>{}]", key, proceed);
+            }
         }
         if (selectCache && proceed == null) {
+            // 缓存穿透设置
             RedisPenetrate.setPenetrate(key);
         }
         return proceed;

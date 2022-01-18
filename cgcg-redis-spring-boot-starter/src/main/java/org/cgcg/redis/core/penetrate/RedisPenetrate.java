@@ -15,8 +15,8 @@ import java.util.concurrent.TimeUnit;
  */
 public final class RedisPenetrate {
 
-    public static final String PENETRATE_KEY = "redis-dangerous-keys";
-    public static final String PENETRATE_VALUE = "method-null-value";
+    public static final String PENETRATE_KEY = "redis-penetrate::keys";
+    public static final String PENETRATE_VALUE = "method-null::values";
 
     /**
      * 缓存穿透的key
