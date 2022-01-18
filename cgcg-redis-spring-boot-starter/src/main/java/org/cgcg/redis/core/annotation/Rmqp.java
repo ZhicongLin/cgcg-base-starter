@@ -1,5 +1,7 @@
 package org.cgcg.redis.core.annotation;
 
+import org.cgcg.redis.core.mq.RedisMqPushFailCallback;
+
 import java.lang.annotation.*;
 
 /**
@@ -17,6 +19,7 @@ public @interface Rmqp {
     String[] value();
     //推送失败重试次数 <=1不重试
     int retry() default 1;
-
+    //回调方法
+    Class<? extends RedisMqPushFailCallback> back() default RedisMqPushFailCallback.class;
 
 }

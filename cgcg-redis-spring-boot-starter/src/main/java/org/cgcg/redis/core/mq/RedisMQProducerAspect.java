@@ -27,20 +27,16 @@ public class RedisMQProducerAspect {
     @Around(value = "@annotation(rmqp)")
     public Object processor(ProceedingJoinPoint joinPoint, Rmqp rmqp) throws Throwable {
         Object result = joinPoint.proceed();
+        final Class<? extends RedisMqPushFailCallback> back = rmqp.back();
         final String[] channel = rmqp.value();
         for (String cn : channel) {
-            RedisMqPublisher.send(cn, result, rmqp.retry());
+            if (!back.equals(RedisMqPushFailCallback.class)) {
+                RedisMqPublisher.send(cn, result, rmqp.retry());
+            } else {
+                RedisMqPublisher.send(cn, result, rmqp.retry(), back.newInstance());
+            }
         }
         return result;
-    }
-
-    private Message getMessage(String channel, Object result) {
-        final Message message = new Message();
-        message.setId(UUIDUtils.getUUID());
-        message.setChannel(channel);
-        message.setData(result);
-        message.setTime(LocalDateTime.now());
-        return message;
     }
 
 }

@@ -54,6 +54,6 @@
                   四、添加Redis消息队列的使用
                      @EnableRedisMQ 开启MQ的应用
                      @Rmqp 为生成这的方法aop注解，由aop实现推送，推送的内容为执行方法的返回值
-                     @Rmqc 为消费者接收redis消息的入口方法，参数为（a,b）或者(a) 其中a为消息内容，b为通道id
+                     @Rmqc 为消费者接收redis消息的入口方法，参数为（Message msg, String chnnal）或者(Message msg) 其中Message为消息内容，chnnal为通道id
                      @RmqListener 注解到消费者端注解@Rmqc方法的类上
                     此外：推送消息的，有提供工具类RedisMqPublisher.send静态方法
