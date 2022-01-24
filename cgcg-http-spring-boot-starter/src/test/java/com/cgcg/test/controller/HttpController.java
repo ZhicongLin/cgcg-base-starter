@@ -21,7 +21,7 @@ public class HttpController {
         HashMap<String, Object> param = new HashMap<>();
         param.put("accountId", id);
         param.put("accountId2", id);
-        final Map<String, Object> h5 = testClient.hasLabelPost(param, "h5");
+//        final Map<String, Object> h5 = testClient.hasLabelPost(param, "h5");
 //        final long upload = testClient2.upload(file);
 //        System.out.println("upload = " + upload);
         final Map<String, Object> objectMap = testClient2.hasLabel(param);

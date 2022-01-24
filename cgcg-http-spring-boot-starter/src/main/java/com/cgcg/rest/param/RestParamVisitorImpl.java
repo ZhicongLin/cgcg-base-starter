@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import sun.security.action.GetPropertyAction;
 
-import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.File;
@@ -29,6 +28,11 @@ import java.util.Set;
  */
 @Slf4j
 public class RestParamVisitorImpl implements RestParamVisitor {
+
+    private static final String CONTENT_TYPE = "Content-Type";
+    private static final String DEFAULT_FILE_KEY = "file";
+    private static final String TMP_DIR = "java.io.tmpdir";
+
     /**
      * 对象转Map .
      *
@@ -38,13 +42,14 @@ public class RestParamVisitorImpl implements RestParamVisitor {
      * @Date: 2018/8/15 9:40
      */
     private static RestHandle<String, Object> obj2Map(Object bean) throws Exception {
-        Class<?> type = bean.getClass();
-        RestHandle<String, Object> returnMap = new RestHandle<>();
-        BeanInfo beanInfo = Introspector.getBeanInfo(type);
+//        Class<?> type = bean.getClass();
+        final RestHandle<String, Object> returnMap = new RestHandle<>();
+//        BeanInfo beanInfo = Introspector.getBeanInfo(type);
 
-        PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
+        final PropertyDescriptor[] propertyDescriptors = Introspector.getBeanInfo(bean.getClass()).getPropertyDescriptors();
+
         for (PropertyDescriptor descriptor : propertyDescriptors) {
-            String propertyName = descriptor.getName();
+            final String propertyName = descriptor.getName();
             if (!"class".equals(propertyName)) {
                 returnMap.put(propertyName, descriptor.getReadMethod().invoke(bean));
             }
@@ -72,8 +77,8 @@ public class RestParamVisitorImpl implements RestParamVisitor {
             if (StringUtils.isNotBlank(value)) {
                 restParam.put(value, param);
             } else if (param instanceof Map) {
-                Map map = (Map) param;
-                final Set keySet = map.keySet();
+                Map<?, ?> map = (Map<?, ?>) param;
+                final Set<?> keySet = map.keySet();
                 for (Object key : keySet) {
                     restParam.put(key.toString(), map.get(key));
                 }
@@ -82,7 +87,7 @@ public class RestParamVisitorImpl implements RestParamVisitor {
             }
             if (!MediaType.MULTIPART_FORM_DATA_VALUE.equals(restParam.getContentType())) {
                 restParam.setContentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE);
-                restParam.getHeaders().add("content-type", MediaType.APPLICATION_FORM_URLENCODED_VALUE);
+                restParam.getHeaders().add(CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -99,27 +104,23 @@ public class RestParamVisitorImpl implements RestParamVisitor {
         } else if (param != null) {
             restParam.setBodyString(JSON.toJSONString(param));
         }
-        restParam.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
-        restParam.getHeaders().add("content-type", MediaType.APPLICATION_JSON_UTF8_VALUE);
+        restParam.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        restParam.getHeaders().add(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
     }
 
     public void visitor(RequestPart annotation, Object param, RestHandle<String, Object> restParam) {
         restParam.setContentType(MediaType.MULTIPART_FORM_DATA_VALUE);
-        restParam.getHeaders().add("content-type", MediaType.MULTIPART_FORM_DATA_VALUE);
-        final String fileKey = StringUtils.isNotBlank(annotation.value()) ? annotation.value() : "file";
+        restParam.getHeaders().add(CONTENT_TYPE, MediaType.MULTIPART_FORM_DATA_VALUE);
+        final String fileKey = StringUtils.isNotBlank(annotation.value()) ? annotation.value() : DEFAULT_FILE_KEY;
         this.saveTempFile(restParam, fileKey, param);
     }
 
     @Override
     public void visitor(DynamicParam annotation, Object param, RestHandle<String, Object> restParam) {
-        boolean isUrl = annotation.isUrl();
-        if (isUrl) {
+        if (annotation.isUrl()) {
             restParam.setUrl(param.toString());
-        } else {
-            final String value = annotation.value();
-            if (StringUtils.isNotBlank(value)) {
-                restParam.setUrl(URLUtils.add(restParam.getUrl(), value));
-            }
+        } else if (StringUtils.isNotBlank(annotation.value())) {
+            restParam.setUrl(URLUtils.add(restParam.getUrl(), annotation.value()));
         }
     }
 
@@ -133,15 +134,15 @@ public class RestParamVisitorImpl implements RestParamVisitor {
      */
     private void saveTempFile(RestHandle<String, Object> params, String fileKey, Object fileObject) {
         if (fileObject instanceof MultipartFile) {
-            MultipartFile multipartFile = (MultipartFile) fileObject;
+            final MultipartFile multipartFile = (MultipartFile) fileObject;
             // 获取文件名
-            String fileName = multipartFile.getOriginalFilename();
+            final String fileName = multipartFile.getOriginalFilename();
             if (fileName == null) {
                 return;
             }
             try {
-                File tmpdir = new File(AccessController.doPrivileged(new GetPropertyAction("java.io.tmpdir")));
-                File tempFile = new File(tmpdir, fileName);
+                final File tmpdir = new File(AccessController.doPrivileged(new GetPropertyAction(TMP_DIR)));
+                final File tempFile = new File(tmpdir, fileName);
                 multipartFile.transferTo(tempFile);
                 params.put(fileKey, new FileSystemResource(tempFile));
                 params.setFiles(new File[]{tempFile});

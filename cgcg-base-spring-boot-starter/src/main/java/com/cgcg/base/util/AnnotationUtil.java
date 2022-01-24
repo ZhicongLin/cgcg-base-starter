@@ -20,7 +20,7 @@ import java.util.List;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AnnotationUtil {
-    private static List<Class<?>> ignore = Arrays.asList(Documented.class, Target.class, Retention.class,
+    private static final List<Class<?>> ignore = Arrays.asList(Documented.class, Target.class, Retention.class,
             Controller.class, Component.class, Indexed.class, Inherited.class, Api.class);
 
     /**
@@ -29,7 +29,7 @@ public final class AnnotationUtil {
      * @auth zhicong.lin
      * @date 2019/7/4
      */
-    public static boolean hasResponseBody(Class clzz) {
+    public static boolean hasResponseBody(Class<?> clzz) {
         return hasAnnotation(clzz, ResponseBody.class);
     }
 
@@ -39,7 +39,7 @@ public final class AnnotationUtil {
      * @auth zhicong.lin
      * @date 2019/7/4
      */
-    public static boolean hasAnnotation(Class clzz, Class<? extends Annotation> annotationType) {
+    public static boolean hasAnnotation(Class<?> clzz, Class<? extends Annotation> annotationType) {
         final Annotation[] annotations = clzz.getAnnotations();
         for (Annotation annotation : annotations) {
             final Class<? extends Annotation> annoType = annotation.annotationType();
@@ -57,11 +57,13 @@ public final class AnnotationUtil {
         return false;
     }
 
-    public static <T extends Annotation> T getAnnotation(Class clzz, Class<T> annotationType) {
+    public static <T extends Annotation> T getAnnotation(Class<?> clzz, Class<T> annotationType) {
         final Annotation[] annotations = clzz.getAnnotations();
         for (Annotation annotation : annotations) {
             if (annotationType.isInstance(annotation)) {
-                return (T) annotation;
+                @SuppressWarnings("unchecked")
+                final T t = (T) annotation;
+                return t;
             }
             final Class<? extends Annotation> annoType = annotation.annotationType();
             if (!ignore.contains(annoType)) {

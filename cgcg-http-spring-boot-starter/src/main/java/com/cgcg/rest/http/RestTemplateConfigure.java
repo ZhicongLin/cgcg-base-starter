@@ -31,6 +31,7 @@ public class RestTemplateConfigure {
     private RestProperties restProperties;
     @Resource
     private RestPoolProperties restPoolProperties;
+
     /**
      * 让spring管理RestTemplate,参数相关配置
      */
@@ -66,10 +67,24 @@ public class RestTemplateConfigure {
      */
     @Bean
     public HttpClientBuilder httpClientBuilder() {
-        final HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
+        /*final HttpClientBuilder httpClientBuilder = CloseHttpClientBuilder.create();
         httpClientBuilder.setConnectionManager(poolingConnectionManager());
-        return httpClientBuilder;
+        try {
+            SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(createIgnoreVerifySSL(),
+                    // 指定TLS版本
+                    null,
+                    // 指定算法
+                    null,
+                    // 取消域名验证
+                    (string, ssls) -> true);
+            httpClientBuilder.setSSLSocketFactory(sslsf);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return httpClientBuilder;*/
+        return CloseHttpClientBuilder.create(poolingConnectionManager());
     }
+
 
     /**
      * 链接线程池管理,可以keep-alive不断开链接请求,这样速度会更快 MaxTotal 连接池最大连接数 DefaultMaxPerRoute

@@ -15,7 +15,7 @@ import java.nio.charset.Charset;
 @AllArgsConstructor
 public enum CharsetCode {
     UTF8("UTF-8");
-    private String name;
+    private final String name;
 
     public static Charset forUtf8() {
         return Charset.forName(UTF8.getName());

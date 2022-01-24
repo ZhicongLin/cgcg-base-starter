@@ -21,7 +21,7 @@ import java.util.List;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MappingProcessor {
-    private static List<Class<?>> mappingAnnotation = Arrays.asList(RequestMapping.class, PostMapping.class, GetMapping.class, PutMapping.class,
+    private static final List<Class<?>> mappingAnnotation = Arrays.asList(RequestMapping.class, PostMapping.class, GetMapping.class, PutMapping.class,
             DeleteMapping.class, PatchMapping.class, DynamicMapping.class, LoadMapping.class, UpLoadMapping.class);
 
     /**
@@ -36,19 +36,20 @@ public final class MappingProcessor {
 
     private static MappingHandle execute(Annotation[] annotations, String value) {
         for (Annotation annotation : annotations) {
-            final Class<? extends Annotation> annoType = annotation.annotationType();
-            if (mappingAnnotation.contains(annoType)) {
-                final String[] valueArr = (String[]) ReflectionUtils.invokeMethod(annotation, "value", new Class[]{}, new Object[]{});
-                if (value == null && valueArr.length > 0) {
-                    value = valueArr[0];
-                }
-                try {
-                    final RequestMethod[] method = (RequestMethod[]) ReflectionUtils.invokeMethod(annotation, "method", new Class[]{}, new Object[]{});
-                    final HttpMethod httpMethod = HttpMethod.valueOf(method.length > 0 ? method[0].name() : RequestMethod.GET.name());
-                    return new MappingHandle(value, httpMethod);
-                } catch (IllegalArgumentException e) {
-                    return execute(annoType.getDeclaredAnnotations(), value);
-                }
+            final Class<? extends Annotation> anType = annotation.annotationType();
+            if (!mappingAnnotation.contains(anType)) {
+                continue;
+            }
+            final String[] valueArr = (String[]) ReflectionUtils.invokeMethod(annotation, "value", new Class[]{}, new Object[]{});
+            if (value == null && valueArr.length > 0) {
+                value = valueArr[0];
+            }
+            try {
+                final RequestMethod[] method = (RequestMethod[]) ReflectionUtils.invokeMethod(annotation, "method", new Class[]{}, new Object[]{});
+                final HttpMethod httpMethod = HttpMethod.valueOf(method.length > 0 ? method[0].name() : RequestMethod.GET.name());
+                return new MappingHandle(value, httpMethod);
+            } catch (IllegalArgumentException e) {
+                return execute(anType.getDeclaredAnnotations(), value);
             }
         }
         return null;

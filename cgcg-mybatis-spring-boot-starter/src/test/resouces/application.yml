@@ -4,11 +4,20 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/my_test?useUnicode=true&characterEncoding=utf8&allowMultiQueries=true&zeroDateTimeBehavior=convertToNull&serverTimezone=Asia/Shanghai
     username: root
-    password: a3873121
+    password: root
     driverClassName: com.mysql.cj.jdbc.Driver
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher #2.6以上版本 swagger会有冲突，将配置修改成ant_path_matcher即可
+
+  main:
+    allow-circular-references: true
 mybatis:
   configuration:
     map-underscore-to-camel-case: true
 logging:
   level:
     com.cgcg: debug
+cgcg:
+  format:
+    response-data: true

@@ -45,7 +45,7 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
                     final HashMap<Object, Object> unauthorized = new HashMap<>();
                     unauthorized.put("code", HttpStatus.UNAUTHORIZED.value());
                     unauthorized.put("message", Translator.toLocale("Unauthorized", "没有访问权限"));
-                    response.addHeader("Content-Type", MediaType.APPLICATION_JSON_UTF8_VALUE);
+                    response.addHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE);
                     response.setCharacterEncoding(CharsetCode.forUtf8().name());
                     response.getWriter().write(JSON.toJSONString(unauthorized));
                     return false;

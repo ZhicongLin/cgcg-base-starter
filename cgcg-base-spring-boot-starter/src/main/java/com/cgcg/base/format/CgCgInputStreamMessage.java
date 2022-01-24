@@ -11,9 +11,9 @@ import java.nio.charset.StandardCharsets;
 @Getter
 public class CgCgInputStreamMessage implements HttpInputMessage {
 
-    private InputStream body;
+    private final InputStream body;
 
-    private HttpHeaders headers;
+    private final HttpHeaders headers;
 
     public CgCgInputStreamMessage(String body, HttpHeaders headers) {
         this.body = IOUtils.toInputStream(body, StandardCharsets.UTF_8);

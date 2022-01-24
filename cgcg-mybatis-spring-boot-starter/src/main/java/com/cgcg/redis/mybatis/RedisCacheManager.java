@@ -24,7 +24,7 @@ public class RedisCacheManager implements Cache {
     // 读写锁
     private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock(true);
     private RedisTemplate<String, Object> redisTemplate;
-    private String id;
+    private final String id;
 
     public RedisCacheManager(final String id) {
         Assert.notNull(id, "require id must not null");

@@ -2,7 +2,6 @@ package com.cgcg.base.interceptor;
 
 import com.cgcg.base.util.RequestApiUtils;
 import com.cgcg.context.util.IpUtils;
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.method.HandlerMethod;
@@ -20,11 +19,12 @@ import java.util.Map;
  *
  * @author zc.lin
  */
-@Slf4j
 public class RequestInterceptor extends HandlerInterceptorAdapter {
+    private static final Logger log = LoggerFactory.getLogger(RequestInterceptor.class);
     private static final Map<String, Logger> LOGGER_MAP = new HashMap<>();
     private static final boolean INFO_ENABLED = log.isInfoEnabled();
     private static final String LOGGER_TIME_FLAG = "_START_TIME";
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         if (INFO_ENABLED) {

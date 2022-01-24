@@ -72,7 +72,7 @@ public class MybatisExceptionHandlerAdvice {
     }
 
     private List<String> getMessage(String msg) {
-        Pattern p = Pattern.compile("\'(.*?)\'");
+        Pattern p = Pattern.compile("'(.*?)'");
         Matcher m = p.matcher(msg);
         final ArrayList<String> result = new ArrayList<>();
         while (m.find()) {

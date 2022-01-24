@@ -11,7 +11,7 @@ public abstract class ExecutorTask implements Runnable {
     private boolean cancel = false;
     private boolean finish = false;
     private Thread currentThread;
-    private String id;
+    private final String id;
     public ExecutorTask() {
         id = UUIDUtils.getUUID();
         log.info("创建任务[{}]", id);

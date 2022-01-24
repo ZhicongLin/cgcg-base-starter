@@ -69,8 +69,7 @@ public class ThreadPoolManager {
         final ThreadPoolManager poolManager = getInstance();
         ThreadPoolExecutor executor = poolManager.getExecutor();
         if (executor == null) {
-            final ThreadPoolExecutor bean = SpringContextHolder.getBean(ThreadPoolExecutor.class);
-            executor = bean != null ? bean : createExecutor(new LinkedBlockingQueue<>(), new ThreadPoolExecutor.AbortPolicy());
+            executor = SpringContextHolder.getBean(ThreadPoolExecutor.class);
             poolManager.setExecutor(executor);
         }
         return executor;

@@ -51,7 +51,7 @@ public class RestClientsRegistrar implements ImportBeanDefinitionRegistrar, Envi
         final Class<?> beanClass = candidateComponent.getBeanClass();
         final AnnotationMetadata metadata = candidateComponent.getMetadata();
         final Boolean proxyModel = this.environment.getProperty("cgcg.rest.proxy-target-class", Boolean.class);
-        final Class proxyClass = proxyModel == null || proxyModel ? RestCglibFactoryBean.class : RestJdkFactoryBean.class;
+        final Class<?> proxyClass = proxyModel == null || proxyModel ? RestCglibFactoryBean.class : RestJdkFactoryBean.class;
         final BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(proxyClass); // BeanDefinitionBuilder.genericBeanDefinition(proxyClass);
         builder.addPropertyValue(Constant.PROXY_CLASS_KEY, beanClass);
         final AbstractBeanDefinition definition = builder.getBeanDefinition();
@@ -77,8 +77,8 @@ public class RestClientsRegistrar implements ImportBeanDefinitionRegistrar, Envi
         if (attributes != null) {
             basePackages.addAll(Arrays.asList((String[]) attributes.get(Constant.REST_CLIENT_VALUE)));
             basePackages.addAll(Arrays.asList((String[]) attributes.get(Constant.REST_CLIENT_BASE_PACKAGES)));
-            final Class[] classes = (Class[]) attributes.get(Constant.REST_CLIENT_BASE_PACKAGE_CLASSES);
-            for (Class clazz : classes) {
+            final Class<?>[] classes = (Class<?>[]) attributes.get(Constant.REST_CLIENT_BASE_PACKAGE_CLASSES);
+            for (Class<?> clazz : classes) {
                 basePackages.add(ClassUtils.getPackageName(clazz));
             }
         }
@@ -88,7 +88,7 @@ public class RestClientsRegistrar implements ImportBeanDefinitionRegistrar, Envi
         return basePackages;
     }
 
-    private String getClientName(Map<String, Object> client, Class clazz) {
+    private String getClientName(Map<String, Object> client, Class<?> clazz) {
         if (client != null) {
             final String value = (String) client.get(Constant.REST_CLIENT_VALUE);
             if (StringUtils.hasText(value)) {

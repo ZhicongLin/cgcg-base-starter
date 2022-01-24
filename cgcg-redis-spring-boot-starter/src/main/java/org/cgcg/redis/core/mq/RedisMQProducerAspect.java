@@ -26,7 +26,7 @@ public class RedisMQProducerAspect {
         final Class<? extends RedisMqPushFailCallback> back = rmqp.fallback();
         final String[] channel = rmqp.value();
         for (String cn : channel) {
-            if (!back.equals(RedisMqPushFailCallback.class)) {
+            if (back.equals(RedisMqPushFailCallback.class)) {
                 RedisMqPublisher.send(cn, result, rmqp.retry());
             } else {
                 RedisMqPublisher.send(cn, result, rmqp.retry(), back.newInstance());

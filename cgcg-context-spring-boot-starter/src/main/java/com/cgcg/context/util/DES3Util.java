@@ -13,7 +13,6 @@ import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -34,7 +33,7 @@ public final class DES3Util {
         mdInst.update(input);
         byte[] output = mdInst.digest();
 
-        int i = 0;
+        int i;
 
         StringBuilder buf = new StringBuilder();
 
@@ -172,17 +171,11 @@ public final class DES3Util {
      *
      * @param keyStr
      * @return
-     * @throws UnsupportedEncodingException
      */
-    public static byte[] build3DesKey(String keyStr) throws UnsupportedEncodingException {
+    public static byte[] build3DesKey(String keyStr) {
         byte[] key = new byte[24];
         byte[] temp = keyStr.getBytes(CharsetCode.forUtf8());
-
-        if (key.length > temp.length) {
-            System.arraycopy(temp, 0, key, 0, temp.length);
-        } else {
-            System.arraycopy(temp, 0, key, 0, key.length);
-        }
+        System.arraycopy(temp, 0, key, 0, Math.min(key.length, temp.length));
         return key;
     }
 
@@ -191,9 +184,8 @@ public final class DES3Util {
      *
      * @param keyStr
      * @return
-     * @throws UnsupportedEncodingException
      */
-    public static String build3DesKeyToStr(String keyStr) throws UnsupportedEncodingException {
+    public static String build3DesKeyToStr(String keyStr) {
         byte[] key = build3DesKey(keyStr);
         return new String(key);
     }
