@@ -32,6 +32,9 @@ import java.util.regex.Pattern;
 @ControllerAdvice
 public class ExceptionHandlerAdvice {
 
+    private static final String TIMEOUT = "timeout";
+    private static final String TIME_D_OUT = "timedout";
+
     /**
      * Instantiates a new Exception handler advice.
      */
@@ -84,7 +87,8 @@ public class ExceptionHandlerAdvice {
         final String message = e.getMessage();
         log.error(message, e);
         final String[] split = message.split("'");
-        if (split.length >= 2) {
+        final int len = 2;
+        if (split.length >= len) {
             return Result.error(400, String.format(Translator.toLocale("ErrorRequestMethodFmt", "请求方式错误"), split[1]));
         }
         return Result.error(400, Translator.toLocale("ErrorRequestMethod", "请求方式错误"));
@@ -106,7 +110,7 @@ public class ExceptionHandlerAdvice {
         if (p.matcher(message).find()) {
             return Result.error(400, message);
         }
-        if (message.contains("timeout") || message.contains("timedout")) {
+        if (message.contains(TIMEOUT) || message.contains(TIME_D_OUT)) {
             return message.contains("refused") ? Result.error(100502, Translator.toLocale("ConnectionRefused", "服务器拒绝连接"))
                     : Result.error(400, Translator.toLocale("ConnectionTimeOut", "服务器连接超时"));
         }
@@ -142,7 +146,7 @@ public class ExceptionHandlerAdvice {
     /**
      * Error param error result.
      *
-     * @param me the me
+     * @param me the MethodArgumentTypeMismatchException
      * @return the error result
      */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
@@ -164,7 +168,8 @@ public class ExceptionHandlerAdvice {
         final String message = e.getMessage();
         log.error(message, e);
         final String[] split = message.split("'");
-        if (split.length >= 2) {
+        final int i = 2;
+        if (split.length >= i) {
             return Result.error(400, String.format(Translator.toLocale("TextTypeErrorFmt", "参数文本类型错误"), split[1]));
         }
         return Result.error(400, Translator.toLocale("TextTypeError", "参数文本类型错误"));

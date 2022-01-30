@@ -1,6 +1,5 @@
 package com.cgcg.test;
 
-import com.alibaba.fastjson.JSON;
 import com.cgcg.service.RedisMQtest;
 import com.cgcg.service.TestService;
 import com.cgcg.service.User;
@@ -27,9 +26,10 @@ public class RedisTest {
     private RedisHelper redisHelper;
     @Resource
     private RedisMQtest redisMQtest;
+
     @GetMapping("/")
     public Object test() {
-       return "hello";
+        return "hello";
     }
 
     @GetMapping("/get")
@@ -43,7 +43,7 @@ public class RedisTest {
 //        System.out.println("s = " + s);
 //        User ser = testService.getSer(key);
 //        String s1 = JSON.toJSONString(ser);
-        return  testService.get(key);
+        return testService.get(key);
     }
 
     @PostMapping("/get")
@@ -54,6 +54,7 @@ public class RedisTest {
 //        redisMQtest.producer(cache);
         return cache;
     }
+
     @DeleteMapping("/get")
     public int de() {
         String key = "test-key";

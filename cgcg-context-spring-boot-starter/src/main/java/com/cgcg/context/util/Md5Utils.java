@@ -15,9 +15,12 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
+/**
+ * @author zhicong.lin
+ */
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class MD5Utils {
+public final class Md5Utils {
 
     private static final String[] HEX_DIGITS = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"};
 
@@ -40,40 +43,46 @@ public final class MD5Utils {
      */
     private static String byteArrayToHexString(byte[] bytes) {
         StringBuilder resultSb = new StringBuilder();
-        for (byte b : bytes) resultSb.append(byteToHexString(b));
+        for (byte b : bytes) {
+            resultSb.append(byteToHexString(b));
+        }
         return resultSb.toString();
     }
 
     private static String byteToHexString(byte b) {
         int n = b;
-        if (n < 0) n += 256;
+        if (n < 0) {
+            n += 256;
+        }
         int d1 = n / 16;
         int d2 = n % 16;
         return HEX_DIGITS[d1] + HEX_DIGITS[d2];
     }
 
-    public static String MD5Encode(String origin, String charsetname) {
+    public static String md5Encode(String origin, String charsetname) {
         String resultString = null;
         try {
             resultString = origin;
             MessageDigest md = MessageDigest.getInstance("MD5");
-            if (charsetname == null || "".equals(charsetname))
+            if (charsetname == null || "".equals(charsetname)) {
                 resultString = byteArrayToHexString(md.digest(resultString.getBytes()));
-            else resultString = byteArrayToHexString(md.digest(resultString.getBytes(charsetname)));
+            } else {
+                resultString = byteArrayToHexString(md.digest(resultString.getBytes(charsetname)));
+            }
         } catch (Exception e) {
             log.warn(e.getMessage(), e);
         }
         return resultString;
     }
 
-    public static String createMD5Sign(String key, Map<String, String> paramMap) {
+    public static String createMd5Sign(String key, Map<String, String> paramMap) {
         StringBuilder sb = new StringBuilder();
         for (String k : paramMap.keySet()) {
             String v = paramMap.get(k);
             sb.append(k).append("=").append(v).append("&");
         }
         String params = sb.append("key=").append(key).substring(0);
-        String sign = MD5Utils.MD5Encode(params, "utf8");
+        String sign = Md5Utils.md5Encode(params, "utf8");
         return sign.toUpperCase();
     }
 
@@ -99,7 +108,9 @@ public final class MD5Utils {
             return null;
         } finally {
             try {
-                if (fis != null) fis.close();
+                if (fis != null) {
+                    fis.close();
+                }
             } catch (IOException e) {
                 log.warn(e.getMessage(), e);
             }
@@ -124,12 +135,12 @@ public final class MD5Utils {
      *            待生成 MD5码的字符串
      * @return 根据字符串生成的 MD5码
      */
-    public static String stringToMD5(String str) {
+    public static String stringToMd5(String str) {
         if (StringUtils.isEmpty(str)) {
             return null;
         }
 
-        MessageDigest md5 = null;
+        MessageDigest md5;
         StringBuilder value = new StringBuilder();
 
         try {

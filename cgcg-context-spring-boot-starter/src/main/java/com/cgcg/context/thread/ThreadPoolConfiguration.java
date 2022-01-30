@@ -9,6 +9,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * 线程池相关配置
+ * @author zhicong.lin
  */
 @Configuration
 public class ThreadPoolConfiguration {

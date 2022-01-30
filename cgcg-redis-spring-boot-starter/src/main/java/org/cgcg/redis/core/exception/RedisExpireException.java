@@ -1,5 +1,7 @@
 package org.cgcg.redis.core.exception;
-
+/**
+ * @author zhicong.lin
+ */
 public class RedisExpireException extends RuntimeException {
 
     /**
@@ -8,6 +10,6 @@ public class RedisExpireException extends RuntimeException {
      * call to {@link #initCause}.
      */
     public RedisExpireException(String expire) {
-        super("Redis缓存Expire时间配置取值异常[" + expire +"]");
+        super("Redis缓存Expire时间配置取值异常[" + expire + "]");
     }
 }

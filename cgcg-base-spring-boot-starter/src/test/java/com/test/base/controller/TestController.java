@@ -3,7 +3,7 @@ package com.test.base.controller;
 import com.cgcg.base.core.exception.CommonException;
 import com.cgcg.base.format.encrypt.Encrypt;
 import com.cgcg.base.format.encrypt.EncryptController;
-import com.cgcg.context.thread.ExecutorTask;
+import com.cgcg.context.thread.AbstractExecutorTask;
 import com.cgcg.context.thread.ThreadPoolManager;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -44,7 +44,7 @@ public class TestController {
     public Object get() throws Exception {
         Map<String, Object> hashMap = new HashMap<>();
         hashMap.put("yes", "OK");
-        final ExecutorTask task = new ExecutorTask() {
+        final AbstractExecutorTask task = new AbstractExecutorTask() {
             @Override
             @SneakyThrows
             public void call() {

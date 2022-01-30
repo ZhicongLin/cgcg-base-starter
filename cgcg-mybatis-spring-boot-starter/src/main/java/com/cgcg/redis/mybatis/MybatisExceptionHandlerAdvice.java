@@ -30,6 +30,7 @@ import java.util.regex.Pattern;
 @ControllerAdvice
 public class MybatisExceptionHandlerAdvice {
 
+    private static final Pattern PATTERN = Pattern.compile("'(.*?)'");
     /**
      * Handle exception result.
      *
@@ -72,8 +73,7 @@ public class MybatisExceptionHandlerAdvice {
     }
 
     private List<String> getMessage(String msg) {
-        Pattern p = Pattern.compile("'(.*?)'");
-        Matcher m = p.matcher(msg);
+        Matcher m = PATTERN.matcher(msg);
         final ArrayList<String> result = new ArrayList<>();
         while (m.find()) {
             result.add(m.group());

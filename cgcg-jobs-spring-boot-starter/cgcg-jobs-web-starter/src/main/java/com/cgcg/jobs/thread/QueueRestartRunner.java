@@ -9,7 +9,9 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.concurrent.LinkedBlockingQueue;
-
+/**
+ * @author zhicong.lin
+ */
 @Slf4j
 @Component
 public class QueueRestartRunner implements Runnable {

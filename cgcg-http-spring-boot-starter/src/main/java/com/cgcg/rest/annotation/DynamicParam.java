@@ -2,6 +2,9 @@ package com.cgcg.rest.annotation;
 
 import java.lang.annotation.*;
 
+/**
+ * @author zhicong.lin
+ */
 @Target({ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented

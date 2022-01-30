@@ -7,6 +7,7 @@ import java.util.Objects;
 
 /**
  * 加密校验工具类
+ * @author zhicong.lin
  */
 public class EncryptCheckHandler {
 

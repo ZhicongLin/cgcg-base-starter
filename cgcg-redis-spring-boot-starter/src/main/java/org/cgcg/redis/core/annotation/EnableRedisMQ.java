@@ -1,9 +1,9 @@
 package org.cgcg.redis.core.annotation;
 
-import org.cgcg.redis.core.mq.RedisMQBeanDefinitionRegistrar;
-import org.cgcg.redis.core.mq.RedisMQProducerAspect;
+import org.cgcg.redis.core.mq.RedisMqBeanDefinitionRegistrar;
 import org.cgcg.redis.core.mq.RedisMqConfiguration;
 import org.cgcg.redis.core.mq.RedisMqListenerRegistrar;
+import org.cgcg.redis.core.mq.RedisMqProducerAspect;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;
@@ -19,10 +19,10 @@ import java.lang.annotation.*;
 @Inherited
 @Documented
 @Import({
-        RedisMQBeanDefinitionRegistrar.class,
+        RedisMqBeanDefinitionRegistrar.class,
         RedisMqConfiguration.class,
         RedisMqListenerRegistrar.class,
-        RedisMQProducerAspect.class
+        RedisMqProducerAspect.class
 })
 public @interface EnableRedisMQ {
 

@@ -7,6 +7,11 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+/**
+ * 任务执行结果
+ *
+ * @author zhicong.lin
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

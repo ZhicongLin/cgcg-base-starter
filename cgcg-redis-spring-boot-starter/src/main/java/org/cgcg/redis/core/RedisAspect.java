@@ -5,10 +5,10 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.cgcg.redis.core.annotation.RedisCache;
+import org.cgcg.redis.core.entity.AbstractRedisTask;
 import org.cgcg.redis.core.entity.CacheNameObject;
 import org.cgcg.redis.core.entity.RedisCacheObject;
 import org.cgcg.redis.core.entity.RedisHelper;
-import org.cgcg.redis.core.entity.RedisTask;
 import org.cgcg.redis.core.enums.RedisEnum;
 import org.cgcg.redis.core.penetrate.RedisPenetrate;
 import org.springframework.core.annotation.Order;
@@ -86,14 +86,14 @@ public class RedisAspect {
     /**
      * 清空当前缓存的所有数据
      *
-     * @auth zhicong.lin
+     * @author zhicong.lin
      * @date 2019/6/26
      */
     private void flushCache(CacheNameObject cno) {
         final Set<String> keys = redisHelper.keys(cno.getName() + ":");
         //清空缓存数据
         if (cno.isLock()) {
-            RedisTask.executeAsync(this.redisHelper, cno.getName(), () -> redisHelper.del(keys));
+            AbstractRedisTask.executeAsync(this.redisHelper, cno.getName(), () -> redisHelper.del(keys));
         } else {
             redisHelper.del(keys);
         }
@@ -102,14 +102,14 @@ public class RedisAspect {
     /**
      * 删除缓存结果数据
      *
-     * @auth zhicong.lin
+     * @author zhicong.lin
      * @date 2019/6/26
      */
     private void deleteCache(CacheNameObject cno, String cacheKey) {
         final String key = cno.getName() + ":" + cacheKey;
         //删除的注解，在方法执行完成后，执行删除
         if (cno.isLock()) {
-            RedisTask.executeAsync(this.redisHelper, key, () -> redisHelper.del(key));
+            AbstractRedisTask.executeAsync(this.redisHelper, key, () -> redisHelper.del(key));
         } else {
             redisHelper.del(key);
         }
@@ -118,13 +118,13 @@ public class RedisAspect {
     /**
      * 缓存执行结果数据
      *
-     * @auth zhicong.lin
+     * @author zhicong.lin
      * @date 2019/6/26
      */
     private void cacheMethodValue(RedisCacheObject rco, String cacheName, String cacheKey, Object proceed) {
         final String key = cacheName + ":" + cacheKey;
         if (rco.getCno() != null && rco.getCno().isLock()) {
-            RedisTask.executeAsync(this.redisHelper, key, () -> redisHelper.set(key, proceed, rco.getTime(), rco.getUnit()));
+            AbstractRedisTask.executeAsync(this.redisHelper, key, () -> redisHelper.set(key, proceed, rco.getTime(), rco.getUnit()));
         } else {
             redisHelper.set(key, proceed, rco.getTime(), rco.getUnit());
         }

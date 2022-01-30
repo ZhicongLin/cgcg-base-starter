@@ -11,7 +11,7 @@ import java.lang.reflect.Method;
 /**
  * 解析SPEL 表达式
  *
- * @auth zhicong.lin
+ * @author zhicong.lin
  * @date 2019/6/20
  */
 public class SpelUtils {

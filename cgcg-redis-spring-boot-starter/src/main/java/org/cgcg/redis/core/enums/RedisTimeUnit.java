@@ -14,12 +14,31 @@ import java.util.concurrent.TimeUnit;
 @Getter
 @AllArgsConstructor
 public enum RedisTimeUnit {
+
+    /**
+     * 秒
+     */
     NULL(TimeUnit.SECONDS),
+
+    /**
+     * 秒
+     */
     SECONDS(TimeUnit.SECONDS),
+
+    /**
+     * 分钟
+     */
     MINUTES(TimeUnit.MINUTES),
+
+    /**
+     * 小时
+     */
     HOURS(TimeUnit.HOURS),
-    DAYS(TimeUnit.DAYS)
-    ;
+
+    /**
+     * 天
+     */
+    DAYS(TimeUnit.DAYS);
     private final TimeUnit timeUnit;
 
 }

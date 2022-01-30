@@ -19,5 +19,7 @@ logging:
   level:
     com.cgcg: debug
 cgcg:
+  swagger:
+    headers: authorization
   format:
     response-data: true

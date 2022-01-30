@@ -15,10 +15,14 @@ public interface RestFilter {
     /**
      * builder成功，excute前执行 .
      *
-     * @Param: [url, httpMethod, restHandle, headers, returnType]
-     * @Return: void
-     * @Author: ZhiCong Lin
-     * @Date: 2018/8/21 17:22
+     * @param url
+     * @param httpMethod
+     * @param restHandle
+     * @param headers
+     * @param returnType
+     * @return void
+     * @author : zhicong.lin
+     * @date : 2022/1/26 16:15
      */
     default void postServer(String url, HttpMethod httpMethod, RestHandle<String, Object> restHandle, HttpHeaders headers, Class<?> returnType) {
     }
@@ -26,10 +30,11 @@ public interface RestFilter {
     /**
      * excute后执行 .
      *
-     * @Param: [result]
-     * @Return: java.lang.Object
-     * @Author: ZhiCong Lin
-     * @Date: 2018/8/21 17:22
+     * @param result
+     * @param returnType
+     * @return Object result
+     * @author : zhicong.lin
+     * @date : 2022/1/26 16:15
      */
     default Object end(Object result, Class<?> returnType) {
         return result;

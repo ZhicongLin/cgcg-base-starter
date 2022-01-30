@@ -6,14 +6,13 @@ import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
 
-import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
  * 通用Redis帮助类
  *
- * @auth zhicong.lin
+ * @author zhicong.lin
  * @date 2019/6/21
  */
 @Slf4j
@@ -36,6 +35,7 @@ public class RedisHelper {
     public boolean lock(String key) {
         return lock(key, 100);
     }
+
     /**
      * 最终加强分布式锁
      *
@@ -68,7 +68,7 @@ public class RedisHelper {
     /**
      * Hash
      *
-     * @auth zhicong.lin
+     * @author zhicong.lin
      * @date 2019/6/21
      */
     public void hset(String name, Object key, Object value, long time, TimeUnit unit) {
@@ -104,7 +104,7 @@ public class RedisHelper {
     /**
      * kv-set
      *
-     * @auth zhicong.lin
+     * @author zhicong.lin
      * @date 2019/6/21
      */
     public void set(String key, Object value, long time, TimeUnit unit) {

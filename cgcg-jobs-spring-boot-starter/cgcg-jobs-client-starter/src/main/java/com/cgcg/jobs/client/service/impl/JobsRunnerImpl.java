@@ -9,16 +9,28 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
+/**
+ * 执行任务实现类
+ *
+ * @author zhicong.lin
+ */
 @Slf4j
 @Service
 public class JobsRunnerImpl implements IJobsRunner {
+    /**
+     * 任务执行入口
+     *
+     * @param jobId jobId
+     * @param args  参数
+     * @return JobsRunCallBack
+     * @author zhicong.lin 2022/1/26
+     */
     @Override
     public JobsRunCallBack invoke(String jobId, String args) {
         final LocalDateTime startTime = LocalDateTime.now();
         final long startLongTime = System.currentTimeMillis();
         log.info(">>> start {} {}<<<", jobId, startTime);
         final MyJobs bean = SpringContextHolder.getBean(jobId);
-//        final Class<?> beanClass = bean.getClass();
         boolean result = false;
         String remark = null;
         try {
@@ -28,8 +40,6 @@ public class JobsRunnerImpl implements IJobsRunner {
             ;
             log.error(e.getMessage());
         }
-//            final Method method = beanClass.getMethod("runner", args.getClass());
-//            method.invoke(bean, args);
         final LocalDateTime endTime = LocalDateTime.now();
         final long endLongTime = System.currentTimeMillis();
         log.info(">>> end {} {}<<<", jobId, endTime);

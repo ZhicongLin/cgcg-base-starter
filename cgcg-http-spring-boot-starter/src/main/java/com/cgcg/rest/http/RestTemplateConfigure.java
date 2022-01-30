@@ -37,7 +37,8 @@ public class RestTemplateConfigure {
      */
     @Bean
     public RestTemplate restTemplate() {
-        final RestTemplate restTemplate = builder.build();// 生成一个RestTemplate实例
+        // 生成一个RestTemplate实例
+        final RestTemplate restTemplate = builder.build();
         restTemplate.setRequestFactory(clientHttpRequestFactory());
         final List<ClientHttpRequestInterceptor> interceptors = restTemplate.getInterceptors();
         interceptors.add(new RestInterceptor());
@@ -52,12 +53,15 @@ public class RestTemplateConfigure {
      */
     @Bean
     public ClientHttpRequestFactory clientHttpRequestFactory() {
-        final HttpComponentsClientHttpRequestFactory chrf = new HttpComponentsClientHttpRequestFactory();
-        chrf.setHttpClient(httpClientBuilder().build());
-        chrf.setConnectTimeout(restProperties.getConnectTimeout()); // 连接超时时间/毫秒
-        chrf.setReadTimeout(restProperties.getReadTimeout()); // 读写超时时间/毫秒
-        chrf.setConnectionRequestTimeout(restProperties.getConnectionRequestTimeout());// 请求超时时间/毫秒
-        return chrf;
+        final HttpComponentsClientHttpRequestFactory chr = new HttpComponentsClientHttpRequestFactory();
+        chr.setHttpClient(httpClientBuilder().build());
+        // 连接超时时间/毫秒
+        chr.setConnectTimeout(restProperties.getConnectTimeout());
+        // 读写超时时间/毫秒
+        chr.setReadTimeout(restProperties.getReadTimeout());
+        // 请求超时时间/毫秒
+        chr.setConnectionRequestTimeout(restProperties.getConnectionRequestTimeout());
+        return chr;
     }
 
     /**
@@ -67,21 +71,6 @@ public class RestTemplateConfigure {
      */
     @Bean
     public HttpClientBuilder httpClientBuilder() {
-        /*final HttpClientBuilder httpClientBuilder = CloseHttpClientBuilder.create();
-        httpClientBuilder.setConnectionManager(poolingConnectionManager());
-        try {
-            SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(createIgnoreVerifySSL(),
-                    // 指定TLS版本
-                    null,
-                    // 指定算法
-                    null,
-                    // 取消域名验证
-                    (string, ssls) -> true);
-            httpClientBuilder.setSSLSocketFactory(sslsf);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return httpClientBuilder;*/
         return CloseHttpClientBuilder.create(poolingConnectionManager());
     }
 

@@ -25,15 +25,20 @@ import java.util.Objects;
 /**
  * 结果集格式化处理
  *
- * @auth zhicong.lin
+ * @author zhicong.lin
  * @date 2019/6/25
  */
 @Slf4j
 @Order(1)
 @ControllerAdvice
 public class ResponseBodyFormatHandler implements ResponseBodyAdvice {
+    private static final String SWAGGER_RESOURCES = "/swagger-resources";
+    private static final String ERROR = "/error";
+    private static final String DOCS = "/v2/api-docs";
+    private static final String DOCS_EXT = "/v2/api-docs-ext";
     @Resource
     private List<String> responseDataIgnore;
+
     @Override
     public boolean supports(MethodParameter returnType, Class converterType) {
         final Class<?> declaringClass = Objects.requireNonNull(returnType.getMethod()).getDeclaringClass();
@@ -41,10 +46,14 @@ public class ResponseBodyFormatHandler implements ResponseBodyAdvice {
     }
 
     @Override
-    public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
+    public Object beforeBodyWrite(Object body,
+                                  MethodParameter returnType,
+                                  MediaType selectedContentType,
+                                  Class selectedConverterType,
+                                  ServerHttpRequest request, ServerHttpResponse response) {
         final URI uri = request.getURI();
         final String path = uri.getPath();
-        if (path.contains("/swagger-resources") || path.equals("/error") || path.equals("/v2/api-docs")|| path.equals("/v2/api-docs-ext")) {
+        if (path.contains(SWAGGER_RESOURCES) || ERROR.equals(path) || DOCS.equals(path) || DOCS_EXT.equals(path)) {
             return body;
         }
         if (returnType.hasMethodAnnotation(ExceptionHandler.class)) {
@@ -60,7 +69,7 @@ public class ResponseBodyFormatHandler implements ResponseBodyAdvice {
         return this.getFormatResult(body, selectedConverterType);
     }
 
-    private Object getFormatResult(Object body, Class selectedConverterType) {
+    private Object getFormatResult(Object body, Class<?> selectedConverterType) {
         final Class<?> formatClass = FormatProperty.getFormatClass();
         if (body != null && body.getClass().getName().equals(formatClass.getName())) {
             //判断ResultMap类型，直接返回，不进行格式化
@@ -80,4 +89,5 @@ public class ResponseBodyFormatHandler implements ResponseBodyAdvice {
         }
         return body;
     }
+
 }

@@ -19,14 +19,15 @@ import javax.servlet.http.HttpServletResponse;
 @Slf4j
 @Component
 public class SwaggerInterceptor implements HandlerInterceptor {
+    private static final String SWAGGER_UI_STR = "swagger-ui";
     @Resource
     SwaggerProperties properties;
 
     @SneakyThrows
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-        final String requestURI = request.getRequestURI();
-        if (requestURI.contains("swagger-ui")) {
+        final String uri = request.getRequestURI();
+        if (uri.contains(SWAGGER_UI_STR)) {
             response.sendRedirect("/doc.html");
             return Boolean.FALSE;
         }

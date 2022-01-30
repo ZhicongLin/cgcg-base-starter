@@ -22,6 +22,7 @@ public class SwaggerProperties {
     private String desc = "http在线接口文档";
     private String apis = "com";
     private List<String> headers;
+    private String authHeader;
     private String version = "1.0.0";
     private boolean disabled = false;
     private String redirectUri = "/";

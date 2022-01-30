@@ -22,6 +22,9 @@ import java.lang.reflect.Method;
 import java.time.LocalDateTime;
 import java.util.*;
 
+/**
+ * @author zhicong.lin
+ */
 @Slf4j
 @Setter
 @Getter
@@ -32,17 +35,17 @@ public class SchedulerQuartzJob implements Job {
     private Class<?> objectType;
     private JobsRunCallBack callback;
     private List<Long> removeIds = new ArrayList<>();
+
     private void before() throws RemoteLookupFailureException {
-//        final JobDataMap dataMap = context.getMergedJobDataMap();
-//        this.taskInfo = JSON.parseObject(dataMap.getString("service"), TaskInfo.class);
-//        runningKey.add(this.taskInfo.getId());
         this.weightRandom();
         log.info(">>> 任务[{}.{}]开始由[{}:{}]执行 <<<", taskInfo.getGroupKey(),
                 taskInfo.getTaskKey(), taskInfo.getServer().getHost(), taskInfo.getServer().getPort());
         this.createRmiProxy();
     }
 
-    // 多个服务器时，进行权重随机
+    /**
+     * 多个服务器时，进行权重随机
+     */
     private void weightRandom() {
         final List<TaskServer> servers = this.taskInfo.getServers();
         if (servers.isEmpty()) {
@@ -132,7 +135,8 @@ public class SchedulerQuartzJob implements Job {
         final TaskInfoMapper taskInfoMapper = SpringContextHolder.getBean(TaskInfoMapper.class);
         final List<TaskRunRecode> tks = taskInfoMapper.findRecodeByServerId(taskInfo.getServer().getId(), defeatedCount);
         final long count = tks.stream().filter(TaskRunRecode::getResult).count();
-        if (tks.size() == 5 && count == 0) { //大于0表示当前defeatedCount笔数据内有成功的数据，表示未达到暂停任务标准
+        //大于0表示当前defeatedCount笔数据内有成功的数据，表示未达到暂停任务标准
+        if (tks.size() == defeatedCount && count == 0) {
             removeIds.add(taskInfo.getServer().getId());
         }
     }

@@ -4,7 +4,6 @@ import com.cgcg.context.SpringContextHolder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.cgcg.redis.core.RedisManager;
 
 import java.util.concurrent.ExecutorService;
 
@@ -17,7 +16,7 @@ import java.util.concurrent.ExecutorService;
 @Slf4j
 @Setter
 @Getter
-public abstract class RedisTask {
+public abstract class AbstractRedisTask {
     private String lockKey;
     private String lockValue = "DEFAULT_LOCK_VALUE";
     private int fixedTime;
@@ -29,7 +28,7 @@ public abstract class RedisTask {
      *
      * @Author: ZhiCong Lin
      */
-    public RedisTask(RedisHelper redisHelper, boolean async) {
+    public AbstractRedisTask(RedisHelper redisHelper, boolean async) {
         this(redisHelper, null, async);
     }
 
@@ -38,7 +37,7 @@ public abstract class RedisTask {
      *
      * @Author: ZhiCong Lin
      */
-    public RedisTask(RedisHelper redisHelper) {
+    public AbstractRedisTask(RedisHelper redisHelper) {
         this(redisHelper, null, false);
     }
 
@@ -48,7 +47,7 @@ public abstract class RedisTask {
      * @param lockKey
      * @Author: ZhiCong Lin
      */
-    public RedisTask(RedisHelper redisHelper, String lockKey, boolean async) {
+    public AbstractRedisTask(RedisHelper redisHelper, String lockKey, boolean async) {
         this(redisHelper, lockKey, 0, async);
     }
 
@@ -58,7 +57,7 @@ public abstract class RedisTask {
      * @param lockKey
      * @Author: ZhiCong Lin
      */
-    public RedisTask(RedisHelper redisHelper, String lockKey) {
+    public AbstractRedisTask(RedisHelper redisHelper, String lockKey) {
         this(redisHelper, lockKey, 0, false);
     }
 
@@ -68,7 +67,7 @@ public abstract class RedisTask {
      * @param lockKey
      * @param fixedTime
      */
-    public RedisTask(RedisHelper redisHelper, String lockKey, int fixedTime, boolean async) {
+    public AbstractRedisTask(RedisHelper redisHelper, String lockKey, int fixedTime, boolean async) {
         this.redisHelper = redisHelper;
         this.async = async;
         if (lockKey == null) {
@@ -131,7 +130,7 @@ public abstract class RedisTask {
     }
 
     public static void execute(RedisHelper redisHelper, String lockKey, int fixedTime, final Callback callback, boolean async) {
-        new RedisTask(redisHelper, lockKey, fixedTime, async) {
+        new AbstractRedisTask(redisHelper, lockKey, fixedTime, async) {
             @Override
             public void execute() { //NOSONAR
                 callback.execute();

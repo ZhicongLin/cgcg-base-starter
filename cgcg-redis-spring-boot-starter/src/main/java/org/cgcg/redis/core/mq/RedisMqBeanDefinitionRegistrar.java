@@ -16,14 +16,14 @@ import org.springframework.util.StringUtils;
 
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
- * Author: zhicong.lin
+ * @author: zhicong.lin
  * Date: 2022/1/12 08:08
- * Description:
  */
-public class RedisMQBeanDefinitionRegistrar implements ImportBeanDefinitionRegistrar {
+public class RedisMqBeanDefinitionRegistrar implements ImportBeanDefinitionRegistrar {
 
     @Override
     public void registerBeanDefinitions(AnnotationMetadata annotationMetadata, BeanDefinitionRegistry beanDefinitionRegistry) {
@@ -55,9 +55,12 @@ public class RedisMQBeanDefinitionRegistrar implements ImportBeanDefinitionRegis
 
         Set<String> basePackages = new HashSet<>();
         // 指定包名
-        for (String pkg : (String[]) attributes.get("packages")) {
-            if (StringUtils.hasText(pkg)) {
-                basePackages.add(pkg);
+        if (!Objects.isNull(attributes)) {
+            final String[] packages = (String[]) attributes.get("packages");
+            for (String pkg : packages) {
+                if (StringUtils.hasText(pkg)) {
+                    basePackages.add(pkg);
+                }
             }
         }
         // 如果没有指定包名，则扫描注解所在类的包名

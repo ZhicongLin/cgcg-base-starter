@@ -7,6 +7,12 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * @author zhicong.lin
+ * @program cgcg-base-starter
+ * @description 忽略请求配置
+ * @create 2022-01-26 14:13
+ **/
 @Setter
 @Getter
 @Component

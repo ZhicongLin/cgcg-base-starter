@@ -33,7 +33,8 @@ public class RedisMqPublisher {
      * @param retry          重试次数
      */
     public static void send(String channel, Object messageContent, int retry) {
-        send(channel, messageContent, retry, message -> {});
+        send(channel, messageContent, retry, message -> {
+        });
     }
 
     /**
@@ -80,7 +81,7 @@ public class RedisMqPublisher {
 
     private static Message getMessage(String channel, Object messageContent) {
         final Message message = new Message();
-        message.setId(UUIDUtils.getUUID());
+        message.setId(UUIDUtils.getUuid());
         message.setChannel(channel);
         message.setData(messageContent);
         message.setTime(LocalDateTime.now());

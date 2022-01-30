@@ -2,7 +2,7 @@ package com.cgcg.rest.http;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.cgcg.rest.URLUtils;
+import com.cgcg.rest.UrlUtils;
 import com.cgcg.rest.exception.ErrorFactory;
 import com.cgcg.rest.exception.RestException;
 import com.cgcg.rest.param.RestHandle;
@@ -28,23 +28,35 @@ import java.util.*;
 
 /**
  * RestTemplate
+ *
+ * @author zhicong.lin
  */
 @Slf4j
 @Component
 public class RestTemplateFactory {
-
+    private static final String CONNECT_EXCEPTION = "java.net.ConnectException";
+    private static final String ERROR_MSG = "errorMsg";
+    private static final String ERROR_CODE = "errorCode";
+    private static final String MSG = "message";
+    private static final String CODE = "code";
     @Resource
     private RestTemplate restTemplate;
     @Resource
     private HttpServletResponse response;
 
-    // 解决下载时中文乱码问题!!!!
+    /**
+     * 解决下载时中文乱码问题!!!!
+     *
+     * @param fileName 文件名
+     * @return String 编码后的文件名
+     */
     private static String encodingFileName(String fileName) {
         String returnFileName = "";
         try {
             returnFileName = URLEncoder.encode(fileName, "UTF-8");
             returnFileName = org.springframework.util.StringUtils.replace(returnFileName, "+", "%20");
-            if (returnFileName.length() > 150) {
+            final int maxLen = 150;
+            if (returnFileName.length() > maxLen) {
                 returnFileName = new String(fileName.getBytes("GB2312"), "ISO8859-1");
                 returnFileName = org.springframework.util.StringUtils.replace(returnFileName, " ", "%20");
             }
@@ -56,10 +68,11 @@ public class RestTemplateFactory {
 
     /**
      * 文件下载
+     *
      * @return 二进制流
      */
     public byte[] loadFileByte(RestHandle<String, Object> handle) {
-        final String url = URLUtils.addParameter(handle.getUrl(), handle.getParameterUri().toString());
+        final String url = UrlUtils.addParameter(handle.getUrl(), handle.getParameterUri().toString());
         final HttpEntity<byte[]> requestEntity = new HttpEntity<>(handle.getHeaders());
         try {
             ResponseEntity<byte[]> result = restTemplate.exchange(url, handle.getHttpMethod(), requestEntity, byte[].class, handle.getUriParams());
@@ -75,7 +88,7 @@ public class RestTemplateFactory {
                     }
                 }
                 final String fileName = String.valueOf(handle.getUriParams().get("fileName") == null ? "" : handle.getUriParams().get("fileName"));
-                if (response.getHeader("content-disposition") == null) {
+                if (response.getHeader(HttpHeaders.CONTENT_DISPOSITION) == null) {
                     //3.设置content-disposition响应头控制浏览器以下载的形式打开文件
                     response.setHeader("content-disposition", "attachment; filename=" + encodingFileName(fileName));
                 }
@@ -93,8 +106,8 @@ public class RestTemplateFactory {
 
     }
 
-    public <T> T execute(RestHandle<String, Object> handle,  Class<T> resultType) {
-        final String url = URLUtils.addParameter(handle.getUrl(), handle.getParameterUri().toString());
+    public <T> T execute(RestHandle<String, Object> handle, Class<T> resultType) {
+        final String url = UrlUtils.addParameter(handle.getUrl(), handle.getParameterUri().toString());
         HttpEntity<?> httpEntity = this.createHttpEntity(handle);
         handle.putAll(handle.getUriParams());
         try {
@@ -128,13 +141,15 @@ public class RestTemplateFactory {
                 multiValueMap.put(entry.getKey(), Collections.singletonList(entry.getValue()));
             }
             httpEntity = new HttpEntity<>(multiValueMap, handle.getHeaders());
-        } else if ((MediaType.APPLICATION_JSON_UTF8_VALUE.equals(contentType) || MediaType.APPLICATION_JSON_VALUE.equals(contentType)) && StringUtils.isNotBlank(handle.getBodyString())) {
+        } else if (StringUtils.isNotBlank(handle.getBodyString()) && MediaType.APPLICATION_JSON_VALUE.equals(contentType)) {
             httpEntity = new HttpEntity<>(handle.getBodyString(), handle.getHeaders());
         } else {
             httpEntity = new HttpEntity<>(handle.getHeaders());
+
         }
         return httpEntity;
     }
+
     /**
      * @return RestException
      * @Description: 捕获微服务接口中返回的异常信息, 封装后再抛出
@@ -142,7 +157,7 @@ public class RestTemplateFactory {
      * @date 2017/11/15 10:50
      */
     private RestException httpErrorMsg(HttpServerErrorException e) {
-        log.error("服务异常原始信息：{}" , e.getResponseBodyAsString(), e);
+        log.error("服务异常原始信息：{}", e.getResponseBodyAsString(), e);
         // 异常码
         int errorCode = e.getRawStatusCode();
         // 异常消息
@@ -151,16 +166,20 @@ public class RestTemplateFactory {
         if (StringUtils.isNotBlank(e.getResponseBodyAsString())) {
             JSONObject jsonError = JSON.parseObject(e.getResponseBodyAsString());
             // errorCode存在且为数字
-            if (jsonError.get("errorCode") != null && StringUtils.isNumeric(jsonError.get("errorCode").toString())) {
-                errorCode = Integer.parseInt(jsonError.get("errorCode").toString()) ;
-            } else if (jsonError.get("code") != null && StringUtils.isNumeric(jsonError.get("code").toString())) {
-                errorCode = Integer.parseInt(jsonError.get("code").toString()) ;
+            if (jsonError.get(ERROR_CODE) != null && StringUtils.isNumeric(jsonError.get(ERROR_CODE).toString())) {
+                errorCode = Integer.parseInt(jsonError.get(ERROR_CODE).toString());
+            } else if (jsonError.get(CODE) != null && StringUtils.isNumeric(jsonError.get(CODE).toString())) {
+                errorCode = Integer.parseInt(jsonError.get(CODE).toString());
             }
             // errorMsg存在
-            if (jsonError.get("message") != null) { // 微服务封装errorMsg的情况下选择errorMsg
-                errorMsg = jsonError.get("message").toString();
-            } else if (jsonError.get("errorMsg") != null) { // 微服务没有封装则调用SpringBoot自带异常消息
-                errorMsg = jsonError.get("errorMsg").toString();
+            // 微服务封装errorMsg的情况下选择errorMsg
+            if (jsonError.get(MSG) != null) {
+                errorMsg = jsonError.get(MSG).toString();
+            } else {
+                if (jsonError.get(ERROR_MSG) != null) {
+                    // 微服务没有封装则调用SpringBoot自带异常消息
+                    errorMsg = jsonError.get(ERROR_MSG).toString();
+                }
             }
         }
         // 抛出异常
@@ -194,10 +213,11 @@ public class RestTemplateFactory {
                 throw new RestException(statusCode.value(), responseBodyAsString);
             }
         } catch (HttpServerErrorException e) {
-            throw httpErrorMsg(e); // 异常处理
+            // 异常处理
+            throw httpErrorMsg(e);
         } catch (ResourceAccessException e) {
             log.error(e.getMessage(), e);
-            if (Objects.requireNonNull(e.getMessage()).contains("java.net.ConnectException")) {
+            if (Objects.requireNonNull(e.getMessage()).contains(CONNECT_EXCEPTION)) {
                 throw new RestException(404, "服务连接失败");
             }
             throw new RestException(403, "资源不可用");

@@ -5,8 +5,8 @@ import com.cgcg.context.util.IpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,21 +19,21 @@ import java.util.Map;
  *
  * @author zc.lin
  */
-public class RequestInterceptor extends HandlerInterceptorAdapter {
+public class RequestInterceptor implements HandlerInterceptor {
     private static final Logger log = LoggerFactory.getLogger(RequestInterceptor.class);
     private static final Map<String, Logger> LOGGER_MAP = new HashMap<>();
     private static final boolean INFO_ENABLED = log.isInfoEnabled();
     private static final String LOGGER_TIME_FLAG = "_START_TIME";
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         if (INFO_ENABLED) {
             final String apiOperationValue = RequestApiUtils.fetchApiOperationValue(handler);
             final String params = RequestApiUtils.fetchParam(request);
             this.getLogger(handler).info("{} [{}] [{}] => [{}] {}", request.getMethod(), IpUtils.getIpAddress(request), apiOperationValue, request.getRequestURL(), params);
             request.setAttribute(LOGGER_TIME_FLAG, System.currentTimeMillis());
         }
-        return super.preHandle(request, response, handler);
+        return true;
     }
 
     @Override

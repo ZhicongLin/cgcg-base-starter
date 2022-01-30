@@ -1,5 +1,6 @@
 package com.cgcg.rest.exception;
 
+import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -8,7 +9,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -32,7 +32,7 @@ public class RestExceptionHandlerAdvice {
     @ExceptionHandler(RestException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Map<String, Object> handleException(RestException e) {
-        Map<String, Object> result = new HashMap<>();
+        final Map<String, Object> result = Maps.newHashMapWithExpectedSize(3);
         result.put("code", e.getErrorCode());
         result.put("message", e.getErrorMsg());
         result.put("data", null);

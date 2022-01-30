@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 @Aspect
 @Component
 @Slf4j
-public class RedisMQProducerAspect {
+public class RedisMqProducerAspect {
 
     @Around(value = "@annotation(rmqp)")
     public Object processor(ProceedingJoinPoint joinPoint, Rmqp rmqp) throws Throwable {

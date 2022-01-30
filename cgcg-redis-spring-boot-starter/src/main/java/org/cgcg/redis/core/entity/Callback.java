@@ -8,5 +8,11 @@ package org.cgcg.redis.core.entity;
  */
 public interface Callback {
 
+    /**
+     * redis回调执行入口
+     *
+     * @return void
+     * @author zhicong.lin 2022/1/26
+     */
     void execute();
 }

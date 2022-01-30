@@ -1,7 +1,7 @@
 package com.cgcg.rest.param;
 
 import com.alibaba.fastjson.JSON;
-import com.cgcg.rest.URLUtils;
+import com.cgcg.rest.UrlUtils;
 import com.cgcg.rest.annotation.DynamicParam;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -42,10 +42,7 @@ public class RestParamVisitorImpl implements RestParamVisitor {
      * @Date: 2018/8/15 9:40
      */
     private static RestHandle<String, Object> obj2Map(Object bean) throws Exception {
-//        Class<?> type = bean.getClass();
         final RestHandle<String, Object> returnMap = new RestHandle<>();
-//        BeanInfo beanInfo = Introspector.getBeanInfo(type);
-
         final PropertyDescriptor[] propertyDescriptors = Introspector.getBeanInfo(bean.getClass()).getPropertyDescriptors();
 
         for (PropertyDescriptor descriptor : propertyDescriptors) {
@@ -57,6 +54,17 @@ public class RestParamVisitorImpl implements RestParamVisitor {
         return returnMap;
     }
 
+    /**
+     * 执行组装请求参数
+     *
+     * @param requestHeader 请求头类型
+     * @param param         参数值
+     * @param handle        注解的各个参数
+     * @return void
+     * @author : zhicong.lin
+     * @date : 2022/1/26 16:10
+     */
+    @Override
     public void visitor(RequestHeader requestHeader, Object param, RestHandle<String, Object> handle) {
         final String value = requestHeader.value();
         if (StringUtils.isNotBlank(value)) {
@@ -66,11 +74,33 @@ public class RestParamVisitorImpl implements RestParamVisitor {
         }
     }
 
+    /**
+     * 执行组装请求参数
+     *
+     * @param annotation 请求参数
+     * @param param      参数值
+     * @param restParam  注解的各个参数
+     * @return void
+     * @author : zhicong.lin
+     * @date : 2022/1/26 16:10
+     */
+    @Override
     public void visitor(RequestParam annotation, Object param, RestHandle<String, Object> restParam) {
         restParam.getParameterUri().append("&").append(annotation.value()).append("=").append("{").append(annotation.value()).append("}");
         restParam.getUriParams().put(annotation.value(), param);
     }
 
+    /**
+     * 执行组装请求参数
+     *
+     * @param modelAttribute 表单传参
+     * @param param          参数值
+     * @param restParam      注解的各个参数
+     * @return void
+     * @author : zhicong.lin
+     * @date : 2022/1/26 16:10
+     */
+    @Override
     public void visitor(ModelAttribute modelAttribute, Object param, RestHandle<String, Object> restParam) {
         try {
             final String value = modelAttribute.value();
@@ -94,10 +124,32 @@ public class RestParamVisitorImpl implements RestParamVisitor {
         }
     }
 
+    /**
+     * 执行组装请求参数
+     *
+     * @param annotation 路径带参数的类型
+     * @param param      参数值
+     * @param restParam  注解的各个参数
+     * @return void
+     * @author : zhicong.lin
+     * @date : 2022/1/26 16:10
+     */
+    @Override
     public void visitor(PathVariable annotation, Object param, RestHandle<String, Object> restParam) {
         restParam.getUriParams().put(annotation.value(), param.toString());
     }
 
+    /**
+     * 执行组装请求参数
+     *
+     * @param annotation json传参类型
+     * @param param      参数值
+     * @param restParam  注解的各个参数
+     * @return void
+     * @author : zhicong.lin
+     * @date : 2022/1/26 16:10
+     */
+    @Override
     public void visitor(RequestBody annotation, Object param, RestHandle<String, Object> restParam) {
         if (param instanceof String) {
             restParam.setBodyString(param.toString());
@@ -108,6 +160,17 @@ public class RestParamVisitorImpl implements RestParamVisitor {
         restParam.getHeaders().add(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
     }
 
+    /**
+     * 执行组装请求参数
+     *
+     * @param annotation 文件传输类型
+     * @param param      参数值
+     * @param restParam  注解的各个参数
+     * @return void
+     * @author : zhicong.lin
+     * @date : 2022/1/26 16:10
+     */
+    @Override
     public void visitor(RequestPart annotation, Object param, RestHandle<String, Object> restParam) {
         restParam.setContentType(MediaType.MULTIPART_FORM_DATA_VALUE);
         restParam.getHeaders().add(CONTENT_TYPE, MediaType.MULTIPART_FORM_DATA_VALUE);
@@ -115,12 +178,22 @@ public class RestParamVisitorImpl implements RestParamVisitor {
         this.saveTempFile(restParam, fileKey, param);
     }
 
+    /**
+     * 执行组装请求参数
+     *
+     * @param annotation 动态参数类型
+     * @param param      参数值
+     * @param restParam  注解的各个参数
+     * @return void
+     * @author : zhicong.lin
+     * @date : 2022/1/26 16:10
+     */
     @Override
     public void visitor(DynamicParam annotation, Object param, RestHandle<String, Object> restParam) {
         if (annotation.isUrl()) {
             restParam.setUrl(param.toString());
         } else if (StringUtils.isNotBlank(annotation.value())) {
-            restParam.setUrl(URLUtils.add(restParam.getUrl(), annotation.value()));
+            restParam.setUrl(UrlUtils.add(restParam.getUrl(), annotation.value()));
         }
     }
 

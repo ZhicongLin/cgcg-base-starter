@@ -9,6 +9,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.Locale;
 
+/**
+ * @author zhicong.lin
+ */
 @Slf4j
 @Component
 public class Translator {

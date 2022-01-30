@@ -4,8 +4,10 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.cgcg.context.SpringContextHolder;
 import com.cgcg.context.enums.CharsetCode;
+import com.google.common.collect.Maps;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 
@@ -18,16 +20,28 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.TreeMap;
 
+/**
+ * @author zhicong.lin
+ */
+@Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class DES3Util {
+public final class Des3Utils {
 
-    // 定义加密算法，DESede即3DES
+    /**
+     * 定义加密算法，DESede即3DES
+     */
     private static final String ALGORITHM = "DESede";
 
-    private static final String THREEDES_KEY = "123456";
+    private static final String THREES_KEY = "123456";
 
-    // MD5
-    public static String MD5Encoding(String source) throws NoSuchAlgorithmException {
+    /**
+     * md5操作字符串
+     *
+     * @param source 进行md5的字符串
+     * @return md5后的字符串
+     * @author zhicong.lin 2022/1/26
+     */
+    public static String md5Encoding(String source) throws NoSuchAlgorithmException {
         MessageDigest mdInst = MessageDigest.getInstance("MD5");
         byte[] input = source.getBytes();
         mdInst.update(input);
@@ -59,7 +73,7 @@ public final class DES3Util {
      * @param src 源数据的字节数组
      */
     public static String encryptMode(String src) {
-        return encryptMode(src, THREEDES_KEY);
+        return encryptMode(src, THREES_KEY);
     }
 
     /**
@@ -76,7 +90,8 @@ public final class DES3Util {
             Cipher cipher = Cipher.getInstance(ALGORITHM);
             cipher.init(Cipher.ENCRYPT_MODE, deskey);
             return Base64Util.encode(cipher.doFinal(targetSrc));
-        } catch (Exception ignored) { //NOSONAR
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
         }
         return "";
     }
@@ -87,7 +102,7 @@ public final class DES3Util {
      * @param src 密文的字节数组
      */
     public static String decryptMode(String src) {
-        return decryptMode(src, THREEDES_KEY);
+        return decryptMode(src, THREES_KEY);
     }
 
     /**
@@ -103,7 +118,7 @@ public final class DES3Util {
             c1.init(Cipher.DECRYPT_MODE, deskey);
             assert targetSrc != null;
             return new String(c1.doFinal(targetSrc), CharsetCode.forUtf8());
-        } catch (Exception ignored) {  //NOSONAR
+        } catch (Exception ignored) {  
         }
         return "";
     }
@@ -128,9 +143,9 @@ public final class DES3Util {
                 String md5Sign = sb.substring(0, sb.length() - 1);
                 // 进行MD5签名
                 try {
-                    return MD5Encoding(md5Sign);
+                    return md5Encoding(md5Sign);
                 } catch (NoSuchAlgorithmException e) {
-                    throw new RuntimeException("数据签名发生异常 : " + e.getMessage()); //NOSONAR
+                    throw new RuntimeException("数据签名发生异常 : " + e.getMessage()); 
                 }
             }
         }
@@ -140,19 +155,19 @@ public final class DES3Util {
     /**
      * 对数据进行验签
      *
-     * @param JsonData JSON格式的字符串
+     * @param jsonData JSON格式的字符串
      * @param sign     原签名字符串
      * @throws NoSuchAlgorithmException
      */
     @SuppressWarnings("unchecked")
-    public static boolean checkSign(String JsonData, String sign) throws NoSuchAlgorithmException {
-        if (JsonData == null) {
-            throw new RuntimeException("签名内容不能为空"); //NOSONAR
+    public static boolean checkSign(String jsonData, String sign) throws NoSuchAlgorithmException {
+        if (jsonData == null) {
+            throw new RuntimeException("签名内容不能为空"); 
         }
         if (sign == null) {
-            throw new RuntimeException("原签名内容不能为空"); //NOSONAR
+            throw new RuntimeException("原签名内容不能为空"); 
         }
-        TreeMap<String, Object> testMap = JSONObject.parseObject(JsonData, TreeMap.class);
+        TreeMap<String, Object> testMap = JSONObject.parseObject(jsonData, TreeMap.class);
         String checkData = testMap.get("data").toString();
         TreeMap<String, Object> tescheckDataMap = JSONObject.parseObject(checkData, TreeMap.class);
         // 对签名的数据体做拼接
@@ -162,7 +177,7 @@ public final class DES3Util {
         }
         String checkMd5Sign = stringBuilder.substring(0, stringBuilder.length() - 1);
         // 进行MD5加密，并与原签名进行比对
-        String signStr = MD5Encoding(checkMd5Sign);
+        String signStr = md5Encoding(checkMd5Sign);
         return StringUtils.equals(signStr, sign);
     }
 
@@ -190,11 +205,15 @@ public final class DES3Util {
         return new String(key);
     }
 
-    //生成一个DES密钥
+    /**
+     * 生成一个DES密钥
+     *
+     * @return String
+     */
     public static String getKey() {
         try {
             KeyGenerator keyGenerator = KeyGenerator.getInstance("DES");
-            keyGenerator.init(56); // 生成一个Key
+            keyGenerator.init(56);
             SecretKey generateKey = keyGenerator.generateKey();
             // 转变为字节数组
             byte[] encoded = generateKey.getEncoded();
@@ -208,7 +227,7 @@ public final class DES3Util {
     /**
      * 获取配置系统DES3加密密钥
      *
-     * @auth zhicong.lin
+     * @author zhicong.lin
      * @date 2019/6/27
      */
     public static String getSystemEncrypt(String envKey) {
@@ -225,12 +244,12 @@ public final class DES3Util {
     }
 
     public static void main(String[] args) {
-        final HashMap<String, Object> hashMap = new HashMap<>();
+        final HashMap<String, Object> hashMap = Maps.newHashMapWithExpectedSize(4);
         hashMap.put("yes", "OK");
         hashMap.put("id", "11");
-        final String s1 = DES3Util.encryptMode(JSON.toJSONString(hashMap));
+        final String s1 = Des3Utils.encryptMode(JSON.toJSONString(hashMap));
         System.out.println("s1 = " + s1);
-        final String s = DES3Util.decryptMode("flVC/ez9pMBPPOOJNzwSHeVkpyeZlRCp", "S5EXCbIx98nrWA7a");
+        final String s = Des3Utils.decryptMode("flVC/ez9pMBPPOOJNzwSHeVkpyeZlRCp", "S5EXCbIx98nrWA7a");
         System.out.println("s = " + s);
     }
 

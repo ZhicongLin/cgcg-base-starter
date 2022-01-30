@@ -19,7 +19,6 @@ import org.cgcg.redis.core.exception.RedisExpireException;
 import org.cgcg.redis.core.util.SpelUtils;
 import org.springframework.core.env.Environment;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
 
@@ -36,6 +35,7 @@ public class RedisCacheObject {
     private static final long START_DEFAULT_TIME = 3600L;
     private static final long DEFAULT_TIME = 7201L;
     private static String timeRegex = "^\\d+$";
+    private static String SP = "#";
     private Environment env;
     private ProceedingJoinPoint proceedingJoinPoint;
     private Signature signature;
@@ -78,7 +78,7 @@ public class RedisCacheObject {
         final String key = redisAnn.key();
         if (StringUtils.isBlank(key)) {
             cacheKey = JSON.toJSONString(proceedingJoinPoint.getArgs());
-        } else if (key.contains("#")) {
+        } else if (key.contains(SP)) {
             MethodSignature methodSignature = (MethodSignature) signature;
             cacheKey = SpelUtils.parse(proceedingJoinPoint.getTarget(), key, methodSignature.getMethod(), proceedingJoinPoint.getArgs());
         } else {
@@ -90,7 +90,7 @@ public class RedisCacheObject {
      * 判断时间是纯数字还是表达式，如果纯数字，则直接返回long格式；
      * 如果表达式则去配置文件获取时间
      *
-     * @auth zhicong.lin
+     * @author zhicong.lin
      * @date 2019/6/21
      */
     private void setExpireTime(String[] expire) {
@@ -99,7 +99,10 @@ public class RedisCacheObject {
         }
         if (expire.length == 1) {
             this.time = this.getExpireLong(expire[0]);
-        } else if (expire.length == 2) {
+            return;
+        }
+        final int len = 2;
+        if (expire.length == len) {
             final long expireLong1 = this.getExpireLong(expire[0]);
             final long expireLong2 = this.getExpireLong(expire[1]);
             if (expireLong1 > expireLong2) {
@@ -143,7 +146,7 @@ public class RedisCacheObject {
      * 有cacheName加上当前cacheName，修改默认时间和单位
      * 没有的话，直接返回
      *
-     * @auth zhicong.lin
+     * @author zhicong.lin
      * @date 2019/6/21
      */
     private void generationNameSpace() {
@@ -160,7 +163,7 @@ public class RedisCacheObject {
     /**
      * 生成缓存名称 + “::select” 格式的cacheName
      *
-     * @auth zhicong.lin
+     * @author zhicong.lin
      * @date 2019/6/21
      */
     private void generationCacheName() {

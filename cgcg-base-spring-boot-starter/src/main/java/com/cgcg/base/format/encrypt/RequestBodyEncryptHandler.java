@@ -3,7 +3,7 @@ package com.cgcg.base.format.encrypt;
 import com.cgcg.base.core.enums.FormatProperty;
 import com.cgcg.base.core.exception.EncryptionParamWrongException;
 import com.cgcg.base.format.CgCgInputStreamMessage;
-import com.cgcg.context.util.DES3Util;
+import com.cgcg.context.util.Des3Utils;
 import com.cgcg.context.util.HttpHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -41,7 +41,7 @@ public class RequestBodyEncryptHandler extends RequestBodyAdviceAdapter implemen
     public HttpInputMessage beforeBodyRead(HttpInputMessage httpInputMessage, MethodParameter methodParameter, Type type, Class<? extends HttpMessageConverter<?>> aClass) throws IOException {
         final HttpHeaders headers = httpInputMessage.getHeaders();
         final String requestBodyString = HttpHelper.getStringBody(httpInputMessage.getBody());
-        final String requestParam = DES3Util.decryptMode(requestBodyString, FormatProperty.des(FormatProperty.DES_PARAM));
+        final String requestParam = Des3Utils.decryptMode(requestBodyString, FormatProperty.des(FormatProperty.DES_PARAM));
         log.debug("body decrypted ==> {}", requestParam);
         if (StringUtils.isBlank(requestParam)) {
             throw new EncryptionParamWrongException(requestBodyString);

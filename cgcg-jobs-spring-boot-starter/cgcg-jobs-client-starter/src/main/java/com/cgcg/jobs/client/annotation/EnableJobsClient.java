@@ -9,6 +9,9 @@ import org.springframework.stereotype.Indexed;
 import java.lang.annotation.*;
 
 
+/**
+ * @author zhicong.lin
+ */
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented

@@ -4,18 +4,25 @@ import com.cgcg.context.util.UUIDUtils;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 基础线程任务类
+ *
+ * @author zhicong.lin
+ */
 @Slf4j
 @Getter
-public abstract class ExecutorTask implements Runnable {
+public abstract class AbstractExecutorTask implements Runnable {
 
     private boolean cancel = false;
     private boolean finish = false;
     private Thread currentThread;
     private final String id;
-    public ExecutorTask() {
-        id = UUIDUtils.getUUID();
+
+    public AbstractExecutorTask() {
+        id = UUIDUtils.getUuid();
         log.info("创建任务[{}]", id);
     }
+
     /**
      * When an object implementing interface <code>Runnable</code> is used
      * to create a thread, starting the thread causes the object's

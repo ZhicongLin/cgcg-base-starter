@@ -34,7 +34,7 @@ public final class RequestApiUtils {
 
 
     public static String fetchParam(HttpServletRequest request) {
-        Enumeration parameterNames = request.getParameterNames();
+        Enumeration<?> parameterNames = request.getParameterNames();
         if (!parameterNames.hasMoreElements()) {
             return "";
         } else {

@@ -28,20 +28,22 @@ public class ValidateAspect {
     @Around("@annotation(vldAnn)")
     public Object specification(ProceedingJoinPoint pjp, Validate vldAnn) throws Throwable {
         final Object[] args = pjp.getArgs();
-        if (args == null || args.length == 0) { //没有参数，无需对参数进行校验
+        //没有参数，无需对参数进行校验
+        if (args == null || args.length == 0) {
             return pjp.proceed();
         }
         final MethodSignature signature = (MethodSignature) pjp.getSignature();
         final Method method = signature.getMethod();
         final String specMethod = vldAnn.method();
-        final String specMethodName = specMethod.equals("") ?  method.getName() : specMethod;
+        final String specMethodName = "".equals(specMethod) ?  method.getName() : specMethod;
         try {
             final Class<?>[] parameterTypes = method.getParameterTypes();
             final Class<?> validateClass = vldAnn.value();
             final Object bean = SpringContextHolder.getBean(validateClass);
             final Method validateMethod = validateClass.getDeclaredMethod(specMethodName, parameterTypes);
             validateMethod.setAccessible(true);
-            validateMethod.invoke(bean, args); //执行校验方法，校验不通过抛出异常
+            //执行校验方法，校验不通过抛出异常
+            validateMethod.invoke(bean, args);
         } catch (InvocationTargetException e) {
             final Throwable cause = this.getCause(e);
             if (cause instanceof CommonException) {

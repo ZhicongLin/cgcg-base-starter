@@ -3,7 +3,7 @@ package com.cgcg.base.format.encrypt;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.cgcg.base.core.enums.FormatProperty;
-import com.cgcg.context.util.DES3Util;
+import com.cgcg.context.util.Des3Utils;
 import com.cgcg.context.util.ReflectionUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -19,7 +19,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 /**
  * 结果集加密处理
  *
- * @auth zhicong.lin
+ * @author zhicong.lin
  * @date 2019/6/25
  */
 @Slf4j
@@ -58,7 +58,7 @@ public class ResponseBodyEncryptHandler implements ResponseBodyAdvice {
             data = ReflectionUtils.getFieldValue(result, fmtField);
         }
         if (data != null) {
-            final String encryData = DES3Util.encryptMode(JSON.toJSONString(data), encryptionKey);
+            final String encryData = Des3Utils.encryptMode(JSON.toJSONString(data), encryptionKey);
             if (jos == null) {
                 ReflectionUtils.setFieldValue(result, fmtField, encryData);
             } else {
@@ -68,7 +68,7 @@ public class ResponseBodyEncryptHandler implements ResponseBodyAdvice {
         } else {
             final Class<?> formatClass = FormatProperty.getFormatClass();
             if (!(result.getClass().equals(formatClass))) {
-                return DES3Util.encryptMode(JSON.toJSONString(result), encryptionKey);
+                return Des3Utils.encryptMode(JSON.toJSONString(result), encryptionKey);
             }
         }
         return result;

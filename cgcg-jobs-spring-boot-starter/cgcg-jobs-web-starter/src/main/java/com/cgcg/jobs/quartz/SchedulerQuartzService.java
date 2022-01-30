@@ -11,11 +11,16 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * @author zhicong.lin
+ */
 @Slf4j
 @Component
 public class SchedulerQuartzService {
 
-    // 任务调度
+    /**
+     * 任务调度
+     */
     @Resource
     private Scheduler scheduler;
 
@@ -134,11 +139,13 @@ public class SchedulerQuartzService {
     public void resumeJob(String name, String group) throws SchedulerException {
         JobKey jobKey = new JobKey(name, group);
         JobDetail jobDetail = scheduler.getJobDetail(jobKey);
-        if (jobDetail == null)
+        if (jobDetail == null) {
             return;
+        }
         scheduler.resumeJob(jobKey);
         log.info(">>> 恢复任务[{}.{}] <<<", group, name);
     }
+
     /**
      * 恢复某个任务
      *

@@ -12,6 +12,7 @@ import java.util.Map;
 
 /**
  * 以静态变量保存Spring ApplicationContext, 可在任何代码任何地方任何时候中取出ApplicaitonContext.
+ * @author zhicong.lin
  */
 @Slf4j
 @Component
@@ -25,7 +26,7 @@ public class SpringContextHolder implements ApplicationContextAware {
      */
     @SuppressWarnings("unchecked")
     public static <T> T getBean(String name) {
-        return (T) applicationContext.getBean(name); // NOSONAR
+        return (T) applicationContext.getBean(name);
     }
 
     /**
@@ -50,10 +51,11 @@ public class SpringContextHolder implements ApplicationContextAware {
     /**
      * 实现ApplicationContextAware接口的context注入函数, 将其存入静态变量.
      */
+    @Override
     public void setApplicationContext(ApplicationContext applicationContext) {
         log.info("Initializing SpringContextHolder");
         Assert.notNull(applicationContext, "SpringContextHolder Load Error");
-        SpringContextHolder.applicationContext = applicationContext; // NOSONAR
-        environment = getBean(Environment.class);  // NOSONAR
+        SpringContextHolder.applicationContext = applicationContext;
+        environment = getBean(Environment.class);
     }
 }

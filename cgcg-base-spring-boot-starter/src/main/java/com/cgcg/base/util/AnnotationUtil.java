@@ -20,13 +20,13 @@ import java.util.List;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AnnotationUtil {
-    private static final List<Class<?>> ignore = Arrays.asList(Documented.class, Target.class, Retention.class,
+    private static final List<Class<?>> IGNORE = Arrays.asList(Documented.class, Target.class, Retention.class,
             Controller.class, Component.class, Indexed.class, Inherited.class, Api.class);
 
     /**
      * 判断clzz注解是否包含了ResponseBody
      *
-     * @auth zhicong.lin
+     * @author zhicong.lin
      * @date 2019/7/4
      */
     public static boolean hasResponseBody(Class<?> clzz) {
@@ -36,7 +36,7 @@ public final class AnnotationUtil {
     /**
      * 判断clzz的注解是否包含annotationType
      *
-     * @auth zhicong.lin
+     * @author zhicong.lin
      * @date 2019/7/4
      */
     public static boolean hasAnnotation(Class<?> clzz, Class<? extends Annotation> annotationType) {
@@ -47,7 +47,7 @@ public final class AnnotationUtil {
                 return true;
             }
             boolean flag = false;
-            if (!ignore.contains(annoType)) {
+            if (!IGNORE.contains(annoType)) {
                 flag = hasAnnotation(annoType, annotationType);
             }
             if (flag) {
@@ -66,7 +66,7 @@ public final class AnnotationUtil {
                 return t;
             }
             final Class<? extends Annotation> annoType = annotation.annotationType();
-            if (!ignore.contains(annoType)) {
+            if (!IGNORE.contains(annoType)) {
                 final T result = getAnnotation(annoType, annotationType);
                 if (result != null) {
                     return result;

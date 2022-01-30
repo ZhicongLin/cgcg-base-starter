@@ -21,7 +21,7 @@ import java.util.List;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MappingProcessor {
-    private static final List<Class<?>> mappingAnnotation = Arrays.asList(RequestMapping.class, PostMapping.class, GetMapping.class, PutMapping.class,
+    private static final List<Class<?>> MAPPING_ANNOTATION = Arrays.asList(RequestMapping.class, PostMapping.class, GetMapping.class, PutMapping.class,
             DeleteMapping.class, PatchMapping.class, DynamicMapping.class, LoadMapping.class, UpLoadMapping.class);
 
     /**
@@ -37,7 +37,7 @@ public final class MappingProcessor {
     private static MappingHandle execute(Annotation[] annotations, String value) {
         for (Annotation annotation : annotations) {
             final Class<? extends Annotation> anType = annotation.annotationType();
-            if (!mappingAnnotation.contains(anType)) {
+            if (!MAPPING_ANNOTATION.contains(anType)) {
                 continue;
             }
             final String[] valueArr = (String[]) ReflectionUtils.invokeMethod(annotation, "value", new Class[]{}, new Object[]{});

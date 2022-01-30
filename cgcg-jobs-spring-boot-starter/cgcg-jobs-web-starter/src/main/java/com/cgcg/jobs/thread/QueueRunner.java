@@ -9,7 +9,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-
+/**
+ * @author zhicong.lin
+ */
 @Slf4j
 @Component
 public class QueueRunner {
@@ -21,7 +23,7 @@ public class QueueRunner {
     @Bean
     public ExecutorService executorService() {
         final int corePoolSize = Runtime.getRuntime().availableProcessors();
-        final ThreadPoolExecutor poolExecutor = new ThreadPoolExecutor(corePoolSize, corePoolSize * 2 + 1, 2, TimeUnit.MINUTES, new LinkedBlockingQueue<>());
+        final ThreadPoolExecutor poolExecutor = new ThreadPoolExecutor(corePoolSize, corePoolSize * 2 + 1, 2, TimeUnit.MINUTES, new LinkedBlockingQueue<>(), r -> new Thread(r));
         poolExecutor.execute(queueRestartRunner);
         poolExecutor.execute(queueStopTaskRunner);
         return poolExecutor;

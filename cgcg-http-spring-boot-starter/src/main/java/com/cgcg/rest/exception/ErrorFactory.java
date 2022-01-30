@@ -21,7 +21,8 @@ import lombok.extern.slf4j.Slf4j;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ErrorFactory {
-
+    public static final String UNAUTHORIZED = "unauthorized";
+    public static final String INVALID_TOKEN = "invalid_token";
     private Integer errorCode;
 
     private String errorMsg;
@@ -30,7 +31,7 @@ public class ErrorFactory {
      * 获取异常结果 .
      *
      * @Param: [errorBody]
-     * @Return: com.restframework.core.exception.ErrorFactory
+     * @Return: ErrorFactory
      * @Author: ZhiCong Lin
      * @Date: 2018/8/13 9:30
      */
@@ -38,9 +39,9 @@ public class ErrorFactory {
         try {
             JSONObject object = JSON.parseObject(errorBody);
             String error = object.getString("error");
-            if ("unauthorized".equals(error)) {
+            if (UNAUTHORIZED.equals(error)) {
                 return new ErrorFactory(100001401, "无权访问该接口");
-            } else if ("invalid_token".equals(error)) {
+            } else if (INVALID_TOKEN.equals(error)) {
                 return new ErrorFactory(100002401, "授权码无效");
             }
         } catch (JSONException je) {
@@ -49,7 +50,4 @@ public class ErrorFactory {
         return null;
     }
 
-    public static void main(String[] args) {
-        ErrorFactory error = getError("{1234");
-    }
 }

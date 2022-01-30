@@ -13,11 +13,15 @@ import java.io.ByteArrayOutputStream;
 
 /**
  * 序列化工具
+ *
+ * @author zhicong.lin
  * @param <T>
  */
 @Slf4j
 public class KryoRedisSerializer<T> implements RedisSerializer<T> {
-    // 由于kryo不是线程安全的，所以每个线程都使用独立的kryo
+    /**
+     * 由于kryo不是线程安全的，所以每个线程都使用独立的kryo
+     */
     final ThreadLocal<Kryo> kryoLocal = ThreadLocal.withInitial(() -> {
         final Kryo kryo = new Kryo();
         // 支持对象循环引用（否则会栈溢出）

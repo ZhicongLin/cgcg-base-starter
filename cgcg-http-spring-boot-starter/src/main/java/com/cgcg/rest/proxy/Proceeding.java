@@ -11,6 +11,9 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
+/**
+ * @author zhicong.lin
+ */
 @Setter
 @Getter
 public class Proceeding {
@@ -30,15 +33,19 @@ public class Proceeding {
         this.logger = LoggerFactory.getLogger(this.logName);
     }
 
-    public static Object cglib(Class interfaceClass, Object fallbackBean, Enhancer enhancer) {
+    public static <T> T cglib(Class<T> interfaceClass, Object fallbackBean, Enhancer enhancer) {
         final MethodInterceptor methodInterceptor = (o, method, arguments, methodProxy) -> RestBuilderProcessor.invoke(new Proceeding(method, arguments, interfaceClass, fallbackBean));
         enhancer.setSuperclass(interfaceClass);
         enhancer.setCallback(methodInterceptor);
-        return enhancer.create();
+        @SuppressWarnings("unchecked")
+        T t = (T) enhancer.create();
+        return t;
     }
 
-    public static Object jdk(Class interfaceClass, Object fallbackBean) {
+    public static <T> T jdk(Class<T> interfaceClass, Object fallbackBean) {
         final InvocationHandler invocationHandler = (proxy, method, args) -> RestBuilderProcessor.invoke(new Proceeding(method, args, interfaceClass, fallbackBean));
-        return Proxy.newProxyInstance(interfaceClass.getClassLoader(), new Class[]{interfaceClass}, invocationHandler);
+        @SuppressWarnings("unchecked")
+        T o = (T) Proxy.newProxyInstance(interfaceClass.getClassLoader(), new Class[]{interfaceClass}, invocationHandler);
+        return o;
     }
 }

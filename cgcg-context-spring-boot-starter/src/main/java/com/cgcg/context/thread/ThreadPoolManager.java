@@ -8,6 +8,7 @@ import java.util.concurrent.*;
 
 /**
  * 线程池工具类
+ * @author zhicong.lin
  */
 @Setter
 @Getter
@@ -93,12 +94,12 @@ public class ThreadPoolManager {
      */
     public static void cancel(Runnable task) {
         if (task != null) {
-            if (task instanceof ExecutorTask) {
-                final ExecutorTask executorTask = (ExecutorTask) task;
-                if (!executorTask.isFinish()) {
-                    executorTask.cancelTask();
+            if (task instanceof AbstractExecutorTask) {
+                final AbstractExecutorTask abstractExecutorTask = (AbstractExecutorTask) task;
+                if (!abstractExecutorTask.isFinish()) {
+                    abstractExecutorTask.cancelTask();
                 }
-                getThreadPoolExecutor().getQueue().remove(executorTask);
+                getThreadPoolExecutor().getQueue().remove(abstractExecutorTask);
             } else {
                 getThreadPoolExecutor().getQueue().remove(task);
             }

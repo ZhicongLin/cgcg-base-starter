@@ -17,8 +17,10 @@ import java.lang.annotation.*;
 public @interface Rmqp {
     //通道值
     String[] value();
+
     //推送失败重试次数 <=1不重试
     int retry() default 1;
+
     //回调方法
     Class<? extends RedisMqPushFailCallback> fallback() default RedisMqPushFailCallback.class;
 

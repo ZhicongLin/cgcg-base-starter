@@ -15,6 +15,7 @@ import java.lang.annotation.*;
 @Documented
 public @interface Rmqc {
     String value();
+
     //消息内容处理失败重试次数 0不重试
     int retry() default 0;
 }

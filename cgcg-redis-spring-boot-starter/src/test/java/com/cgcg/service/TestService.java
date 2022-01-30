@@ -1,8 +1,8 @@
 package com.cgcg.service;
 
-import org.cgcg.redis.core.annotation.Rmqp;
 import org.cgcg.redis.core.annotation.RedisCache;
 import org.cgcg.redis.core.annotation.RedisNameSpace;
+import org.cgcg.redis.core.annotation.Rmqp;
 import org.cgcg.redis.core.enums.RedisEnum;
 import org.springframework.stereotype.Service;
 
@@ -33,7 +33,7 @@ public class TestService {
     @RedisCache(key = "#key", expire = {"30", "500"}, type = RedisEnum.UPD)
     public Map<String, Object> cache(String key) {
         final Map<String, Object> map = new HashMap<>();
-        map.put(key,  "haha" + key);
+        map.put(key, "haha" + key);
         return map;
     }
 
@@ -44,7 +44,7 @@ public class TestService {
             return null;
         }
         final Map<String, Object> map = new HashMap<>();
-        map.put(key,  "haha" + key);
+        map.put(key, "haha" + key);
         return map;
     }
 

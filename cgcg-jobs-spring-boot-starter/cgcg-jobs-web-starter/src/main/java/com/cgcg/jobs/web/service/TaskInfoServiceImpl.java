@@ -22,6 +22,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * @author zhicong.lin
+ */
 @Slf4j
 @Service
 public class TaskInfoServiceImpl implements TaskInfoService {
@@ -37,6 +40,16 @@ public class TaskInfoServiceImpl implements TaskInfoService {
     private QueueStopTaskRunner queueStopTaskRunner;
     @Resource
     private QueueRestartRunner queueRestartRunner;
+
+    /**
+     * 保存或者修改任务信息
+     *
+     * @param info 任务信息
+     * @return void
+     * @throws SchedulerException
+     * @author : zhicong.lin
+     * @date : 2022/1/26 15:38
+     */
     @Override
     public void saveOrUpdateTaskInfo(TaskInfo info) throws SchedulerException {
         final Long id = info.getId();
@@ -49,7 +62,6 @@ public class TaskInfoServiceImpl implements TaskInfoService {
             final int update = this.taskInfoMapper.update(info);
             if (isRemoveOldTask && update > 0) {
                 queueStopTaskRunner.push(oldInfo);
-//                this.schedulerQuartzService.deleteJob(oldInfo.getTaskKey(), oldInfo.getGroupKey());
                 this.schedulerQuartzService.startTaskInfo(info);
             } else if (!oldInfo.getCron().equals(info.getCron())) {
                 this.schedulerQuartzService.modifyJob(info.getTaskKey(), info.getGroupKey(), info.getCron());
@@ -60,6 +72,13 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         }
     }
 
+    /**
+     * 获取全部服务
+     *
+     * @return java.util.List<com.cgcg.jobs.model.TaskInfo>
+     * @author : zhicong.lin
+     * @date : 2022/1/26 15:39
+     */
     @Override
     public List<TaskInfo> findAll() {
         final List<TaskInfo> allTaskInfo = taskInfoMapper.findAllTaskInfo();
@@ -69,6 +88,16 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         return allTaskInfo;
     }
 
+    /**
+     * 保存运行记录
+     *
+     * @param taskInfo 任务
+     * @param callback 任务执行回调
+     * @return java.lang.Long
+     * @throws SchedulerException
+     * @author : zhicong.lin
+     * @date : 2022/1/26 15:40
+     */
     @Override
     public Long saveRunRecode(TaskInfo taskInfo, JobsRunCallBack callback) throws SchedulerException {
         final TaskRunRecode taskRunRecode = new TaskRunRecode();
@@ -87,6 +116,17 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         return null;
     }
 
+    /**
+     * 修改服务器状态
+     *
+     * @param id       服务器详情id
+     * @param serverId 服务器基本信息id
+     * @param status   状态
+     * @return com.cgcg.jobs.model.TaskServer
+     * @throws SchedulerException
+     * @author : zhicong.lin
+     * @date : 2022/1/26 15:41
+     */
     @Override
     public TaskServer modifyStatus(Long id, Long serverId, Integer status) throws SchedulerException {
         final List<TaskServer> servers = this.taskServerMapper.findByTaskId(id);
@@ -106,16 +146,24 @@ public class TaskInfoServiceImpl implements TaskInfoService {
         if (serverList.isEmpty()) {
             // 删除任务
             queueStopTaskRunner.push(taskInfo);
-//            this.schedulerQuartzService.deleteJob(taskInfo.getTaskKey(), taskInfo.getGroupKey());
         } else {
             // 重启任务
             taskInfo.setServers(serverList);
             queueRestartRunner.push(taskInfo);
-//            this.schedulerQuartzService.resumeJob(taskInfo.getTaskKey(), taskInfo.getGroupKey(), taskInfo);
         }
         return taskServer;
     }
 
+    /**
+     * 停止服务器执行任务
+     *
+     * @param info      任务信息
+     * @param serverIds 服务器基本信息id列表
+     * @return void
+     * @throws SchedulerException
+     * @author : zhicong.lin
+     * @date : 2022/1/26 15:43
+     */
     @Override
     public void stopServers(TaskInfo info, List<Long> serverIds) throws SchedulerException {
         final List<TaskServer> servers = info.getServers();
@@ -133,21 +181,21 @@ public class TaskInfoServiceImpl implements TaskInfoService {
             }
             info.setServers(newServers);
             queueRestartRunner.push(info);
-//            this.schedulerQuartzService.resumeJob(info.getTaskKey(), info.getGroupKey(), info);
         } else {
             queueStopTaskRunner.push(info);
-//            this.schedulerQuartzService.deleteJob(info.getTaskKey(), info.getGroupKey());
         }
     }
 
     private Long checkAndCloseTask(TaskInfo taskInfo) throws SchedulerException {
         final int defeatedCount = this.jobsWebProperties.getDefeatedCount();
-        if (defeatedCount <= 0) { // 失败不停止， 发起重试
+        // 失败不停止， 发起重试
+        if (defeatedCount <= 0) {
             return taskInfo.getServer().getId();
         }
         final List<TaskRunRecode> tks = this.taskInfoMapper.findRecodeByServerId(taskInfo.getServer().getId(), defeatedCount);
         final long count = tks.stream().filter(TaskRunRecode::getResult).count();
-        if (tks.size() == 5 && count == 0) { //大于0表示当前defeatedCount笔数据内有成功的数据，表示未达到暂停任务标准
+        //大于0表示当前defeatedCount笔数据内有成功的数据，表示未达到暂停任务标准
+        if (tks.size() == jobsWebProperties.getDefeatedCount() && count == 0) {
             final TaskServer server = this.modifyStatus(taskInfo.getId(), taskInfo.getServer().getId(), 2);
             log.warn("任务[{}.{}]已连续失败{}次，暂停向服务[{}:{}]发布执行任务", taskInfo.getGroupKey(),
                     taskInfo.getTaskKey(), defeatedCount, server.getHost(), server.getPort());

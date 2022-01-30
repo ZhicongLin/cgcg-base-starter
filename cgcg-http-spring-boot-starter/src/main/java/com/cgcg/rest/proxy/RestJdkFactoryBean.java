@@ -4,19 +4,22 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.FactoryBean;
 
+/**
+ * @author zhicong.lin
+ */
 @Setter
 @Getter
-public class RestJdkFactoryBean implements FactoryBean {
+public class RestJdkFactoryBean<T> implements FactoryBean<T> {
 
-    private Class interfaceClass;
+    private Class<T> interfaceClass;
     private Object fallbackBean;
     @Override
-    public Object getObject() {
+    public T getObject() {
         return Proceeding.jdk(interfaceClass, fallbackBean);
     }
 
     @Override
-    public Class getObjectType() {
+    public Class<T> getObjectType() {
         return this.interfaceClass;
     }
 

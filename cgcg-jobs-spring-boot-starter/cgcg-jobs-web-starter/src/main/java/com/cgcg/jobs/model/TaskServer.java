@@ -2,8 +2,9 @@ package com.cgcg.jobs.model;
 
 import lombok.Data;
 
-import java.util.List;
-
+/**
+ * @author zhicong.lin 2022/1/26
+ */
 @Data
 public class TaskServer {
     private Long id;
@@ -11,5 +12,5 @@ public class TaskServer {
     private String host;
     private Integer port;
     private Integer status;
-    private Integer coreCount; //Runtime.getRuntime().availableProcessors()
+    private Integer coreCount;
 }

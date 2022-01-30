@@ -1,5 +1,7 @@
 ## cgcg-redis-spring-boot-starter
+
 服务redis缓存工具基础包
+
 ### 包功能简介
 
     一、注解
@@ -23,9 +25,9 @@
          RedisCache注解方式缓存数据，有更新缓存时，会异步更新缓存数据。降低缓存对主流程的影响。
     二、工具类
         RedisHelper --Spring javabean类，通过DI注入来使用，提供缓存锁的功能
-        
+
 ### 包引用
-    
+
     git clone 代码到本地
     mvn clean deploy部署到maven的仓库服务
     
@@ -34,14 +36,13 @@
         <artifactId>cgcg-redis-spring-boot-starter</artifactId>
         <version>XXXX对应版本号</version>    
     </dependency>
-    
+
 ### 服务配置
-    
+
     缓存连接配置同Spring boot配置相同即可
-      
-      
 
 ### 版本迭代
+
     1.2.1.release 修改redis缓存key-value的形式，每个kv使用单独过期时间（原先用的hset，过期时间配置会存在问题）
     1.2.2.release 支持base包中数据校验，添加优先顺序，@Validate和@RedisCache同时注解时，优先执行@RedisCache
     1.3.2.release 一、修改redis默认过期时间为3600-7200中取随机数，即未配置过期时间时，过期时间默认为 1-2个小时

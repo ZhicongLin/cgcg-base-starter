@@ -9,6 +9,9 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.rmi.RemoteException;
 
+/**
+ * @author zhicong.lin
+ */
 @Slf4j
 @Component
 public class CgcgJobsConfiguration {
@@ -16,6 +19,7 @@ public class CgcgJobsConfiguration {
     private IJobsRunner iJobsRunner;
     @Resource
     private JobsProperties jobsProperties;
+
     @Bean
     public RmiServiceExporter rmiServiceExporter() {
         final RmiServiceExporter service = new RmiServiceExporter();

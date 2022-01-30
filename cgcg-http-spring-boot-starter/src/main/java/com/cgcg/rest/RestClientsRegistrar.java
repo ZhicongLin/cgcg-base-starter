@@ -26,12 +26,14 @@ import java.util.Set;
 
 /**
  * RestClient Registrar SpringContext
+ * @author zhicong.lin
  */
 @Slf4j
 @Setter
 public class RestClientsRegistrar implements ImportBeanDefinitionRegistrar, EnvironmentAware {
     private Environment environment;
 
+    @Override
     public void registerBeanDefinitions(AnnotationMetadata annotationMetadata, BeanDefinitionRegistry registry) {
         //获取扫描包
         final Set<String> basePackages = this.getBasePackages(annotationMetadata);
@@ -52,7 +54,7 @@ public class RestClientsRegistrar implements ImportBeanDefinitionRegistrar, Envi
         final AnnotationMetadata metadata = candidateComponent.getMetadata();
         final Boolean proxyModel = this.environment.getProperty("cgcg.rest.proxy-target-class", Boolean.class);
         final Class<?> proxyClass = proxyModel == null || proxyModel ? RestCglibFactoryBean.class : RestJdkFactoryBean.class;
-        final BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(proxyClass); // BeanDefinitionBuilder.genericBeanDefinition(proxyClass);
+        final BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(proxyClass);
         builder.addPropertyValue(Constant.PROXY_CLASS_KEY, beanClass);
         final AbstractBeanDefinition definition = builder.getBeanDefinition();
         definition.setAutowireCandidate(true);
@@ -60,9 +62,11 @@ public class RestClientsRegistrar implements ImportBeanDefinitionRegistrar, Envi
         if (attributes != null) {
             final Boolean enableFallback = this.environment.getProperty("cgcg.rest.fallback.enable", Boolean.class);
             final Object fallback = attributes.get(Constant.PROXY_FALLBACK_KEY);
-            if ((enableFallback == null || enableFallback) && fallback != Void.class) {
-                final Object bean = ((Class<?>) fallback).newInstance();
-                builder.addPropertyValue(Constant.PROXY_FALLBACK_BEAN_KEY, bean);
+            if (enableFallback == null || enableFallback) {
+                if (fallback != Void.class) {
+                    final Object bean = ((Class<?>) fallback).newInstance();
+                    builder.addPropertyValue(Constant.PROXY_FALLBACK_BEAN_KEY, bean);
+                }
             }
         }
         definition.setFactoryBeanName(candidateComponent.getBeanClassName());

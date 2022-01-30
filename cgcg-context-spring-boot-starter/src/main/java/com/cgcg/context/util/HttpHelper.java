@@ -14,7 +14,8 @@ import java.io.InputStreamReader;
 /**
  * Http Body Utils
  *
- * @auth zhicong.lin
+ * @author zhicong.lin
+ * @author zhicong.lin
  * @date 2019/6/27
  */
 @Slf4j

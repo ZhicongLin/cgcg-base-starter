@@ -22,6 +22,7 @@ import java.util.Set;
  * Author: zhicong.lin
  * Date: 2022/1/12 08:08
  * Description:
+ * @author zhicong.lin
  */
 public class JobsBeanDefinitionRegistrar implements ImportBeanDefinitionRegistrar {
 
@@ -40,7 +41,6 @@ public class JobsBeanDefinitionRegistrar implements ImportBeanDefinitionRegistra
 
         for (BeanDefinition beanDefinition : beanDefinitions) {
             // beanName通常由对应的BeanNameGenerator来生成，比如Spring自带的AnnotationBeanNameGenerator、DefaultBeanNameGenerator等，也可以自己实现。
-//            String beanName = beanDefinition.getBeanClassName();
             final Map<String, Object> attributes = ((ScannedGenericBeanDefinition) beanDefinition).getMetadata().getAnnotationAttributes(Jobs.class.getName());
             final String beanClassName = beanDefinition.getBeanClassName();
             if (attributes != null) {
@@ -56,10 +56,14 @@ public class JobsBeanDefinitionRegistrar implements ImportBeanDefinitionRegistra
         Map<String, Object> attributes = annotationMetadata.getAnnotationAttributes(EnableJobsClient.class.getCanonicalName());
 
         Set<String> basePackages = new HashSet<>();
+
         // 指定包名
-        for (String pkg : (String[]) attributes.get("packages")) {
-            if (StringUtils.hasText(pkg)) {
-                basePackages.add(pkg);
+        if (attributes != null) {
+            String[] packages = (String[]) attributes.get("packages");
+            for (String pkg : packages) {
+                if (StringUtils.hasText(pkg)) {
+                    basePackages.add(pkg);
+                }
             }
         }
         // 如果没有指定包名，则扫描注解所在类的包名

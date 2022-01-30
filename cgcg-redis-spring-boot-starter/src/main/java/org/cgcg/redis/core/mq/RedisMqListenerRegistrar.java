@@ -3,8 +3,8 @@ package org.cgcg.redis.core.mq;
 import com.cgcg.context.SpringContextHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.cgcg.redis.core.RedisManager;
-import org.cgcg.redis.core.annotation.Rmqc;
 import org.cgcg.redis.core.annotation.RmqListener;
+import org.cgcg.redis.core.annotation.Rmqc;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -18,6 +18,9 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * @author zhicong.lin
+ */
 @Slf4j
 public class RedisMqListenerRegistrar implements ApplicationListener<ContextRefreshedEvent> {
     @Resource

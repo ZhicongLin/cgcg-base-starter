@@ -1,8 +1,8 @@
 package com.cgcg.service;
 
-import org.cgcg.redis.core.annotation.Rmqp;
-import org.cgcg.redis.core.annotation.Rmqc;
 import org.cgcg.redis.core.annotation.RmqListener;
+import org.cgcg.redis.core.annotation.Rmqc;
+import org.cgcg.redis.core.annotation.Rmqp;
 import org.cgcg.redis.core.mq.Message;
 
 import java.util.Map;

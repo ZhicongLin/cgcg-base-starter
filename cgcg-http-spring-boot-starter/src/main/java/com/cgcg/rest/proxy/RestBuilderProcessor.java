@@ -6,6 +6,7 @@ import com.cgcg.rest.annotation.LoadMapping;
 import com.cgcg.rest.http.RestBuilder;
 import com.cgcg.rest.http.RestTemplateFactory;
 import com.cgcg.rest.param.RestHandle;
+import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Method;
@@ -74,7 +75,7 @@ public class RestBuilderProcessor implements BuilderCallBack {
             result = ReflectionUtils.invokeMethod(fallbackBean, method.getName(), method.getParameterTypes(), args);
         }
         if (fallbackMethod == null) {
-            fallbackMethod = new HashMap<>();
+            fallbackMethod = Maps.newHashMapWithExpectedSize(2);
         }
         fallbackMethod.put(method.getName() + "time", startTime);
         fallbackMethod.put(method, result);

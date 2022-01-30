@@ -8,6 +8,9 @@ import org.springframework.http.HttpInputMessage;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * @author zhicong.lin
+ */
 @Getter
 public class CgCgInputStreamMessage implements HttpInputMessage {
 

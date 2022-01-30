@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * redis分布式锁的实现
+ * @author zhicong.lin
  */
 @Setter
 @Getter
@@ -41,6 +42,7 @@ public class RedisLock {
 
     /**
      * 构造器
+     *
      * @param lockKey 锁的key
      */
     public RedisLock(String lockKey) {
@@ -50,7 +52,8 @@ public class RedisLock {
 
     /**
      * 构造器
-     * @param lockKey 锁的key
+     *
+     * @param lockKey     锁的key
      * @param expireMsecs 获取锁的超时时间
      */
     public RedisLock(String lockKey, long expireMsecs) {

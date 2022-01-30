@@ -1,7 +1,5 @@
 package org.cgcg.redis.core.annotation;
 
-import org.springframework.stereotype.Component;
-
 import java.lang.annotation.*;
 
 /**

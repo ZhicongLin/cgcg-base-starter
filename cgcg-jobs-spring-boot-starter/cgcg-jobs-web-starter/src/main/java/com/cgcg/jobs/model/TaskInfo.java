@@ -4,6 +4,9 @@ import lombok.Data;
 
 import java.util.List;
 
+/**
+ * @author zhicong.lin
+ */
 @Data
 public class TaskInfo {
     private Long id;

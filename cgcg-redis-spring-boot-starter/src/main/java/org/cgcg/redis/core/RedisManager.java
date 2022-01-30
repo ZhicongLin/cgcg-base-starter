@@ -61,12 +61,13 @@ public class RedisManager {
         // new SynchronousQueue<Runnable>() 队列没有空间，表示一旦有任务就马上会被执行, 这里会无限制的开辟线程，适合时间较短的操作
         return Executors.newCachedThreadPool();
     }
+
     @Bean("executorMQService")
-    public ExecutorService executorMQService() {
+    public ExecutorService executorMqService() {
         final int corePoolSize = Runtime.getRuntime().availableProcessors();
         final int maximumPoolSize = corePoolSize * 2 + 1;
         return new ThreadPoolExecutor(corePoolSize, maximumPoolSize, 180L, TimeUnit.SECONDS,
-                new LinkedBlockingQueue<>());
+                new LinkedBlockingQueue<>(), r -> new Thread(r));
     }
 
     @Scheduled(fixedDelay = 5000L)
@@ -76,7 +77,7 @@ public class RedisManager {
             if (this.redisProperties.getPassword() != null) {
                 jedis.auth(this.redisProperties.getPassword());
             }
-            online = jedis.ping().equalsIgnoreCase("PONG");
+            online = "PONG".equalsIgnoreCase(jedis.ping());
         } catch (Exception e) {
             online = false;
             log.warn("Redis[{}:{}]缓存服务不在线！", this.redisProperties.getHost(), this.redisProperties.getPort());

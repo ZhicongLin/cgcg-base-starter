@@ -2,7 +2,7 @@ package com.cgcg.rest.http;
 
 import com.cgcg.rest.MappingProcessor;
 import com.cgcg.context.SpringContextHolder;
-import com.cgcg.rest.URLUtils;
+import com.cgcg.rest.UrlUtils;
 import com.cgcg.rest.annotation.DynamicMapping;
 import com.cgcg.rest.annotation.MappingFilter;
 import com.cgcg.rest.annotation.RestClient;
@@ -43,7 +43,8 @@ public final class RestBuilder {
     private static final String HOST = "host";
     private static final String PORT = "port";
     private static volatile Map<Method, RestBuilder> builderMap = new HashMap<>();
-
+    private static final String HTTP_SCHEMA = "http://";
+    private static final String HTTP_SCHEMAS = "https://";
     private Method method;
 
     private Object[] args;
@@ -83,7 +84,7 @@ public final class RestBuilder {
     private RestBuilder(Method method) {
         this.method = method;
         this.buildFilter(method);
-        this.initURI(method);
+        this.initUri(method);
         this.builderSchema();
     }
 
@@ -147,13 +148,13 @@ public final class RestBuilder {
      *
      * @param method
      */
-    private void initURI(Method method) {
+    private void initUri(Method method) {
         RestClient restClient = method.getDeclaringClass().getAnnotation(RestClient.class);
         this.url = StringUtils.isNotBlank(restClient.url()) ? this.getUrlProperties(restClient) : this.getProperties(restClient.value());
         final MappingProcessor.MappingHandle handle = MappingProcessor.execute(method);
         if (handle != null) {
             this.httpMethod = handle.getHttpMethod();
-            this.url = URLUtils.add(url, handle.getValue());
+            this.url = UrlUtils.add(url, handle.getValue());
         }
     }
 
@@ -165,14 +166,15 @@ public final class RestBuilder {
     private String getProperties(String uri) {
         final Environment ctx = SpringContextHolder.getBean(Environment.class);
         String isHttpsStr = ctx.getProperty(uri + SEPARATOR + HTTPS);
-        this.isHttps = StringUtils.isNotBlank(isHttpsStr) && isHttpsStr.equals("true");
+        this.isHttps = StringUtils.isNotBlank(isHttpsStr) && "true".equals(isHttpsStr);
         final String host = ctx.getProperty(uri + SEPARATOR + HOST);
         final String httpUri = ctx.getProperty(uri);
         if (StringUtils.isNotBlank(httpUri)) {
             return httpUri;
         }
         final String httpString = (this.isHttps ? HTTPS : HTTP) + HTTP_SEPARATOR;
-        if (StringUtils.isBlank(host)) { //配置文件找不到相关配置，直接返回value值
+        //配置文件找不到相关配置，直接返回value值
+        if (StringUtils.isBlank(host)) {
             return httpString;
         }
         final String port = ctx.getProperty(uri + SEPARATOR + PORT);
@@ -193,15 +195,15 @@ public final class RestBuilder {
 
 
     private void builderSchema() {
-        String schema = "http://";
+        String schema = HTTP_SCHEMA;
         if (isHttps) {
-            schema = "https://";
+            schema = HTTP_SCHEMAS;
         }
         if (!this.url.toLowerCase().startsWith(schema)) {
-            if (this.url.toLowerCase().startsWith("http://")) {
-                this.url = this.url.replace("http://", schema);
-            } else if (this.url.toLowerCase().startsWith("https://")) {
-                this.url = this.url.replace("https://", schema);
+            if (this.url.toLowerCase().startsWith(HTTP_SCHEMA)) {
+                this.url = this.url.replace(HTTP_SCHEMA, schema);
+            } else if (this.url.toLowerCase().startsWith(HTTP_SCHEMAS)) {
+                this.url = this.url.replace(HTTP_SCHEMAS, schema);
             } else {
                 this.url = schema + this.url;
             }

@@ -10,6 +10,9 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.security.cert.X509Certificate;
 
+/**
+ * @author zhicong.lin
+ */
 public class CloseHttpClientBuilder extends HttpClientBuilder {
 
     public CloseHttpClientBuilder() {
@@ -21,6 +24,7 @@ public class CloseHttpClientBuilder extends HttpClientBuilder {
         return builder.connectionManager(connectionManager).sslSocketFactory();
     }
 
+    @Override
     public CloseableHttpClient build() {
         return super.build();
     }
@@ -32,7 +36,7 @@ public class CloseHttpClientBuilder extends HttpClientBuilder {
 
     private CloseHttpClientBuilder sslSocketFactory() {
         try {
-            this.setSSLSocketFactory(new SSLConnectionSocketFactory(createIgnoreVerifySSL(),
+            this.setSSLSocketFactory(new SSLConnectionSocketFactory(createIgnoreVerifySsl(),
                     // 指定TLS版本
                     null,
                     // 指定算法
@@ -52,7 +56,7 @@ public class CloseHttpClientBuilder extends HttpClientBuilder {
      * @return
      * @throws Exception
      */
-    private SSLContext createIgnoreVerifySSL() throws Exception {
+    private SSLContext createIgnoreVerifySsl() throws Exception {
         final SSLContext sc = SSLContext.getInstance("TLS");
         // 实现一个X509TrustManager接口，用于绕过验证，不用修改里面的方法
         final X509TrustManager managers = new X509TrustManager() {

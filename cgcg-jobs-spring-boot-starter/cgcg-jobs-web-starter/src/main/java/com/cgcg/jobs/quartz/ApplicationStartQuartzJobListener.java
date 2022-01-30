@@ -1,21 +1,19 @@
 package com.cgcg.jobs.quartz;
 
-import com.cgcg.jobs.model.TaskInfo;
-import com.cgcg.jobs.web.service.TaskInfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
-import org.quartz.core.QuartzScheduler;
 import org.quartz.impl.StdSchedulerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.ContextRefreshedEvent;
 
 import javax.annotation.Resource;
-import java.util.List;
+/**
+ * @author zhicong.lin
+ */
 @Slf4j
 @Configuration
 public class ApplicationStartQuartzJobListener implements ApplicationListener<ContextRefreshedEvent>{

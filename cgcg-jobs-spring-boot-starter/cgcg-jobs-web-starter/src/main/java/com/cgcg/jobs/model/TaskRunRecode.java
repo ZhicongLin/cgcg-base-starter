@@ -5,6 +5,9 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+/**
+ * @author zhicong.lin
+ */
 @Setter
 @Getter
 public class TaskRunRecode {

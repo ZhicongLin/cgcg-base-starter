@@ -1,18 +1,17 @@
 package com.cgcg.jobs.quartz;
 
-import com.alibaba.fastjson.JSON;
 import com.cgcg.jobs.model.TaskInfo;
 import com.cgcg.jobs.web.service.TaskInfoService;
 import lombok.extern.slf4j.Slf4j;
-import org.quartz.*;
+import org.quartz.SchedulerException;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
+/**
+ * @author zhicong.lin
+ */
 @Slf4j
 @Component
 public class QuartzRunner {

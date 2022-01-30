@@ -28,7 +28,8 @@ public final class RedisPenetrate {
         final int currentValue = count + 1;
         getHashOps().put(PENETRATE_KEY, key, currentValue);
         //如果缓存查询为空，且执行方法后也为空，超过3次的话，则将缓存"method-null-value"字符串, 接下来1分钟内不会穿透到数据库
-        if (currentValue >= 3) {
+        final int retryCount = 3;
+        if (currentValue >= retryCount) {
             getValueOps().set(key, PENETRATE_VALUE, 60L, TimeUnit.SECONDS);
         }
     }
