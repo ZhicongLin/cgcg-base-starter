@@ -24,23 +24,27 @@ public final class AnnotationUtil {
             Controller.class, Component.class, Indexed.class, Inherited.class, Api.class);
 
     /**
-     * 判断clzz注解是否包含了ResponseBody
+     * 判断clazz注解是否包含了ResponseBody
      *
-     * @author zhicong.lin
-     * @date 2019/7/4
+     * @param clazz
+     * @return boolean
+     * @author : zhicong.lin
+     * @date : 2019/7/4 11:48
      */
-    public static boolean hasResponseBody(Class<?> clzz) {
-        return hasAnnotation(clzz, ResponseBody.class);
+    public static boolean hasResponseBody(Class<?> clazz) {
+        return hasAnnotation(clazz, ResponseBody.class);
     }
 
     /**
-     * 判断clzz的注解是否包含annotationType
+     * 判断clazz的注解是否包含annotationType
      *
-     * @author zhicong.lin
-     * @date 2019/7/4
+     * @param clazz
+     * @return boolean
+     * @author : zhicong.lin
+     * @date : 2019/7/4 11:48
      */
-    public static boolean hasAnnotation(Class<?> clzz, Class<? extends Annotation> annotationType) {
-        final Annotation[] annotations = clzz.getAnnotations();
+    public static boolean hasAnnotation(Class<?> clazz, Class<? extends Annotation> annotationType) {
+        final Annotation[] annotations = clazz.getAnnotations();
         for (Annotation annotation : annotations) {
             final Class<? extends Annotation> annoType = annotation.annotationType();
             if (annoType.equals(annotationType)) {
@@ -56,14 +60,20 @@ public final class AnnotationUtil {
         }
         return false;
     }
-
-    public static <T extends Annotation> T getAnnotation(Class<?> clzz, Class<T> annotationType) {
-        final Annotation[] annotations = clzz.getAnnotations();
+    /**
+     * 获取clazz的包含annotationType
+     *
+     * @param clazz
+     * @return boolean
+     * @author : zhicong.lin
+     * @date : 2019/7/4 11:48
+     */
+    @SuppressWarnings("unchecked")
+    public static <T extends Annotation> T getAnnotation(Class<?> clazz, Class<T> annotationType) {
+        final Annotation[] annotations = clazz.getAnnotations();
         for (Annotation annotation : annotations) {
             if (annotationType.isInstance(annotation)) {
-                @SuppressWarnings("unchecked")
-                final T t = (T) annotation;
-                return t;
+                return (T) annotation;
             }
             final Class<? extends Annotation> annoType = annotation.annotationType();
             if (!IGNORE.contains(annoType)) {

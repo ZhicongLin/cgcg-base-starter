@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 public final class RedisPenetrate {
 
     public static final String PENETRATE_KEY = "redis-penetrate::keys";
+
     public static final String PENETRATE_VALUE = "method-null::values";
 
     /**
@@ -44,6 +45,10 @@ public final class RedisPenetrate {
         final HashOperations<String, Object, Object> hashOps = getHashOps();
         for (Object key : keys) {
             final Object value = valueOps.get(key.toString());
+            /*
+             *查询redis中对应的key是否有值，如果不为null且不为PENETRATE_VALUE的值
+             *则判断为不为穿透的值，将清理对应的key
+             */
             if (value != null && value.equals(PENETRATE_VALUE)) {
                 // 风险解除，清理掉key
                 hashOps.delete(PENETRATE_KEY, key);

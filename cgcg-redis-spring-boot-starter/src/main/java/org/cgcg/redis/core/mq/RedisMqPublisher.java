@@ -4,7 +4,7 @@ import com.cgcg.context.util.UUIDUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.cgcg.redis.core.RedisManager;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * Redis消息队列推送工具
@@ -33,8 +33,7 @@ public class RedisMqPublisher {
      * @param retry          重试次数
      */
     public static void send(String channel, Object messageContent, int retry) {
-        send(channel, messageContent, retry, message -> {
-        });
+        send(channel, messageContent, retry, null);
     }
 
     /**
@@ -84,7 +83,7 @@ public class RedisMqPublisher {
         message.setId(UUIDUtils.getUuid());
         message.setChannel(channel);
         message.setData(messageContent);
-        message.setTime(LocalDateTime.now());
+        message.setTime(new Date());
         return message;
     }
 }

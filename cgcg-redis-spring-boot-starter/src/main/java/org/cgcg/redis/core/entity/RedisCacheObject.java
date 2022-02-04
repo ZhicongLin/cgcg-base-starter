@@ -23,7 +23,7 @@ import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
 
 /**
- * RedisCahce缓存对象 .
+ * RedisCache缓存对象 .
  *
  * @author zhicong.lin
  * @date 2019/6/20

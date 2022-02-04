@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * redis分布式锁的实现
+ *
  * @author zhicong.lin
  */
 @Setter
@@ -66,7 +67,7 @@ public class RedisLock {
      *
      * @return 获取锁成功返回ture，超时返回false
      */
-    public synchronized boolean lock() {
+    public boolean lock() {
         if (expireMsecs == 0) {
             expireMsecs = 100;
         }
@@ -80,7 +81,7 @@ public class RedisLock {
      *
      * @return 获取锁成功返回ture，超时返回false
      */
-    public synchronized boolean foreverLock() {
+    public boolean foreverLock() {
         Boolean result = redisTemplate.opsForValue().setIfAbsent(lockKey, DEFAULT_VAL);
         locked = result != null && result;
         return locked;
@@ -89,13 +90,21 @@ public class RedisLock {
     /**
      * 释放获取到的锁
      */
-    public synchronized void unlock() {
+    public void unlock() {
         if (locked) {
             redisTemplate.delete(lockKey);
             locked = false;
         }
     }
 
+    /**
+     * 普通锁，默认100ms自动解锁
+     *
+     * @param lockKey
+     * @return void
+     * @author : zhicong.lin
+     * @date : 2022/2/4 11:40
+     */
     public static void lockHear(String lockKey) throws RedisLockException {
         final RedisLock redisLock = new RedisLock(lockKey);
         if (!redisLock.lock()) {
@@ -103,6 +112,15 @@ public class RedisLock {
         }
     }
 
+    /**
+     * 普通锁，需要设置自动解锁时间
+     *
+     * @param lockKey
+     * @param timeMillis
+     * @return void
+     * @author : zhicong.lin
+     * @date : 2022/2/4 11:40
+     */
     public static void lockHear(String lockKey, long timeMillis) throws RedisLockException {
         final RedisLock redisLock = new RedisLock(lockKey, timeMillis);
         if (!redisLock.lock()) {
@@ -110,6 +128,14 @@ public class RedisLock {
         }
     }
 
+    /**
+     * 永久锁
+     *
+     * @param lockKey
+     * @return void
+     * @author : zhicong.lin
+     * @date : 2022/2/4 11:40
+     */
     public static void lockHearForever(String lockKey) throws RedisLockException {
         final RedisLock redisLock = new RedisLock(lockKey);
         if (!redisLock.foreverLock()) {

@@ -4,3 +4,6 @@ test.time: 1000
 logging:
   level:
     org.cgcg: debug
+spring:
+  redis:
+    serial: kryo

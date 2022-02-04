@@ -28,9 +28,9 @@ public class RedisMqBeanDefinitionRegistrar implements ImportBeanDefinitionRegis
     @Override
     public void registerBeanDefinitions(AnnotationMetadata annotationMetadata, BeanDefinitionRegistry beanDefinitionRegistry) {
         //是否使用默认的filter，使用默认的filter意味着只扫描那些类上拥有Component、Service、Repository或Controller注解的类。
-        boolean useDefaultFilters = false;
-        ClassPathScanningCandidateComponentProvider beanScanner = new ClassPathScanningCandidateComponentProvider(useDefaultFilters);
-        TypeFilter includeFilter = new AnnotationTypeFilter(RmqListener.class);
+        final boolean useDefaultFilters = false;
+        final ClassPathScanningCandidateComponentProvider beanScanner = new ClassPathScanningCandidateComponentProvider(useDefaultFilters);
+        final TypeFilter includeFilter = new AnnotationTypeFilter(RmqListener.class);
         beanScanner.addIncludeFilter(includeFilter);
 
         final Set<BeanDefinition> beanDefinitions = new HashSet<>();
@@ -51,9 +51,9 @@ public class RedisMqBeanDefinitionRegistrar implements ImportBeanDefinitionRegis
     }
 
     private Set<String> getBasePackages(AnnotationMetadata annotationMetadata) {
-        Map<String, Object> attributes = annotationMetadata.getAnnotationAttributes(EnableRedisMQ.class.getCanonicalName());
+        final Map<String, Object> attributes = annotationMetadata.getAnnotationAttributes(EnableRedisMQ.class.getCanonicalName());
 
-        Set<String> basePackages = new HashSet<>();
+        final Set<String> basePackages = new HashSet<>();
         // 指定包名
         if (!Objects.isNull(attributes)) {
             final String[] packages = (String[]) attributes.get("packages");

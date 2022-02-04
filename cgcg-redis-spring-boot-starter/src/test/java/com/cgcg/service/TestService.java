@@ -45,6 +45,9 @@ public class TestService {
         }
         final Map<String, Object> map = new HashMap<>();
         map.put(key, "haha" + key);
+        map.put(key + "1", "haha" + key);
+        map.put(key + "2", "haha" + key);
+        map.put(key + "3", "haha" + key);
         return map;
     }
 

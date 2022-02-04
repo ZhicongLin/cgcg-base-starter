@@ -58,3 +58,5 @@
                      @Rmqc 为消费者接收redis消息的入口方法，参数为（Message msg, String chnnal）或者(Message msg) 其中Message为消息内容，chnnal为通道id
                      @RmqListener 注解到消费者端注解@Rmqc方法的类上
                     此外：推送消息的，有提供工具类RedisMqPublisher.send静态方法
+                  五、增加spring.redis.serial序列化工具配置，默认fst（FastSerializationRedisSerializer）
+                        可选json（FastJsonRedisSerializer）、kryo(KryoRedisSerializer)、jdk(原生)、fst（FastSerializationRedisSerializer）

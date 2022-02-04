@@ -2,4 +2,5 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
     org.cgcg.redis.core.RedisAspect,\
     org.cgcg.redis.core.RedisManager,\
     org.cgcg.redis.core.entity.RedisHelper,\
+    org.cgcg.redis.core.serializer.RedisSerializerProperties,\
     org.cgcg.redis.core.penetrate.RedisPenetrateScheduled

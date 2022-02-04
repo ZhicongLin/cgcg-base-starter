@@ -4,7 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.time.LocalDateTime;
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @author zhicong.lin
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 @Setter
 @Getter
 @ToString
-public class Message {
+public class Message implements Serializable {
 
     private String id;
 
@@ -20,6 +21,6 @@ public class Message {
 
     private Object data;
 
-    private LocalDateTime time;
+    private Date time;
 
 }

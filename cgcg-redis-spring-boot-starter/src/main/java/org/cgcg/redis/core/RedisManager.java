@@ -2,7 +2,7 @@ package org.cgcg.redis.core;
 
 import com.cgcg.context.SpringContextHolder;
 import lombok.extern.slf4j.Slf4j;
-import org.cgcg.redis.core.serializer.KryoRedisSerializer;
+import org.cgcg.redis.core.serializer.*;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -44,12 +44,27 @@ public class RedisManager {
             RedisTemplateHolder.redisTemplate.setKeySerializer(keySerializer);
             RedisTemplateHolder.redisTemplate.setHashKeySerializer(keySerializer);
             // KryoRedisSerializer 替换默认序列化
-            final KryoRedisSerializer<?> valueSerializer = new KryoRedisSerializer<>();
+            final RedisSerializer<?> valueSerializer = getSerializer();
             RedisTemplateHolder.redisTemplate.setValueSerializer(valueSerializer);
             RedisTemplateHolder.redisTemplate.setHashValueSerializer(valueSerializer);
             RedisTemplateHolder.redisTemplate.afterPropertiesSet();
         }
         return RedisTemplateHolder.redisTemplate;
+    }
+
+    private static RedisSerializer<?> getSerializer() {
+        final RedisSerializerProperties properties = SpringContextHolder.getBean(RedisSerializerProperties.class);
+        final SerialType serial = properties.getSerial();
+        switch (serial) {
+            case JDK:
+                return RedisSerializer.java(RedisManager.class.getClassLoader());
+            case JSON:
+                return new FastJsonRedisSerializer();
+            case FST:
+                return new FastSerializationRedisSerializer();
+            default:
+                return new KryoRedisSerializer();
+        }
     }
 
     static class RedisTemplateHolder {
