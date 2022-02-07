@@ -1,7 +1,7 @@
 package com.cgcg.rest.http;
 
-import com.cgcg.rest.MappingProcessor;
 import com.cgcg.context.SpringContextHolder;
+import com.cgcg.rest.MappingProcessor;
 import com.cgcg.rest.UrlUtils;
 import com.cgcg.rest.annotation.DynamicMapping;
 import com.cgcg.rest.annotation.MappingFilter;
@@ -21,9 +21,9 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Rest请求建立者.
@@ -42,7 +42,7 @@ public final class RestBuilder {
     private static final String SEPARATOR = ".";
     private static final String HOST = "host";
     private static final String PORT = "port";
-    private static volatile Map<Method, RestBuilder> builderMap = new HashMap<>();
+    private static volatile Map<String, RestBuilder> builderMap = new ConcurrentHashMap<>();
     private static final String HTTP_SCHEMA = "http://";
     private static final String HTTP_SCHEMAS = "https://";
     private Method method;
@@ -63,15 +63,20 @@ public final class RestBuilder {
 
     public static RestBuilder getInstance(Proceeding proceeding) {
         final Method method = proceeding.getMethod();
-        RestBuilder restBuilder = builderMap.get(method);
+        String methodNameKey = getMethodNameKey(method);
+        RestBuilder restBuilder = builderMap.get(methodNameKey);
         if (restBuilder == null) {
-            synchronized (RestBuilder.class) {
-                restBuilder = builderMap.get(method);
-                if (restBuilder == null) {
-                    restBuilder = new RestBuilder(method);
-                    restBuilder.setMethodLogger(proceeding.getLogName());
-                }
-            }
+            restBuilder = initRestBuilder(proceeding, method, methodNameKey);
+        }
+        return restBuilder;
+    }
+
+    private static synchronized RestBuilder initRestBuilder(Proceeding proceeding, Method method, String methodNameKey) {
+        RestBuilder restBuilder = builderMap.get(methodNameKey);
+        if (restBuilder == null) {
+            restBuilder = new RestBuilder(method);
+            restBuilder.setMethodLogger(proceeding.getLogName());
+            builderMap.put(methodNameKey, restBuilder);
         }
         return restBuilder;
     }
@@ -208,5 +213,15 @@ public final class RestBuilder {
                 this.url = schema + this.url;
             }
         }
+    }
+
+    private static String getMethodNameKey(Method method) {
+        StringBuilder key = new StringBuilder(method.getDeclaringClass().getName() + "#" + method.getName());
+        final Class<?>[] parameterTypes = method.getParameterTypes();
+        for (Class<?> parameterType : parameterTypes) {
+            String name = parameterType.getName();
+            key.append(name).append(":");
+        }
+        return key.toString();
     }
 }

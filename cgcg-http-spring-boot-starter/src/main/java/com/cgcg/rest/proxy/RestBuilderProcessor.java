@@ -10,8 +10,8 @@ import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 代理处理器.
@@ -23,8 +23,7 @@ import java.util.Map;
 public class RestBuilderProcessor implements BuilderCallBack {
 
     private static final long DEFAULT_EXPIRE = 60000L;
-    private static RestBuilderProcessor restBuilderProcessor = new RestBuilderProcessor();
-    private static Map<Object, Map<Object, Object>> fallBackResult = new HashMap<>();
+    private static final Map<Object, Map<Object, Object>> FALL_BACK_RESULT = new ConcurrentHashMap<>();
 
     /**
      * 包装调用方法：进行预处理、调用后处理
@@ -39,9 +38,9 @@ public class RestBuilderProcessor implements BuilderCallBack {
         try {
             if (valid) {
                 proceeding.getLogger().info("RestClient Hit Fallback.");
-                return fallBackResult.get(fallbackBean).get(method);
+                return FALL_BACK_RESULT.get(fallbackBean).get(method);
             }
-            return builder.addArgs(args).execute(restBuilderProcessor);
+            return builder.addArgs(args).execute(RestBuilderProcessorHolder.REST_BUILDER_PROCESSOR);
         } catch (Exception e) {
             if (fallbackBean != null) {
                 return fallback(method, args, fallbackBean, start, valid);
@@ -57,19 +56,19 @@ public class RestBuilderProcessor implements BuilderCallBack {
         if (fallbackBean == null) {
             return false;
         }
-        final Map<Object, Object> fallbackMethod = fallBackResult.get(fallbackBean);
+        final Map<Object, Object> fallbackMethod = FALL_BACK_RESULT.get(fallbackBean);
         final String timeKey = method.getName() + "time";
         final Long expire = SpringContextHolder.getProperty("cgcg.rest.fallback.expire", Long.class);
         if (fallbackMethod != null && fallbackMethod.get(timeKey) != null) {
             final Object time = fallbackMethod.get(timeKey);
-            final long timeSub = startTime - Long.valueOf(time.toString());
+            final long timeSub = startTime - Long.parseLong(time.toString());
             return timeSub <= (expire == null ? DEFAULT_EXPIRE : expire);
         }
         return false;
     }
 
     private static Object fallback(Method method, Object[] args, Object fallbackBean, long startTime, boolean validate) {
-        Map<Object, Object> fallbackMethod = fallBackResult.get(fallbackBean);
+        Map<Object, Object> fallbackMethod = FALL_BACK_RESULT.get(fallbackBean);
         Object result = null;
         if (fallbackMethod == null || fallbackMethod.get(method) == null || !validate) {
             result = ReflectionUtils.invokeMethod(fallbackBean, method.getName(), method.getParameterTypes(), args);
@@ -79,20 +78,20 @@ public class RestBuilderProcessor implements BuilderCallBack {
         }
         fallbackMethod.put(method.getName() + "time", startTime);
         fallbackMethod.put(method, result);
-        fallBackResult.put(fallbackBean, fallbackMethod);
+        FALL_BACK_RESULT.put(fallbackBean, fallbackMethod);
         return result;
     }
 
     /**
      * 具体发起请求的方法 .
      *
-     * @param method
-     * @param args
-     * @param url
-     * @Param: [method, args, serverUri, httpMethod, headers, values, returnType]
-     * @Return: java.lang.Object
-     * @Author: ZhiCong Lin
-     * @Date: 2018/8/21 13:48
+     * @param method 方法
+     * @param args   参数
+     * @param url    url
+     * @param handle 包含请求的信息（请求方式、头部信息之类的）
+     * @return java.lang.Object
+     * @author : zhicong.lin
+     * @date : 2022/2/6 8:11
      */
     @Override
     public Object execute(Method method, Object[] args, String url, RestHandle<String, Object> handle) {
@@ -102,5 +101,10 @@ public class RestBuilderProcessor implements BuilderCallBack {
         } else {
             return templeFactory.execute(handle, method.getReturnType());
         }
+    }
+
+    static class RestBuilderProcessorHolder {
+
+        private static final RestBuilderProcessor REST_BUILDER_PROCESSOR = new RestBuilderProcessor();
     }
 }
