@@ -1,5 +1,6 @@
 package com.cgcg.jobs.quartz;
 
+import com.cgcg.jobs.core.JobsType;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -17,4 +18,5 @@ public class JobsWebProperties {
      * 失败暂停次数
      */
     private int defeatedCount = 3;
+    private JobsType type = JobsType.RMI;
 }

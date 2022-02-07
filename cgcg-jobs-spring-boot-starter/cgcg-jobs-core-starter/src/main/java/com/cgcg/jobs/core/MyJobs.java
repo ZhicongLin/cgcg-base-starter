@@ -1,4 +1,4 @@
-package com.cgcg.jobs.client;
+package com.cgcg.jobs.core;
 
 /**
  * 任务统一接口类

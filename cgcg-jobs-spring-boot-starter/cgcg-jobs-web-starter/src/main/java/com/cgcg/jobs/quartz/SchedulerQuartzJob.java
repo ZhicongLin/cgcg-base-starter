@@ -2,8 +2,10 @@ package com.cgcg.jobs.quartz;
 
 import com.alibaba.fastjson.JSON;
 import com.cgcg.context.SpringContextHolder;
+import com.cgcg.jobs.core.Constant;
 import com.cgcg.jobs.core.IJobsRunner;
 import com.cgcg.jobs.core.JobsRunCallBack;
+import com.cgcg.jobs.core.JobsType;
 import com.cgcg.jobs.model.TaskInfo;
 import com.cgcg.jobs.model.TaskRunRecode;
 import com.cgcg.jobs.model.TaskServer;
@@ -13,6 +15,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomUtils;
+import org.cgcg.redis.core.mq.RedisMqPublisher;
 import org.quartz.*;
 import org.springframework.remoting.RemoteLookupFailureException;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
@@ -20,7 +23,9 @@ import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Vector;
 
 /**
  * @author zhicong.lin
@@ -87,9 +92,15 @@ public class SchedulerQuartzJob implements Job {
         this.taskInfo = JSON.parseObject(dataMap.getString("service"), TaskInfo.class);
         if (runningKey.contains(this.taskInfo.getId())) {
             log.info(">>> 任务[{}.{}]正在运行中，本次任务取消 <<<", taskInfo.getGroupKey(), taskInfo.getTaskKey());
-        } else {
-            runningKey.add(this.taskInfo.getId());
+            return;
+        }
+        runningKey.add(this.taskInfo.getId());
+        final JobsWebProperties property = SpringContextHolder.getBean(JobsWebProperties.class);
+        if (JobsType.RMI.equals(property.getType())) {
             invokeExe(context);
+        } else {
+            RedisMqPublisher.send(Constant.MQ_ID, this.taskInfo);
+            runningKey.remove(this.taskInfo.getId());
         }
     }
 
