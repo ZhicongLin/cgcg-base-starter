@@ -5,6 +5,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @program: cgcg-base-starter
@@ -13,9 +14,10 @@ import java.io.Serializable;
  * @create: 2022-02-07 09:59
  **/
 @Data
-@Document("test")
+@Document
 public class MongoTestObj implements Serializable {
     @Id
     private String id;
     private String name;
+    private Date createTime;
 }

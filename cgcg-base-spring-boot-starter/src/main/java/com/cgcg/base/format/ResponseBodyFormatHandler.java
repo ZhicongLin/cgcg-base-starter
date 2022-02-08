@@ -31,7 +31,7 @@ import java.util.Objects;
 @Slf4j
 @Order(1)
 @ControllerAdvice
-public class ResponseBodyFormatHandler implements ResponseBodyAdvice {
+public class ResponseBodyFormatHandler implements ResponseBodyAdvice<Object> {
     private static final String SWAGGER_RESOURCES = "/swagger-resources";
     private static final String ERROR = "/error";
     private static final String DOCS = "/v2/api-docs";

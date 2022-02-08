@@ -4,12 +4,13 @@ import com.cgcg.context.SpringContextHolder;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 /**
- * @program: cgcg-base-starter
  * @description: mongodb 构建器
  * @author: zhicong.lin
  * @create: 2022-02-07 11:24
  **/
 public class MongoDbBuilder {
+
+    protected static final String ID = "id";
 
     /**
      * 获取mongoTemplate

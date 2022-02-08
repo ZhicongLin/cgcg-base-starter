@@ -90,7 +90,7 @@ public class ReflectionUtils {
                 Field field = superClass.getDeclaredField(fieldName);
                 field.setAccessible(true);
                 return field;
-            } catch (NoSuchFieldException e) {//NOSONAR
+            } catch (NoSuchFieldException e) {
                 // Field不在当前类定义,继续向上转型
             }
         }
@@ -134,7 +134,7 @@ public class ReflectionUtils {
 
                 return method;
 
-            } catch (NoSuchMethodException e) {//NOSONAR
+            } catch (NoSuchMethodException e) {
                 // Method不在当前类定义,继续向上转型
             }
         }
@@ -156,7 +156,7 @@ public class ReflectionUtils {
                 method.setAccessible(true);
                 return method;
 
-            } catch (NoSuchMethodException e) {//NOSONAR
+            } catch (NoSuchMethodException e) {
                 // Method不在当前类定义,继续向上转型
             }
         }
@@ -170,11 +170,11 @@ public class ReflectionUtils {
      * public UserDao extends HibernateDao<User>
      *
      * @param clazz The class to introspect
-     * @return the first generic declaration, or Object.class if cannot be determined
+     * @return the first generic declaration, or Object. Class if you cannot be determined
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public static <T> Class<T> getSuperClassGenricType(final Class clazz) {
-        return getSuperClassGenricType(clazz, 0);
+    public static <T> Class<T> getSuperClassGenericType(final Class clazz) {
+        return getSuperClassGenericType(clazz, 0);
     }
 
     /**
@@ -184,11 +184,11 @@ public class ReflectionUtils {
      * 如public UserDao extends HibernateDao<User,Long>
      *
      * @param clazz clazz The class to introspect
-     * @param index the Index of the generic ddeclaration,start from 0.
-     * @return the index generic declaration, or Object.class if cannot be determined
+     * @param index the Index of the generic declaration,start from 0.
+     * @return the index generic declaration, or Object. Class if you cannot be determined
      */
     @SuppressWarnings("rawtypes")
-    public static Class getSuperClassGenricType(final Class clazz, final int index) {
+    public static Class getSuperClassGenericType(final Class clazz, final int index) {
 
         Type genType = clazz.getGenericSuperclass();
 

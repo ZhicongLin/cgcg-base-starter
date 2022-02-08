@@ -1,10 +1,8 @@
 package com.cgcg.context.util;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.cgcg.context.SpringContextHolder;
 import com.cgcg.context.enums.CharsetCode;
-import com.google.common.collect.Maps;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +15,6 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
 import java.util.TreeMap;
 
 /**
@@ -81,14 +78,14 @@ public final class Des3Utils {
      *
      * @param src 源数据的字节数组
      */
-    public static String encryptMode(String src, String threedesKey) {
+    public static String encryptMode(String src, String threesKey) {
         try {
             byte[] targetSrc = src.getBytes(CharsetCode.forUtf8());
             // 生成密钥
-            SecretKey deskey = new SecretKeySpec(build3DesKey(threedesKey), ALGORITHM);
+            SecretKey desKey = new SecretKeySpec(build3DesKey(threesKey), ALGORITHM);
             // 实例化Cipher
             Cipher cipher = Cipher.getInstance(ALGORITHM);
-            cipher.init(Cipher.ENCRYPT_MODE, deskey);
+            cipher.init(Cipher.ENCRYPT_MODE, desKey);
             return Base64Util.encode(cipher.doFinal(targetSrc));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -110,12 +107,12 @@ public final class Des3Utils {
      *
      * @param src 密文的字节数组
      */
-    public static String decryptMode(String src, String threedesKey) {
+    public static String decryptMode(String src, String threesKey) {
         try {
             byte[] targetSrc = Base64Util.decode(src);
-            SecretKey deskey = new SecretKeySpec(build3DesKey(threedesKey), ALGORITHM);
+            SecretKey desKey = new SecretKeySpec(build3DesKey(threesKey), ALGORITHM);
             Cipher c1 = Cipher.getInstance(ALGORITHM);
-            c1.init(Cipher.DECRYPT_MODE, deskey);
+            c1.init(Cipher.DECRYPT_MODE, desKey);
             assert targetSrc != null;
             return new String(c1.doFinal(targetSrc), CharsetCode.forUtf8());
         } catch (Exception ignored) {  
@@ -126,7 +123,7 @@ public final class Des3Utils {
     /**
      * 生成MD5数据签名
      *
-     * @param jsonStr 数据体的JSON格式的字符串,不能是JSONARRAY类型字符串
+     * @param jsonStr 数据体的JSON格式的字符串,不能是JSON ARRAY类型字符串
      */
     @SuppressWarnings("unchecked")
     public static String getSign(String jsonStr) {
@@ -169,11 +166,11 @@ public final class Des3Utils {
         }
         TreeMap<String, Object> testMap = JSONObject.parseObject(jsonData, TreeMap.class);
         String checkData = testMap.get("data").toString();
-        TreeMap<String, Object> tescheckDataMap = JSONObject.parseObject(checkData, TreeMap.class);
+        TreeMap<String, Object> tesCheckDataMap = JSONObject.parseObject(checkData, TreeMap.class);
         // 对签名的数据体做拼接
         StringBuilder stringBuilder = new StringBuilder();
-        for (String key : tescheckDataMap.keySet()) {
-            stringBuilder.append(key).append("=").append(tescheckDataMap.get(key)).append("&");
+        for (String key : tesCheckDataMap.keySet()) {
+            stringBuilder.append(key).append("=").append(tesCheckDataMap.get(key)).append("&");
         }
         String checkMd5Sign = stringBuilder.substring(0, stringBuilder.length() - 1);
         // 进行MD5加密，并与原签名进行比对
@@ -241,16 +238,6 @@ public final class Des3Utils {
             return property;
         }
         return null;
-    }
-
-    public static void main(String[] args) {
-        final HashMap<String, Object> hashMap = Maps.newHashMapWithExpectedSize(4);
-        hashMap.put("yes", "OK");
-        hashMap.put("id", "11");
-        final String s1 = Des3Utils.encryptMode(JSON.toJSONString(hashMap));
-        System.out.println("s1 = " + s1);
-        final String s = Des3Utils.decryptMode("flVC/ez9pMBPPOOJNzwSHeVkpyeZlRCp", "S5EXCbIx98nrWA7a");
-        System.out.println("s = " + s);
     }
 
 }

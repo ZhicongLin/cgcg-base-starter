@@ -12,6 +12,7 @@ import java.util.Map;
 
 /**
  * 以静态变量保存Spring ApplicationContext, 可在任何代码任何地方任何时候中取出ApplicaitonContext.
+ *
  * @author zhicong.lin
  */
 @Slf4j
@@ -24,9 +25,10 @@ public class SpringContextHolder implements ApplicationContextAware {
     /**
      * 从静态变量ApplicationContext中取得Bean, 自动转型为所赋值对象的类型.
      */
-    @SuppressWarnings("unchecked")
     public static <T> T getBean(String name) {
-        return (T) applicationContext.getBean(name);
+        @SuppressWarnings("unchecked")
+        T bean = (T) applicationContext.getBean(name);
+        return bean;
     }
 
     /**
@@ -36,14 +38,39 @@ public class SpringContextHolder implements ApplicationContextAware {
         return applicationContext.getBean(clazz);
     }
 
+    /**
+     * 获取配置文件的配置值
+     *
+     * @param name
+     * @param tClass
+     * @return T
+     * @author zhicong.lin
+     * @date 2022/2/8 9:43
+     */
     public static <T> T getProperty(String name, Class<T> tClass) {
         return environment.getProperty(name, tClass);
     }
 
+    /**
+     * 获取配置文件配置值
+     *
+     * @param name
+     * @return java.lang.String
+     * @author zhicong.lin
+     * @date 2022/2/8 9:43
+     */
     public static String getProperty(String name) {
         return environment.getProperty(name);
     }
 
+    /**
+     * 获取所有注解类的Map
+     *
+     * @param clazz
+     * @return java.util.Map<java.lang.String, java.lang.Object>
+     * @author zhicong.lin
+     * @date 2022/2/8 9:42
+     */
     public static Map<String, Object> getBeansWithAnnotation(Class<? extends Annotation> clazz) {
         return applicationContext.getBeansWithAnnotation(clazz);
     }

@@ -9,7 +9,7 @@
     </parent>
     <groupId>org.cgcg</groupId>
     <artifactId>cgcg-mongodb-spring-boot-starter</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.3.2.snapshot</version>
     <name>cgcg-mongodb-spring-boot-starter</name>
     <description>cgcg-mongodb-spring-boot-starter</description>
     <properties>

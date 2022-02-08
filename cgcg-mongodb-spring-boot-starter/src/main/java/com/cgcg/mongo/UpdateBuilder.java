@@ -3,7 +3,6 @@ package com.cgcg.mongo;
 import com.alibaba.fastjson.JSON;
 import com.mongodb.client.result.UpdateResult;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
@@ -37,14 +36,14 @@ public class UpdateBuilder extends MongoDbBuilder {
     }
 
     private <T> void setObject(T bean) {
-        Field[] fields = clazz.getDeclaredFields();
+        final Field[] fields = clazz.getDeclaredFields();
         for (Field field : fields) {
             try {
                 field.setAccessible(true);
                 Object value = field.get(bean);
                 this.update.set(field.getName(), value);
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
+                log.warn(e.getMessage());
             }
         }
     }
@@ -72,7 +71,7 @@ public class UpdateBuilder extends MongoDbBuilder {
      * @date : 2022/2/7 13:50
      */
     public void updateById(Object id) {
-        updateByName("id", id);
+        updateByName(ID, id);
     }
 
     /**
@@ -86,17 +85,18 @@ public class UpdateBuilder extends MongoDbBuilder {
     public <T> void saveOrUpdate(T bean) {
         Object id;
         try {
-            final Field idField = clazz.getDeclaredField("id");
+            final Field idField = clazz.getDeclaredField(ID);
             idField.setAccessible(true);
             id = idField.get(bean);
         } catch (NoSuchFieldException | IllegalAccessException e) {
+            log.warn(e.getMessage());
             return;
         }
         if (id == null) {
             getTemplate().save(bean);
             log.debug("Save [{}]: {}", clazz, JSON.toJSONString(bean));
         } else {
-            final Query query = new Query(Criteria.where("id").is(id));
+            final Query query = QueryBuilder.builder().id(id).build();
             setObject(bean);
             getTemplate().updateFirst(query, update, clazz);
             log.debug("Modify [{}]: {}", clazz, JSON.toJSONString(update.getUpdateObject()));
@@ -113,7 +113,7 @@ public class UpdateBuilder extends MongoDbBuilder {
      * @date : 2022/2/7 13:49
      */
     public void updateByName(String name, Object value) {
-        final Query query = new Query(Criteria.where(name).is(value));
+        final Query query = QueryBuilder.builder().eq(name, value).build();
         final UpdateResult result = getTemplate().updateFirst(query, update, clazz);
         log.debug("Modify [{}]: {}", clazz, JSON.toJSONString(update.getUpdateObject()));
     }
@@ -127,7 +127,7 @@ public class UpdateBuilder extends MongoDbBuilder {
      * @date : 2022/2/7 13:49
      */
     public void deleteById(Object id) {
-        final Query query = new Query(Criteria.where("id").is(id));
+        final Query query = QueryBuilder.builder().id(id).build();
         getTemplate().remove(query, clazz);
         log.debug("Delete [{}]: id={}", clazz, id);
     }

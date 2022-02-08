@@ -8,6 +8,7 @@ import java.util.concurrent.*;
 
 /**
  * 线程池工具类
+ *
  * @author zhicong.lin
  */
 @Setter
@@ -49,7 +50,7 @@ public class ThreadPoolManager {
         // * workQueue：等待队列，存储还未执行的任务
         // * threadFactory：线程创建的工厂
         // * handler：异常处理机制
-        return new ThreadPoolExecutor( CPU_COUNT + 1, CPU_COUNT * 2 + 1, KEEP_ALIVE, TimeUnit.SECONDS,
+        return new ThreadPoolExecutor(CPU_COUNT + 1, CPU_COUNT * 2 + 1, KEEP_ALIVE, TimeUnit.SECONDS,
                 linkedBlockingQueue, Executors.defaultThreadFactory(), abortPolicy);
     }
 
@@ -92,18 +93,19 @@ public class ThreadPoolManager {
      *
      * @param task
      */
-    public static void cancel(Runnable task) {
+    public static boolean cancel(Runnable task) {
         if (task != null) {
             if (task instanceof AbstractExecutorTask) {
                 final AbstractExecutorTask abstractExecutorTask = (AbstractExecutorTask) task;
                 if (!abstractExecutorTask.isFinish()) {
                     abstractExecutorTask.cancelTask();
                 }
-                getThreadPoolExecutor().getQueue().remove(abstractExecutorTask);
+                return getThreadPoolExecutor().getQueue().remove(abstractExecutorTask);
             } else {
-                getThreadPoolExecutor().getQueue().remove(task);
+                return getThreadPoolExecutor().getQueue().remove(task);
             }
         }
+        return false;
     }
 
 }

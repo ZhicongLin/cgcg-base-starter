@@ -25,7 +25,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 @Slf4j
 @Order(2)
 @ControllerAdvice
-public class ResponseBodyEncryptHandler implements ResponseBodyAdvice {
+public class ResponseBodyEncryptHandler implements ResponseBodyAdvice<Object> {
     @Override
     public boolean supports(MethodParameter returnType, Class converterType) {
         return EncryptCheckHandler.processor(returnType);
@@ -39,7 +39,7 @@ public class ResponseBodyEncryptHandler implements ResponseBodyAdvice {
         return null;
     }
 
-    private Object encrypt(Object result, Class selectedConverterType) {
+    private Object encrypt(Object result, Class<?> selectedConverterType) {
         final String encryptionKey = FormatProperty.des(FormatProperty.DES_RESULT);
         if (StringUtils.isBlank(encryptionKey)) {
             return result;

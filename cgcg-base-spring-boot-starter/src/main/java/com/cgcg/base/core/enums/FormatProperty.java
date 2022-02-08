@@ -27,7 +27,7 @@ public enum FormatProperty {
     //数据加密返回结果密钥配置
     DES_RESULT("cgcg.format.des3.result");
 
-    private String key;
+    private final String key;
     private Object property;
 
     FormatProperty(String key) {
@@ -65,7 +65,7 @@ public enum FormatProperty {
         return null;
     }
 
-    public static Class getFormatClass() {
+    public static Class<?> getFormatClass() {
         final String className = CLASS_NAME.getString();
         Class<?> formatClass = Result.class;
         try {

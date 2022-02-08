@@ -21,6 +21,13 @@ public enum CharsetCode {
     UTF8("UTF-8");
     private final String charset;
 
+    /**
+     * 获取字符编码类型
+     *
+     * @return java.nio.charset.Charset
+     * @author zhicong.lin
+     * @date 2022/2/8 9:56
+     */
     public static Charset forUtf8() {
         return Charset.forName(UTF8.getCharset());
     }

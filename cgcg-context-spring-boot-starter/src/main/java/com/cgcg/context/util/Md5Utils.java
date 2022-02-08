@@ -59,15 +59,24 @@ public final class Md5Utils {
         return HEX_DIGITS[d1] + HEX_DIGITS[d2];
     }
 
-    public static String md5Encode(String origin, String charsetname) {
+    /**
+     * 指定md5字符串编码
+     *
+     * @param origin
+     * @param charset
+     * @return java.lang.String
+     * @author zhicong.lin
+     * @date 2022/2/8 9:51
+     */
+    public static String md5Encode(String origin, String charset) {
         String resultString = null;
         try {
             resultString = origin;
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            if (charsetname == null || "".equals(charsetname)) {
+            final MessageDigest md = MessageDigest.getInstance("MD5");
+            if (charset == null || "".equals(charset)) {
                 resultString = byteArrayToHexString(md.digest(resultString.getBytes()));
             } else {
-                resultString = byteArrayToHexString(md.digest(resultString.getBytes(charsetname)));
+                resultString = byteArrayToHexString(md.digest(resultString.getBytes(charset)));
             }
         } catch (Exception e) {
             log.warn(e.getMessage(), e);
@@ -75,27 +84,35 @@ public final class Md5Utils {
         return resultString;
     }
 
+    /**
+     * map进行md5签名
+     *
+     * @param key
+     * @param paramMap
+     * @return java.lang.String
+     * @author zhicong.lin
+     * @date 2022/2/8 9:50
+     */
     public static String createMd5Sign(String key, Map<String, String> paramMap) {
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         for (String k : paramMap.keySet()) {
-            String v = paramMap.get(k);
-            sb.append(k).append("=").append(v).append("&");
+            sb.append(k).append("=").append(paramMap.get(k)).append("&");
         }
-        String params = sb.append("key=").append(key).substring(0);
-        String sign = Md5Utils.md5Encode(params, "utf8");
+        final String params = sb.append("key=").append(key).substring(0);
+        final String sign = Md5Utils.md5Encode(params, "utf8");
         return sign.toUpperCase();
     }
 
     /**
      * 对一个文件求他的md5值
      *
-     * @param f 要求md5值的文件
+     * @param file 要求md5值的文件
      * @return md5串
      */
-    public static String md5(File f) {
+    public static String md5(File file) {
         FileInputStream fis = null;
         try {
-            fis = new FileInputStream(f);
+            fis = new FileInputStream(file);
             byte[] buffer = new byte[8192];
             int length;
             while ((length = fis.read(buffer)) != -1) {
@@ -104,7 +121,7 @@ public final class Md5Utils {
 
             return new String(Hex.encodeHex(md.digest()));
         } catch (IOException e) {
-            log.error("md5 file " + f.getAbsolutePath() + " failed:" + e.getMessage());
+            log.error("md5 file " + file.getAbsolutePath() + " failed:" + e.getMessage());
             return null;
         } finally {
             try {
@@ -163,8 +180,6 @@ public final class Md5Utils {
         return value.toString();
 
     }
-
-    // 哈希加密S
 
     /**
      * 将源字符串使用MD5加密为字节数组

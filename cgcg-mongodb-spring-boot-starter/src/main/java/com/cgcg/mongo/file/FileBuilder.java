@@ -131,7 +131,9 @@ public class FileBuilder extends MongoDbBuilder {
         try {
             byte[] bytes = FileCopyUtils.copyToByteArray(input);
             final String md5 = Md5Utils.md5(new String(bytes));
-            final FileGridFsInfo load = QueryBuilder.builder().eq("md5", md5).findOne(FileGridFsInfo.class);
+            final FileGridFsInfo load = QueryBuilder.builder()
+                    .eq("md5", md5)
+                    .findOne(FileGridFsInfo.class);
             if (load == null) {
                 final Binary content = new Binary(bytes);
                 fileGridFsInfo.setContent(content);
@@ -139,7 +141,7 @@ public class FileBuilder extends MongoDbBuilder {
                 fileGridFsInfo.setSize(bytes.length);
                 fileGridFsInfo.setUploadDate(new Date());
                 // 将文件存储到mongodb中,mongodb 将会返回这个文件的具体信息
-                FileGridFsInfo info = repository().save(fileGridFsInfo);
+                final FileGridFsInfo info = repository().save(fileGridFsInfo);
                 return saveGroup(info);
             }
             return saveGroup(load);
@@ -147,10 +149,6 @@ public class FileBuilder extends MongoDbBuilder {
             e.printStackTrace();
         }
         return null;
-    }
-
-    protected FileRepository repository() {
-        return SpringContextHolder.getBean(FileRepository.class);
     }
 
     /**
@@ -162,7 +160,7 @@ public class FileBuilder extends MongoDbBuilder {
      * @date : 2022/2/7 16:57
      */
     public FileGridFsInfo load(String id) {
-        final FileGridFsGroup group = QueryBuilder.builder().eq("id", id).findOne(FileGridFsGroup.class);
+        final FileGridFsGroup group = QueryBuilder.builder().findById(id, FileGridFsGroup.class);
         if (group == null) {
             return repository().findById(id).orElse(null);
         }
@@ -174,14 +172,16 @@ public class FileBuilder extends MongoDbBuilder {
         if (info != null) {
             info.setName(group.getFileName());
             info.setId(group.getId());
+            info.setUploadDate(group.getUploadDate());
         }
         return info;
     }
 
     /**
      * 刪除文件
-     * 当文件多个副本时，删除单个副本，保留元数据
-     * 当文件单个副本时，删除副本，并删除元数据
+     * 1.当文件多个副本时，删除副本
+     * 2.当文件单个副本时，删除副本，并删除元数据
+     * 3.不存在副本时，直接删除元数据
      *
      * @param id
      * @return void
@@ -189,14 +189,14 @@ public class FileBuilder extends MongoDbBuilder {
      * @date : 2022/2/7 16:56
      */
     public void delete(String id) {
-        final FileGridFsGroup group = QueryBuilder.builder().eq("id", id).findOne(FileGridFsGroup.class);
+        final FileGridFsGroup group = QueryBuilder.builder().findById(id, FileGridFsGroup.class);
         if (group == null) {
             repository().deleteById(id);
             return;
         }
         final String infoId = group.getInfoId();
         final long idCount = QueryBuilder.builder().eq("infoId", infoId).count(FileGridFsGroup.class);
-        QueryBuilder.builder().eq("id", id).delete(FileGridFsGroup.class);
+        UpdateBuilder.builder(FileGridFsGroup.class).deleteById(id);
         if (idCount == 1) {
             repository().deleteById(infoId);
         }
@@ -212,5 +212,9 @@ public class FileBuilder extends MongoDbBuilder {
         info.setId(id);
         info.setName(fileName);
         return info;
+    }
+
+    private FileRepository repository() {
+        return SpringContextHolder.getBean(FileRepository.class);
     }
 }

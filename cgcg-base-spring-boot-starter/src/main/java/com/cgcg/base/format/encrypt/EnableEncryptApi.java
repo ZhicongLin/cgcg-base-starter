@@ -6,7 +6,6 @@ import java.lang.annotation.*;
 
 /**
  * 加密开关
- * .
  *
  * @author zhicong.lin
  * @date 2019/7/1
