@@ -18,6 +18,12 @@ mybatis:
 logging:
   level:
     com.cgcg: debug
+    com.mysql.cj: debug
+    java:
+      sql:
+        Connection: debug
+        PreparedStatement: debug
+        Statement: debug
 cgcg:
   swagger:
     headers: authorization

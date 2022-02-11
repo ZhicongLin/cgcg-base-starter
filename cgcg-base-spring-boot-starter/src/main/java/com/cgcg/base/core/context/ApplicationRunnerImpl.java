@@ -15,4 +15,5 @@ public class ApplicationRunnerImpl implements ApplicationRunner {
     public void run(ApplicationArguments args) {
         FormatProperty.init();
     }
+
 }

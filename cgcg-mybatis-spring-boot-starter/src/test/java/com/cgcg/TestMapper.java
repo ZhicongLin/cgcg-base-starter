@@ -1,5 +1,6 @@
 package com.cgcg;
 
+import com.cgcg.service.User;
 import org.apache.ibatis.annotations.*;
 import com.cgcg.redis.mybatis.RedisCacheManager;
 
@@ -21,6 +22,6 @@ public interface TestMapper {
     @Update("update sys_user set user_name = '2222' where id = '1'")
     int update();
 
-    @Insert("insert into sys_user (user_name) values (1)")
-    int insert();
+    @Insert("insert into sys_user (user_name, code) values (#{name}, #{code})")
+    int insert(User user);
 }

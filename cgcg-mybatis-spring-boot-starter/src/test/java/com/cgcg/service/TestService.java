@@ -1,7 +1,11 @@
 package com.cgcg.service;
 
 import com.cgcg.TestMapper;
+import com.cgcg.base.core.exception.CommonException;
+import com.cgcg.context.SpringContextHolder;
+import com.cgcg.redis.mybatis.tx.TxManager;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 
@@ -19,5 +23,27 @@ public class TestService {
     TestMapper testMapper;
     public Object findAll() {
         return this.testMapper.findAll();
+    }
+
+    @TxManager(id = "TestService.test")
+    public User save(String name) {
+        TestService bean = SpringContextHolder.getBean(TestService.class);
+        bean.save2(name);
+        User user = new User(name, "222");
+        testMapper.insert(user);
+        if (name.equals("1")) {
+            throw new CommonException("测试事务抱错");
+        }
+        return user;
+    }
+
+    @Transactional
+    public User save2(String name) {
+        User user = new User(name, name);
+        testMapper.insert(user);
+        if (name.equals("2")) {
+            throw new CommonException("测试事务抱错2");
+        }
+        return user;
     }
 }

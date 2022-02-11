@@ -1,10 +1,7 @@
 package com.cgcg.test;
 
 import com.cgcg.service.TestService;
-import com.cgcg.service.User;
 import io.swagger.annotations.Api;
-import org.cgcg.redis.core.entity.RedisHelper;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,6 +26,11 @@ public class RedisTest {
         String token = request.getHeader("token");
         System.out.println("token = " + token);
         return testService.findAll();
+    }
+
+    @PostMapping
+    public Object test2(String name) {
+       return testService.save(name);
     }
 
 }

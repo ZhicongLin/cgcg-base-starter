@@ -34,7 +34,7 @@
         </dependencies>
     </dependencyManagement>
     <distributionManagement>
-        <repository>
+       <!-- <repository>
             <id>Well-Soft-Central</id>
             <name>Well Soft Central Repository</name>
             <url>http://nexus.well-soft.com:81/nexus/content/groups/public/</url>
@@ -43,13 +43,14 @@
             <id>Well-Soft-Snapshots</id>
             <name>Well Soft Snapshots Repository</name>
             <url>http://nexus.well-soft.com:81/nexus/content/repositories/snapshots/</url>
-        </snapshotRepository>
+        </snapshotRepository>-->
     </distributionManagement>
     <build>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>2.6.2</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

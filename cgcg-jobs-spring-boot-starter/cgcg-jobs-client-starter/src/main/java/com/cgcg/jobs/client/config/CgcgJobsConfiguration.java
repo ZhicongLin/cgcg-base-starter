@@ -46,7 +46,7 @@ public class CgcgJobsConfiguration {
 
     @Rmqc(Constant.MQ_ID)
     public void invokeService(Message message) {
-        final Map<String, Object> dataMap = message.getDataMap();
+        final Map<String, Object> dataMap = message.dataMap();
         final String jobId = dataMap.get("jobId").toString();
         MyJobs bean = null;
         try {

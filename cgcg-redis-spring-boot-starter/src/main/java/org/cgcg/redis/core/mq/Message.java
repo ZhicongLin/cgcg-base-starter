@@ -26,7 +26,7 @@ public class Message implements Serializable {
 
     private Date time;
 
-    public Map<String, Object> getDataMap() {
+    public Map<String, Object> dataMap() {
         String dataJson = JSON.toJSONString(data);
         return JSONObject.parseObject(dataJson);
     }
