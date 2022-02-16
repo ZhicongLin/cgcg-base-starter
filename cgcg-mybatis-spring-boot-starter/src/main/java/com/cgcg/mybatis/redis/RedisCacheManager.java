@@ -1,15 +1,15 @@
-package com.cgcg.redis.mybatis;
+package com.cgcg.mybatis.redis;
+
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.cache.Cache;
 import org.cgcg.redis.core.RedisManager;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.Assert;
-
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * redis缓存管理工具.

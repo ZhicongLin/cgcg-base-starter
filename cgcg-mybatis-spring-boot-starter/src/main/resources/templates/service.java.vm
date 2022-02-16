@@ -1,0 +1,30 @@
+package ${package.Service};
+
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.cgcg.mybatis.plus.IService;
+import ${package.Entity}.${entity};
+
+/**
+ * $!{table.comment} 服务类
+ *
+ * @author ${author}
+ * @date ${cfg.datetime}
+ */
+#if(${kotlin})
+interface ${table.serviceName} : ${superServiceClass}<${entity}>
+#else
+public interface ${table.serviceName} extends ${superServiceClass}<${entity}> {
+
+    /**
+     * 查询$!{table.comment}分页数据
+     *
+     * @param page 分页参数
+     * @param keyword  关键字
+     * @return Page<User>
+     * @author zhicong.lin
+     * @date ${cfg.datetime}
+     */
+    Page<${entity}> findPage(Page<${entity}> page, String keyword);
+}
+#end
+

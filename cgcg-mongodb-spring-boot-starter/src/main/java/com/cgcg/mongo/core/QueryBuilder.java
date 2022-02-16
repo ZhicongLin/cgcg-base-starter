@@ -1,6 +1,7 @@
-package com.cgcg.mongo;
+package com.cgcg.mongo.core;
 
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -9,6 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -20,10 +22,13 @@ import java.util.stream.Collectors;
  * @author: zhicong.lin
  * @create: 2022-02-07 10:33
  **/
+@Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class QueryBuilder extends MongoDbBuilder {
     private Query query;
     private Pageable pageable;
+    private Criteria criteria;
+    private final List<Criteria> orCriteria = new ArrayList<>();
 
     /**
      * 创建构建器
@@ -48,7 +53,48 @@ public class QueryBuilder extends MongoDbBuilder {
      * @date : 2022/2/7 10:49
      */
     public QueryBuilder eq(String name, Object value) {
-        query.addCriteria(Criteria.where(name).is(value));
+        if (criteria == null) {
+            criteria = Criteria.where(name).is(value);
+            query.addCriteria(criteria);
+        } else {
+            criteria.and(name).is(value);
+        }
+        return this;
+    }
+
+    /**
+     * 全字段匹配 IS NULL
+     *
+     * @param name
+     * @return org.cgcg.mongo.QueryBuilder
+     * @author : zhicong.lin
+     * @date : 2022/2/7 10:49
+     */
+    public QueryBuilder isNull(String name) {
+        if (criteria == null) {
+            criteria = Criteria.where(name).isNull();
+            query.addCriteria(criteria);
+        } else {
+            criteria.and(name).isNull();
+        }
+        return this;
+    }
+
+    /**
+     * 全字段匹配 IS NOT NULL
+     *
+     * @param name
+     * @return org.cgcg.mongo.QueryBuilder
+     * @author : zhicong.lin
+     * @date : 2022/2/7 10:49
+     */
+    public QueryBuilder isNotNull(String name) {
+        if (criteria == null) {
+            criteria = Criteria.where(name).exists(true);
+            query.addCriteria(criteria);
+        } else {
+            criteria.and(name).exists(true);
+        }
         return this;
     }
 
@@ -76,7 +122,91 @@ public class QueryBuilder extends MongoDbBuilder {
      */
     public QueryBuilder like(String name, String value) {
         final Pattern pattern = Pattern.compile("^.*" + value + ".*$");
-        query.addCriteria(Criteria.where(name).regex(pattern));
+        if (criteria == null) {
+            criteria = Criteria.where(name).regex(pattern);
+            query.addCriteria(criteria);
+        } else {
+            criteria.and(name).regex(pattern);
+        }
+        return this;
+    }
+
+    /**
+     * in
+     *
+     * @param name
+     * @param values
+     * @return org.cgcg.mongo.QueryBuilder
+     * @author zhicong.lin
+     * @date : 2022/2/7 10:49
+     */
+    public QueryBuilder in(String name, Object... values) {
+        if (criteria == null) {
+            criteria = Criteria.where(name).in(values);
+            query.addCriteria(criteria);
+        } else {
+            criteria.and(name).in(values);
+        }
+        return this;
+    }
+
+    /**
+     * or In
+     *
+     * @param name
+     * @param values
+     * @return org.cgcg.mongo.QueryBuilder
+     * @author zhicong.lin
+     * @date : 2022/2/7 10:49
+     */
+    public QueryBuilder orIn(String name, Object... values) {
+        orCriteria.add(Criteria.where(name).in(values));
+        return this;
+    }
+
+    /**
+     * or eq
+     *
+     * @param name
+     * @param values
+     * @return org.cgcg.mongo.QueryBuilder
+     * @author zhicong.lin
+     * @date : 2022/2/7 10:49
+     */
+    public QueryBuilder orEq(String name, Object values) {
+        if (values == null) {
+            orCriteria.add(Criteria.where(name).isNull());
+        } else {
+            orCriteria.add(Criteria.where(name).is(values));
+        }
+        return this;
+    }
+
+    /**
+     * or eq
+     *
+     * @param name
+     * @return org.cgcg.mongo.QueryBuilder
+     * @author zhicong.lin
+     * @date : 2022/2/7 10:49
+     */
+    public QueryBuilder orExists(String name) {
+        orCriteria.add(Criteria.where(name).exists(true));
+        return this;
+    }
+
+    /**
+     * or eq
+     *
+     * @param name
+     * @param value
+     * @return org.cgcg.mongo.QueryBuilder
+     * @author zhicong.lin
+     * @date : 2022/2/7 10:49
+     */
+    public QueryBuilder orLike(String name, Object value) {
+        final Pattern pattern = Pattern.compile("^.*" + value + ".*$");
+        orCriteria.add(Criteria.where(name).regex(pattern));
         return this;
     }
 
@@ -146,6 +276,9 @@ public class QueryBuilder extends MongoDbBuilder {
      * @date : 2022/2/7 11:49
      */
     public <T> T findOne(Class<T> clazz) {
+        if (!orCriteria.isEmpty()) {
+            criteria.orOperator(orCriteria);
+        }
         return getTemplate().findOne(this.query, clazz);
     }
 
@@ -171,6 +304,9 @@ public class QueryBuilder extends MongoDbBuilder {
      * @date : 2022/2/7 11:50
      */
     public <T> List<T> find(Class<T> clazz) {
+        if (!orCriteria.isEmpty()) {
+            criteria.orOperator(orCriteria);
+        }
         return getTemplate().find(this.query, clazz);
     }
 
@@ -183,6 +319,9 @@ public class QueryBuilder extends MongoDbBuilder {
      * @date : 2022/2/7 11:50
      */
     public <T> long count(Class<T> clazz) {
+        if (!orCriteria.isEmpty()) {
+            criteria.orOperator(orCriteria);
+        }
         return getTemplate().count(this.query, clazz);
     }
 
@@ -195,6 +334,9 @@ public class QueryBuilder extends MongoDbBuilder {
      * @date : 2022/2/8 9:00
      */
     public <T> Page<T> findPage(Class<T> clazz) {
+        if (!orCriteria.isEmpty()) {
+            criteria.orOperator(orCriteria);
+        }
         return new PageImpl<>(find(clazz), pageable, count(clazz));
     }
 

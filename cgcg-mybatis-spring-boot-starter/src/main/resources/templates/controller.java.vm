@@ -1,0 +1,63 @@
+package ${package.Controller};
+
+import javax.annotation.Resource;
+import java.io.Serializable;
+import java.util.Arrays;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.web.bind.annotation.*;
+
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.cgcg.base.SimplePageInfo;
+import ${package.Entity}.${entity};
+import ${package.Service}.${entity}Service;
+
+/**
+ * $!{table.comment} 前端控制器
+ *
+ * @author ${author}
+ * @date ${cfg.datetime}
+ */
+@Api(value = "$!{table.comment}控制器", tags = "$!{table.comment}控制器")
+@RestController
+@RequestMapping("/${table.entityPath}s")
+public class ${entity}Controller {
+
+    @Resource
+    private ${entity}Service ${table.entityPath}Service;
+
+    @ApiOperation("根据主键id查询$!{table.comment}数据")
+    @GetMapping("/{id}")
+    public ${entity} getOne(@PathVariable Serializable id) {
+        return this.${table.entityPath}Service.getById(id);
+    }
+
+    @ApiOperation("分页查询$!{table.comment}数据")
+    @GetMapping
+    public Page<${entity}> page(@RequestParam(required = false) String keyword, SimplePageInfo simplePageInfo) {
+        Page<${entity}> page = new Page<>(simplePageInfo.getPageNum(), simplePageInfo.getPageSize());
+        return this.${table.entityPath}Service.findPage(page, keyword);
+    }
+
+    @ApiOperation("新增$!{table.comment}数据")
+    @PostMapping
+    public ${entity} save(${entity} ${table.entityPath}) {
+        this.${table.entityPath}Service.save(${table.entityPath});
+        return ${table.entityPath};
+    }
+
+    @ApiOperation("根据主键id修改$!{table.comment}数据")
+    @PutMapping
+    public ${entity} modify(${entity} ${table.entityPath}) {
+        this.${table.entityPath}Service.updateById(${table.entityPath});
+        return ${table.entityPath};
+    }
+
+    @ApiOperation("根据主键ids批量删除$!{table.comment}数据")
+    @DeleteMapping
+    public int batchDelete(String... ids) {
+        this.${table.entityPath}Service.removeByIds(Arrays.asList(ids));
+        return 1;
+    }
+}

@@ -1,6 +1,10 @@
 package com.cgcg.base.swagger;
 
-import com.cgcg.context.SpringContextHolder;
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import io.swagger.annotations.Api;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Bean;
@@ -14,10 +18,7 @@ import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import com.cgcg.context.SpringContextHolder;
 
 /**
  * swagger配置
@@ -76,9 +77,12 @@ public class SwaggerConfig {
                 new AuthorizationScope("global", "accessEverything")
         };
         final List<String> headers = this.properties.getHeaders();
-        return headers.stream()
-                .map(h -> new SecurityReference(h, authorizationScopes))
-                .collect(Collectors.toList());
+        if (headers != null) {
+            return headers.stream()
+                    .map(h -> new SecurityReference(h, authorizationScopes))
+                    .collect(Collectors.toList());
+        }
+        return new ArrayList<>();
     }
 
 

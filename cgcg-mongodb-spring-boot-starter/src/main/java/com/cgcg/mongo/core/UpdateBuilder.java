@@ -1,4 +1,4 @@
-package com.cgcg.mongo;
+package com.cgcg.mongo.core;
 
 import com.alibaba.fastjson.JSON;
 import com.mongodb.client.result.UpdateResult;

@@ -2,11 +2,12 @@ package com.cgcg.mongo.file;
 
 import com.cgcg.context.SpringContextHolder;
 import com.cgcg.context.util.Md5Utils;
-import com.cgcg.mongo.MongoDbBuilder;
-import com.cgcg.mongo.QueryBuilder;
-import com.cgcg.mongo.UpdateBuilder;
+import com.cgcg.mongo.core.MongoDbBuilder;
+import com.cgcg.mongo.core.QueryBuilder;
+import com.cgcg.mongo.core.UpdateBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.Binary;
+import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -125,6 +126,7 @@ public class FileBuilder extends MongoDbBuilder {
      * @date : 2022/2/7 16:58
      */
     public FileGridFsInfo upload() {
+        GridFsTemplate gridFsTemplate = SpringContextHolder.getBean(GridFsTemplate.class);
         if (fileGridFsInfo == null) {
             fileGridFsInfo = new FileGridFsInfo();
         }

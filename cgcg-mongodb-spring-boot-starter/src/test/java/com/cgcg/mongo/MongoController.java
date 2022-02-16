@@ -1,5 +1,7 @@
 package com.cgcg.mongo;
 
+import com.cgcg.mongo.core.QueryBuilder;
+import com.cgcg.mongo.core.UpdateBuilder;
 import com.cgcg.mongo.document.MongoTestObj;
 import org.apache.commons.lang3.RandomUtils;
 import org.springframework.data.domain.Page;

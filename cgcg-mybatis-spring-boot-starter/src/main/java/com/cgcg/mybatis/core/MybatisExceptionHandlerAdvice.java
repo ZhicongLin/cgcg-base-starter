@@ -1,8 +1,11 @@
-package com.cgcg.redis.mybatis;
+package com.cgcg.mybatis.core;
 
-import com.cgcg.base.format.Result;
-import com.cgcg.base.language.Translator;
-import com.mysql.cj.jdbc.exceptions.MysqlDataTruncation;
+import java.sql.SQLSyntaxErrorException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -12,11 +15,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import java.sql.SQLSyntaxErrorException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.cgcg.base.format.Result;
+import com.cgcg.base.language.Translator;
+import com.mysql.cj.jdbc.exceptions.MysqlDataTruncation;
 
 /**
  * Description : 使用Advice方式处理异常

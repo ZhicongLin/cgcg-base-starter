@@ -1,4 +1,4 @@
-package com.cgcg.mongo;
+package com.cgcg.mongo.core;
 
 import com.cgcg.context.SpringContextHolder;
 import org.springframework.data.mongodb.core.MongoTemplate;

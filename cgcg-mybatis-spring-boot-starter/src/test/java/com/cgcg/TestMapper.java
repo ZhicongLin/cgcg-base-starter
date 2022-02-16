@@ -2,7 +2,7 @@ package com.cgcg;
 
 import com.cgcg.service.User;
 import org.apache.ibatis.annotations.*;
-import com.cgcg.redis.mybatis.RedisCacheManager;
+import com.cgcg.mybatis.redis.RedisCacheManager;
 
 import java.util.List;
 import java.util.Map;
