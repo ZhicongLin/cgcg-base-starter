@@ -36,7 +36,7 @@ public class ${entity}Controller {
     @ApiOperation("分页查询$!{table.comment}数据")
     @GetMapping
     public Page<${entity}> page(@RequestParam(required = false) String keyword, SimplePageInfo simplePageInfo) {
-        Page<${entity}> page = new Page<>(simplePageInfo.getPageNum(), simplePageInfo.getPageSize());
+        final Page<${entity}> page = new Page<>(simplePageInfo.getPageNum(), simplePageInfo.getPageSize());
         return this.${table.entityPath}Service.findPage(page, keyword);
     }
 

@@ -44,7 +44,10 @@ public class ${table.serviceImplName} extends BaseServiceImpl<${table.mapperName
                 #else
                         #set($getprefix="get")
                 #end
+                #if(${field.keyFlag})
+                #else
                 .or().like(${entity}::${getprefix}${field.capitalName}, keyword)
+                #end
         #end
         ).orderByDesc(${entity}::getId);
         return this.page(page, wrapper);

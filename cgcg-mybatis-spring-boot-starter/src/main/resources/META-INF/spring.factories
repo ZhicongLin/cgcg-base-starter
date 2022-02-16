@@ -1,2 +1,3 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-    com.cgcg.mybatis.core.MybatisExceptionHandlerAdvice
+    com.cgcg.mybatis.core.MybatisExceptionHandlerAdvice,\
+    com.cgcg.mybatis.core.MyBatisConfiguration

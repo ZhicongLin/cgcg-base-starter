@@ -8,12 +8,13 @@ import lombok.experimental.Accessors;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.generator.AutoGenerator;
 import com.baomidou.mybatisplus.generator.InjectionConfig;
-import com.baomidou.mybatisplus.generator.config.*;
+import com.baomidou.mybatisplus.generator.config.DataSourceConfig;
+import com.baomidou.mybatisplus.generator.config.GlobalConfig;
+import com.baomidou.mybatisplus.generator.config.PackageConfig;
+import com.baomidou.mybatisplus.generator.config.StrategyConfig;
 import com.baomidou.mybatisplus.generator.config.po.TableFill;
-import com.baomidou.mybatisplus.generator.config.po.TableInfo;
 import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
 import com.cgcg.mybatis.plus.BaseEntity;
 import com.cgcg.mybatis.plus.IMapper;
@@ -83,10 +84,11 @@ public class MysqlGenerator {
         mpg.setDataSource(dsc);
         // 包配置
         PackageConfig pc = new PackageConfig();
-        pc.setParent("com.chux.pest");
+        pc.setParent(properties.getRootPkg());
         pc.setEntity("domain.entity");
         pc.setService("domain.service");
         pc.setServiceImpl("infrastructure.service");
+        pc.setXml("infrastructure.mapper");
         pc.setMapper("domain.mapper");
         pc.setController("application");
         mpg.setPackageInfo(pc);
@@ -108,7 +110,7 @@ public class MysqlGenerator {
                 map.put("datetime", new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date()));
             }
         };
-        // 如果模板引擎是 velocity
+        /*// 如果模板引擎是 velocity
         String templatePath = "/templates/mapper.xml.vm";
         // 自定义输出配置
         List<FileOutConfig> focList = new ArrayList<>();
@@ -119,7 +121,7 @@ public class MysqlGenerator {
                 return projectPath + properties.getGenerationType().getDir() + "\\main\\resources\\mapper\\" + tableInfo.getMapperName() + StringPool.DOT_XML;
             }
         });
-        cfg.setFileOutConfigList(focList);
+        cfg.setFileOutConfigList(focList);*/
         return cfg;
     }
 
@@ -142,8 +144,9 @@ public class MysqlGenerator {
         strategy.setEntityLombokModel(true);
         // 设置逻辑删除键
         strategy.setLogicDeleteFieldName(properties.getLogicDelete());
-        // 自增id
-        strategy.setInclude(table);
+        if (table != null && table.length > 0) {
+            strategy.setInclude(table);
+        }
         // uuid
         strategy.setTableFillList(tableFillList);
         strategy.setSuperEntityClass(BaseEntity.class);

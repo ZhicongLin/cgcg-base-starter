@@ -16,6 +16,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 @Getter
 @Accessors(chain = true)
 public class MybatisGenerationProperties {
+    private String rootPkg;
     private String author = "zhicong.lin";
     private String[] tablePrefix;
     private IdType idType = IdType.AUTO;
