@@ -3,11 +3,14 @@ package ${package.Controller};
 import javax.annotation.Resource;
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.List;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cgcg.base.SimplePageInfo;
 import ${package.Entity}.${entity};
@@ -35,9 +38,10 @@ public class ${entity}Controller {
 
     @ApiOperation("分页查询$!{table.comment}数据")
     @GetMapping
-    public Page<${entity}> page(@RequestParam(required = false) String keyword, SimplePageInfo simplePageInfo) {
-        final Page<${entity}> page = new Page<>(simplePageInfo.getPageNum(), simplePageInfo.getPageSize());
-        return this.${table.entityPath}Service.findPage(page, keyword);
+    public PageInfo<${entity}> page(@RequestParam(required = false) String keyword, SimplePageInfo simplePageInfo) {
+        PageHelper.startPage(simplePageInfo.getPageNum(), simplePageInfo.getPageSize());
+        final List<${entity}> list = this.${table.entityPath}Service.findByKeyword(keyword);
+        return PageInfo.of(list);
     }
 
     @ApiOperation("新增$!{table.comment}数据")

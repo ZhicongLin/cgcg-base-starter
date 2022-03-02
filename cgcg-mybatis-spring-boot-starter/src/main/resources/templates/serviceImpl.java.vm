@@ -3,9 +3,10 @@ package ${package.ServiceImpl};
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import java.util.List;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cgcg.mybatis.plus.BaseServiceImpl;
 import ${package.Entity}.${entity};
 import ${package.Mapper}.${table.mapperName};
@@ -25,19 +26,18 @@ open class ${table.serviceImplName} : ${superServiceImplClass}<${table.mapperNam
 #else
 public class ${table.serviceImplName} extends BaseServiceImpl<${table.mapperName}, ${entity}> implements ${table.serviceName} {
 
-    /**
-     * 查询$!{table.comment}分页数据
-     *
-     * @param page 分页参数
-     * @param keyword 关键字
-     * @return Page<${entity}>
-     * @author zhicong.lin
-     * @date ${cfg.datetime}
-     */
-    @Override
-    public Page<${entity}> findPage(Page<${entity}> page, String keyword) {
-        QueryWrapper<${entity}> wrapper = Wrappers.query();
-        wrapper.lambda().and(StringUtils.isNotBlank(keyword), w -> w
+        /**
+         * 查询$!{table.comment}分页数据
+         *
+         * @param keyword 关键字
+         * @return Page<${entity}>
+         * @author zhicong.lin
+         * @date ${cfg.datetime}
+         */
+        @Override
+        public List<${entity}>findByKeyword(String keyword){
+        LambdaQueryWrapper<${entity}>wrapper=Wrappers.lambdaQuery(${entity}.class)
+        .and(StringUtils.isNotBlank(keyword),w->w
         #foreach($field in ${table.fields})
                 #if(${field.propertyType.equals("boolean")})
                         #set($getprefix="is")
@@ -46,12 +46,12 @@ public class ${table.serviceImplName} extends BaseServiceImpl<${table.mapperName
                 #end
                 #if(${field.keyFlag})
                 #else
-                .or().like(${entity}::${getprefix}${field.capitalName}, keyword)
+                        .or().like(${entity}::${getprefix}${field.capitalName},keyword)
                 #end
         #end
         ).orderByDesc(${entity}::getId);
-        return this.page(page, wrapper);
-    }
-}
+        return this.list(wrapper);
+        }
+        }
 #end
 

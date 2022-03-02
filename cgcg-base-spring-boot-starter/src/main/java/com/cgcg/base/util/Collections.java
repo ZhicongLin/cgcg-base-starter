@@ -1,6 +1,7 @@
 package com.cgcg.base.util;
 
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,8 +15,9 @@ import java.util.Map;
  * @author zhicong.lin
  * @since 2022/2/22 17:49
  */
+@Accessors(chain = true)
 @NoArgsConstructor
-public final class Collections extends java.util.Collections {
+public final class Collections {
 
     /**
      * 创建一个ArrayList

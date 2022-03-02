@@ -1,19 +1,18 @@
 package com.cgcg.mybatis.plus;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
-
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.fasterxml.jackson.annotation.JsonFormat;
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 基础的实体类
@@ -40,7 +39,7 @@ public class BaseEntity implements Serializable {
     @ApiModelProperty(hidden = true)
     @JsonFormat(pattern = PATTERN)
     @DateTimeFormat(pattern = PATTERN)
-    private LocalDateTime createTime;
+    private Date createTime;
 
     @TableField(fill = FieldFill.INSERT_UPDATE)
     @ApiModelProperty(hidden = true)
@@ -50,5 +49,5 @@ public class BaseEntity implements Serializable {
     @ApiModelProperty(hidden = true)
     @JsonFormat(pattern = PATTERN)
     @DateTimeFormat(pattern = PATTERN)
-    private LocalDateTime updateTime;
+    private Date updateTime;
 }

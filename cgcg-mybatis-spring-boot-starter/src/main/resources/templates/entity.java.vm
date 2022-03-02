@@ -1,5 +1,9 @@
 package ${package.Entity};
 
+import java.math.BigDecimal;
+import java.util.Date;
+import java.time.LocalDate;
+
 #if(${swagger2})
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

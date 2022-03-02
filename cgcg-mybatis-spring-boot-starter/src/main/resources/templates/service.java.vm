@@ -1,6 +1,7 @@
 package ${package.Service};
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.util.List;
+
 import com.cgcg.mybatis.plus.IService;
 import ${package.Entity}.${entity};
 
@@ -15,16 +16,15 @@ interface ${table.serviceName} : ${superServiceClass}<${entity}>
 #else
 public interface ${table.serviceName} extends ${superServiceClass}<${entity}> {
 
-    /**
-     * 查询$!{table.comment}分页数据
-     *
-     * @param page 分页参数
-     * @param keyword  关键字
-     * @return Page<User>
-     * @author zhicong.lin
-     * @date ${cfg.datetime}
-     */
-    Page<${entity}> findPage(Page<${entity}> page, String keyword);
-}
+        /**
+         * 查询$!{table.comment}分页数据
+         *
+         * @param keyword 关键字
+         * @return List<User>
+         * @author zhicong.lin
+         * @date ${cfg.datetime}
+         */
+        List<${entity}> findByKeyword(String keyword);
+        }
 #end
 

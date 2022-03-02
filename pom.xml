@@ -14,7 +14,6 @@
         <module>cgcg-redis-spring-boot-starter</module>
         <module>cgcg-http-spring-boot-starter</module>
         <module>cgcg-context-spring-boot-starter</module>
-        <module>cgcg-jobs-spring-boot-starter</module>
         <module>cgcg-mongodb-spring-boot-starter</module>
         <module>cgcg-base-parent</module>
     </modules>
